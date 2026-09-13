@@ -6,6 +6,7 @@ window.SJI_SAVE = (function () {
   const KEY = "shiji_madao_v1";
   const DEF = {
     progress: {},          // stageId -> true
+    unlocked: { dage: true },  // 已立传（可操作）角色
     charWins: {},          // charId -> 胜场数（角色挑战成就）
     ach: {},               // achId -> true
     bestSurvival: 0,
@@ -57,6 +58,32 @@ window.SJI_SAVE = (function () {
     setBestSurvival(n) { if (n > data.bestSurvival) { data.bestSurvival = n; persist(); return true; } return false; },
     setSetting(k, v) { data.settings[k] = v; persist(); },
     markPrologue() { data.prologueSeen = true; persist(); },
+
+    /* ---- 角色解锁：击败谁就为谁立传 ---- */
+    isUnlocked(cid) {
+      if (data.settings.ngPlus) return true;          // 二周目全解锁
+      if (!data.unlocked) data.unlocked = { dage: true };
+      return !!data.unlocked[cid];
+    },
+    unlockChars(list) {
+      if (!data.unlocked) data.unlocked = { dage: true };
+      let fresh = [];
+      for (const cid of list || []) {
+        if (!data.unlocked[cid]) { data.unlocked[cid] = true; fresh.push(cid); }
+      }
+      if (fresh.length) persist();
+      return fresh;
+    },
+    /* 旧存档迁移：按已通关关卡补算解锁（不含初始角色之外的无主角色） */
+    migrateUnlocks() {
+      if (data.unlocked) return;
+      data.unlocked = { dage: true };
+      const D = window.SJI_DATA;
+      for (const st of D.STAGES) {
+        if (data.progress[st.id] && st.unlocks) for (const cid of st.unlocks) data.unlocked[cid] = true;
+      }
+      persist();
+    },
 
     /* ---- 成就：本场解锁记录（供结算页展示） ---- */
     beginAchLog() { achLog = []; },

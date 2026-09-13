@@ -143,6 +143,30 @@ with sync_playwright() as p:
     assert undone == before, f"撤销未还原 {undone} vs {before}"
     log(f"[6] 撤销移动：回到 {undone[:2]}，行动点退还为 {undone[2]} — OK")
 
+    # ---- 一屏化布局断言（1280x800 与 1024x700 均不需滚动） ----
+    for vw, vh in ((1280, 800), (1024, 700)):
+        pg.set_viewport_size({"width": vw, "height": vh})
+        pg.wait_for_timeout(350)
+        m = pg.evaluate("""(() => {
+          const se = document.scrollingElement;
+          return JSON.stringify({ needs: se.scrollHeight > window.innerHeight + 2,
+            canvasH: document.querySelector('#battle-canvas').getBoundingClientRect().height | 0 });
+        })()""")
+        d = json.loads(m)
+        if d["needs"]:
+            m = pg.evaluate("""(() => {
+              const h = id => { const e = document.querySelector(id); return e ? Math.round(e.getBoundingClientRect().height) : -1; };
+              return JSON.stringify({ scrollH: document.scrollingElement.scrollHeight, innerH: window.innerHeight,
+                topbar: h('#screen-battle .topbar'), wrap: h('#battle-wrap'), left: h('#battle-left'),
+                canvas: h('#battle-canvas'), pcard: h('#player-card'), actbar: h('.actbar'),
+                right: h('#battle-right'), app: h('#app') });
+            })()""")
+            print("   [布局明细] " + m, flush=True)
+        assert not d["needs"], f"{vw}x{vh} 战斗界面仍需滚动"
+        log(f"[6.5] 一屏化 {vw}x{vh}：无需滚动，画布高 {d['canvasH']}px — OK")
+    pg.set_viewport_size({"width": 1280, "height": 900})
+    pg.screenshot(path="D:/code/shiji-madao/testshots/17-noscroll-battle.png")
+
     # ---- 点敌军看图鉴 ----
     # 先确保处于玩家阶段且无弹层（否则点击会被遮罩拦下）
     pg.wait_for_function("() => window.SJI.battle._playerPhaseActive===true", timeout=15000)

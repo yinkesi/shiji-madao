@@ -93,7 +93,7 @@ with sync_playwright() as p:
     page.click("#btn-story")
     page.wait_for_selector("#screen-story.on")
     locked = page.evaluate("[...document.querySelectorAll('.stage-card.locked')].length")
-    log(f"[2] 剧情列表 16 关, 锁定 {locked}（应15）")
+    log(f"[2] 剧情列表 25 关, 锁定 {locked}（应24）")
     page.click(".stage-card:not(.locked)")
     page.wait_for_selector("#modal-mask.on")
     page.screenshot(path=SHOT + "/03-stage-intro.png")
@@ -163,8 +163,8 @@ with sync_playwright() as p:
     page.click("#btn-story")
     page.wait_for_selector("#screen-story.on")
     locked2 = page.evaluate("[...document.querySelectorAll('.stage-card.locked')].length")
-    log(f"[8] 刷新后锁定 {locked2}（应14）→ 存档持久化 OK")
-    assert locked2 == 14
+    log(f"[8] 刷新后锁定 {locked2}（应23）→ 存档持久化 OK")
+    assert locked2 == 23
 
     # ===== 图鉴 =====
     page.evaluate("window.SJI_UI.showScreen('title')")

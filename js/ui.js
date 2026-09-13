@@ -57,6 +57,44 @@ window.SJI_UI = (function () {
     return '<span class="tokenface ' + (extraCls || "") + '" style="background:' + ch.color + '">' + ch.glyph + "</span>";
   }
 
+  /* ---------------- 双人同屏对战：两步点将 ---------------- */
+  function openVersusSelect() {
+    const picks = { p1: null, p2: null };
+    const roster = D.PLAYABLE.filter(id => SAVE.isUnlocked(id));
+    const labels = { p1: "一号位点将", p2: "二号位点将" };
+
+    function step(who, next) {
+      showScreen("versus");
+      $("#versus-title").textContent = labels[who];
+      const grid = $("#versus-grid");
+      grid.innerHTML = "";
+      roster.forEach(id => {
+        const ch = D.CHARACTERS[id];
+        const card = document.createElement("div");
+        card.className = "char-card";
+        card.innerHTML = face(ch) + '<div><div class="nm">' + ch.name + '</div><div class="hao">' + ch.hao + "</div></div>";
+        card.onclick = () => {
+          AU.select();
+          picks[who] = id;
+          $$("#versus-grid .char-card").forEach(c => c.classList.remove("sel"));
+          card.classList.add("sel");
+        };
+        grid.appendChild(card);
+      });
+      $("#versus-go").onclick = () => {
+        if (!picks[who]) { toast("先点选角色"); return; }
+        AU.click();
+        if (who === "p1") step("p2", next);
+        else next();
+      };
+    }
+
+    step("p1", () => {
+      startBattle({ mode: "versus", playerChar: picks.p1, p2Char: picks.p2 });
+      showScreen("battle");
+    });
+  }
+
   /* ---------------- 花瓣 ---------------- */
   function spawnPetals(container, n, colors) {
     if (!container) return;
@@ -87,6 +125,11 @@ window.SJI_UI = (function () {
         if (!b) { toast("上局已无法恢复"); SAVE.clearBattle(); initTitle(); return; }
         resumeBattle(b);
       };
+    }
+    const vb = $("#btn-versus");
+    if (vb) {
+      vb.style.display = "block";
+      vb.onclick = () => { AU.unlock(); AU.click(); openVersusSelect(); };
     }
     const ng = $("#btn-ngplus");
     if (ng) {
@@ -220,7 +263,7 @@ window.SJI_UI = (function () {
     const pgrid = $("#free-pgrid"), egrid = $("#free-egrid");
     pgrid.innerHTML = ""; egrid.innerHTML = "";
     freeSel = { player: null, enemies: [], diff: "normal" };
-    D.PLAYABLE.forEach(id => {
+    D.PLAYABLE.filter(id => SAVE.isUnlocked(id)).forEach(id => {
       const ch = D.CHARACTERS[id];
       const card = document.createElement("div");
       card.className = "char-card";
@@ -438,10 +481,12 @@ window.SJI_UI = (function () {
   function phaseLocked() { return !battle || battle.over || battle._playerPhaseActive !== true; }
 
   /* 玩家阶段（引擎调用） */
-  async function playerPhase(b) {
+  async function playerPhase(b, unit) {
     battle = b;
+    const u = unit || b.player;
+    if (u && u !== b.player && (b.mode === "versus")) b.player = u;
     b._playerPhaseActive = true;
-    await showBanner("汝之回合", 700);
+    await showBanner(b.mode === "versus" ? (u.side === "p2" ? "二号位回合" : "一号位回合") : "汝之回合", 700);
     if (checkAutoEnd()) { b._playerPhaseActive = false; return; }
     updateAll();
     await new Promise(resolve => { b._phaseResolve = resolve; });
@@ -562,6 +607,47 @@ window.SJI_UI = (function () {
         setTimeout(() => { const b2 = $$("#modal-box .rps-btn")[Math.floor(Math.random() * 3)]; if (b2 && !b2.disabled) b2.click(); }, 30);
       }
     }));
+  }
+
+  /* ---------------- 双人猜拳（各自暗拳，同时亮出） ---------------- */
+  async function rpsDuel(b, who) {
+    battle = b;
+    const label = who === "p1" ? "一号位" : "二号位";
+    if (SAVE.settings.rpsMode === "auto") {
+      const k = Math.random();
+      const resK = k < 0.4 ? "胜" : (k < 0.75 ? "和" : "负");
+      const ap = resK === "胜" ? 4 : (resK === "和" ? 3 : 2);
+      b.pushLog("—— " + label + "自动猜拳：" + resK + "，得" + ap + "动。——");
+      return { ap };
+    }
+    return new Promise(resolve => {
+      modal(
+        '<div class="rps-title">' + label + ' 出拳</div>' +
+        '<div class="rps-sub">另一侧请勿偷看</div>' +
+        '<div class="rps-btns">' + RPS.map((r, i) => '<button class="rps-btn" data-i="' + i + '"><span class="g">' + r.g + "</span>" + r.n + "</button>").join("") + "</div>" +
+        '<div class="rps-vs" id="rps-vs">　</div>'
+      );
+      $$("#modal-box .rps-btn").forEach(btn => {
+        btn.onclick = async () => {
+          const mine = RPS[+btn.dataset.i];
+          const foe = RPS[Math.floor(Math.random() * 3)];
+          $$("#modal-box .rps-btn").forEach(x => x.disabled = true);
+          for (let i = 0; i < 5; i++) {
+            vs_text = mine.g + "　对　" + RPS[i % 3].g;
+            $("#rps-vs").textContent = vs_text;
+            AU.click();
+            await new Promise(r => setTimeout(r, window.SJI_DEBUG && window.SJI_DEBUG.fast ? 40 : 90));
+          }
+          $("#rps-vs").textContent = mine.g + "　对　" + foe.g;
+          let resK, ap;
+          if (mine.k === foe.k) { resK = "和"; ap = 3; AU.rpsDraw(); }
+          else if ((mine.k === "rock" && foe.k === "scissors") || (mine.k === "scissors" && foe.k === "paper") || (mine.k === "paper" && foe.k === "rock")) { resK = "胜"; ap = 4; AU.rpsWin(); }
+          else { resK = "负"; ap = 2; AU.rpsLose(); }
+          $("#rps-vs").textContent = label + "：" + resK + "，得" + ap + "动";
+          setTimeout(() => { closeModal(); resolve({ ap }); }, window.SJI_DEBUG && window.SJI_DEBUG.fast ? 30 : 850);
+        };
+      });
+    });
   }
 
   /* ---------------- 增益三选一 ---------------- */
@@ -925,8 +1011,14 @@ window.SJI_UI = (function () {
       ctx.fillStyle = u.flash > 0 && Math.sin(u.flash * 50) > 0 ? "#ffffff" : u.ch.color;
       ctx.fill();
       ctx.lineWidth = u.side === "player" ? 4.5 : 3;
-      ctx.strokeStyle = u.side === "player" ? "#d8a11f" : (u.side === "ally" ? "#3a7d46" : "#6e2318");
+      ctx.strokeStyle = u.side === "player" ? "#d8a11f" : (u.side === "p2" ? "#8a5cd6" : (u.side === "ally" ? "#3a7d46" : "#6e2318"));
       ctx.stroke();
+      if (battle.mode === "versus") {
+        ctx.font = "bold 12px KaiTi, serif";
+        ctx.fillStyle = u.side === "player" ? "#ffd98a" : "#d8c8ff";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(u.side === "player" ? "壹" : "贰", px, py - 40);
+      }
       if (u.st.bloodlust > 0) {
         ctx.strokeStyle = "rgba(255,90,90," + (0.35 + 0.3 * Math.sin(performance.now() / 140)) + ")";
         ctx.lineWidth = 3;
@@ -1286,6 +1378,13 @@ window.SJI_UI = (function () {
       extra = '<p class="stat-inline">此行抵达第 ' + reached + " 波" + (isNew ? " · 新纪录！" : " · 最远第 " + SAVE.data.bestSurvival + " 波") + "</p>";
     }
     SAVE.beginAchLog();
+    if (win && b.cfg.stage && b.cfg.stage.unlocks) {
+      const fresh = SAVE.unlockChars(b.cfg.stage.unlocks);
+      for (const cid of fresh) {
+        const c = D.CHARACTERS[cid];
+        toast("新角色立传：「" + c.name + "」（" + c.hao + "）已可调用");
+      }
+    }
     if (win) {
       SAVE.unlockAch("a_first");
       SAVE.bump("wins");
@@ -1421,6 +1520,7 @@ window.SJI_UI = (function () {
 
   /* ---------------- 启动 ---------------- */
   function boot() {
+    SAVE.migrateUnlocks();
     const back = (id, fn) => { $(id).onclick = () => { AU.click(); fn(); }; };
     back("#story-back", () => { initTitle(); showScreen("title"); });
     back("#free-back", () => { initTitle(); showScreen("title"); });
@@ -1444,6 +1544,7 @@ window.SJI_UI = (function () {
     boot, toast, showScreen, onLog, onState: updateAll,
     rpsRound, playerPhase, pickBoon, onBattleEnd,
     fxFloat, fxHit, fxStatus, snap, fxAttack, fxDeath, fxVignette,
+    rpsDuel,
     banner: showBanner,
     get battle() { return battle; },
     set battleRef(b) { battle = b; }

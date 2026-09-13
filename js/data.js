@@ -255,7 +255,7 @@ window.SJI_DATA = (function () {
         desc: "距二内一敌受2伤。（六班数学之首也，无多事）" },
       quote: "万震者，六班数学之首也，潜心至学，无多事。",
       bio: "TGO成员。wonder每有新题辄曰：wonder震，来不来。后入哈尔滨工业大学。",
-      playable: false, aggr: 0.5
+      playable: true, aggr: 0.5
     },
     keai: {
       id: "keai", name: "可怡", hao: "大展之怡", juan: "卷六", glyph: "怡",
@@ -344,7 +344,9 @@ window.SJI_DATA = (function () {
     }
   };
 
-  const PLAYABLE = ["dage","shenren","xiannv","touge","lifan","wonder","wenbin","yurun","luhao","xiaochuan","guyin","zichen","shaoming","xinhui","guayu","yiran","dazhan"];
+  /* 初始可用：第一卷从大哥写起（见原书《序》）。其余角色随剧情"立传"解锁。 */
+  const STARTERS = ["dage"];
+  const PLAYABLE = ["dage","shenren","xiannv","touge","lifan","wonder","wenbin","yurun","luhao","xiaochuan","guyin","zichen","shaoming","xinhui","guayu","yiran","dazhan","wanzhen"];
 
   /* ---------------- 剧情关卡（十五卷 + 序章） ---------------- */
   const STAGES = [
@@ -352,7 +354,7 @@ window.SJI_DATA = (function () {
       id: "s0", juan: "序章", title: "马刀书",
       intro: "wonder引马刀于TGO，于体育课玩，于是马刀得散。规则至简，而引人入胜。世界马刀协会既立，奉wonder为马刀之神。今汝初执马刀，对手乃潜心至学之万震——无多事，善。",
       tip: "猜拳胜得四动，和得三动，负得二动。行动可：买刀、买马、移动、刀击、马踢、血祭、用技。同城（城墙）上马踢，扣三血并踢下城。",
-      enemies: ["wanzhen"], allies: [], rule: null,
+      enemies: ["wanzhen"], allies: [], rule: null, unlocks: ["wanzhen"],
       outro: "万震败，曰：善。",
       yueks: "音克思曰：马刀之所以引人入胜，在于马刀之人也。既毕业，无复有刀者，悲哉！今以刀会友，善。"
     },
@@ -360,10 +362,19 @@ window.SJI_DATA = (function () {
       id: "s1", juan: "卷一", title: "三异能者列传",
       intro: "实验有三异能者，谓之大哥、神人、仙女。与人不善，神情固执，边幅不修，然为师所善，得'卫生标兵''正能量之星'之誉。今三子轮番上阵：先大哥，次神人，终仙女——切记各别其能。",
       tip: "三阵连战，阵间回复四血。大哥立于城墙则伤害+1，诱其下城；神人体味蚀人，勿恋近身；仙女免疫晕眩，其声不可惑。",
-      enemies: ["dage", "shenren", "xiannv"], waves: [["dage"], ["shenren"], ["xiannv"]], allies: [], rule: null,
+      enemies: ["dage", "shenren", "xiannv"], waves: [["dage"], ["shenren"], ["xiannv"]], allies: [], rule: null, unlocks: ["shenren", "xiannv"],
       outro: "后哥以综评入香港中文大学，神入北京电子科技大学——马刀场上，亦复如是。",
       yueks: "音克思曰：向使大哥不贪女色，神重于仪表，仙以礼待人，何至于为人所恶也？然马刀场上，异能者自有异能之用。"
     },
+    {
+      id: "s1b", juan: "卷一·其二", title: "宿舍风波",
+      intro: "熄灯之后，宿舍才是真正的马刀场。神人欲开风扇，鲁豪以身翼蔽开关；仙女于教室后诵书，声震走廊。今夜，两声源合流——汝当寝管。",
+      tip: "神人与仙女相邻时互相壮胆（伤害+1），先分其阵。",
+      enemies: ["shenren", "xiannv"], allies: [], rule: { id: "dyad", desc: "敌人相邻时刀击与马踢伤害+1（二声部合唱）" },
+      outro: "翌日，舍友七人联名上书。含笑曰：宿舍者，必里外为一而后可。",
+      yueks: "音克思曰：一风扇之争，可见固执之弊；然其勤诵晨读，亦可敬也。"
+    },
+
     {
       id: "s2", juan: "卷二", title: "含笑本纪",
       intro: "含笑者，孙含笑也，予称之为'上'。上查寝，见汝未当床；上诘之，汝狡辨曰：吾在通济。上怒曰：尔在何处？实验高中耳！——今上亲至马刀场，'遣返回家'之罚，汝且试之。",
@@ -376,32 +387,60 @@ window.SJI_DATA = (function () {
       id: "s3", juan: "卷三", title: "绍歆列传",
       intro: "绍铭仪表堂堂，歆慧貌美晔丽。初，鲁豪感绍铭曰：急击勿失。于是绍歆自此游。二人比邻，则情比金坚，伤害+1——欲破其阵，先分其人。歆慧一声'滚'，能退汝两格。汝之友军，正是媒人鲁豪。",
       tip: "二人相邻时各伤害+1，勿让其聚首。鲁豪会为你顶刀，但别指望他输出。",
-      enemies: ["shaoming", "xinhui"], allies: ["luhao"], rule: { id: "dyad", desc: "敌人相邻时伤害+1（情比金坚）" },
+      enemies: ["shaoming", "xinhui"], allies: ["luhao"], rule: { id: "dyad", desc: "敌人相邻时伤害+1（情比金坚）" }, unlocks: ["shaoming", "xinhui"],
       outro: "铭沉默良久，长叹曰：怎能不悔也！慧既黑铭，曰：吾觉未有之爽也。",
       yueks: "音克思曰：吾闻之大展曰：恋爱多出于地理近。绍歆岂不类乎？欲以己之一厢情愿而恋爱，卒亡其慧，尚不觉寐而不自省，过矣。"
     },
     {
+      id: "s3b", juan: "卷三·其二", title: "运动会",
+      intro: "秋季运动会。绍铭存歆慧手链于袖，观其入场。今日之绍铭，不怒自威——他刚在级部榜上名列前茅。",
+      tip: "此时的绍铭已被加强：血11、纸条3伤。勿令其半血以下，被动『不怒自威』会加伤。",
+      enemies: ["shaoming"], allies: [], rule: null, hpScale: 1.15,
+      outro: "运动会既散，绍铭窃置手链于歆慧口袋。歆慧归家乃视之，以QQ问曰：手链？二人遂和好如初。",
+      yueks: "音克思曰：一链定情，一纸绝交。少年之心，秋天的运动会。"
+    },
+
+    {
       id: "s4", juan: "卷四", title: "六班老师传",
       intro: "张世波者，大师也，仙风道骨，鹤发童颜，每回合吸东来之紫气自愈；杨为荣者，物理老师也，黑棒不盈尺而威力无双，刀击+1。二师授课于马刀场。汝非孤军——汶斌在侧：下课铃响，故走往饭，此自然之理也！",
       tip: "大师会回血，集火先斩之。为荣黑棒刀刀入肉（刀击+1），勿与之纠缠。",
-      enemies: ["shibo", "weirong"], allies: ["wenbin"], rule: null,
+      enemies: ["shibo", "weirong"], allies: ["wenbin"], rule: null, unlocks: ["wenbin"],
       blocked: [[2, 2], [2, 4], [4, 2], [4, 4]],   // 六班教室的课桌
       outro: "为荣见绍铭班倒一，以戒尺笃之，而阴谓课代表曰：绍铭今班倒一，此恋爱乎？",
       yueks: "音克思曰：凡六班之老师，无不爱岗敬业，知识渊博，此六班强盛之基也。"
     },
     {
+      id: "s4b", juan: "卷四·其二", title: "物理晚自习",
+      intro: "晚自习，为荣执黑棒巡行于课桌之间。教室里桌椅纵横，正是伏击之地。钦法于门外观望。",
+      tip: "课桌不可通行，可借以卡位。为荣的黑棒刀击+1，勿与其贴身。",
+      enemies: ["weirong", "mob"], allies: [], rule: null,
+      blocked: [[2, 2], [2, 4], [4, 2], [4, 4]],
+      outro: "子琛谓之破伤风棒：苟有得痔疮者离击，或已死。为荣闻之，不怒，反以此为荣。",
+      yueks: "音克思曰：为荣之物理，广大而精微，妙趣横生，生皆拥之。"
+    },
+
+    {
       id: "s5", juan: "卷五", title: "TGO列传",
       intro: "TGO者，tiganorganization也，数学题感无双。今逐一领教：先会教主汶斌——秒解题，弹簧纸箭射程数米；再战马刀之神wonder——血祭翻倍两次，勿使其近身血祭。每有新题，wonder辄曰：GBC，算不算？",
       tip: "两阵连战，阵间回复四血。汶斌之箭与wonder之神算皆远及三格，近身则其刀亦利。wonder血祭后两击双倍，见祭速退！",
-      enemies: ["wonder", "wenbin"], waves: [["wenbin"], ["wonder"]], allies: [], rule: null,
+      enemies: ["wonder", "wenbin"], waves: [["wenbin"], ["wonder"]], allies: [], rule: null, unlocks: ["wonder"],
       outro: "Wonder每算错，即拍大腿而叫曰：别叫别叫。汶斌有诗赞之曰：打完响指拍大腿，大喊一声别叫了。",
       yueks: "音克思曰：TGO为六班数学之冠，奇思妙想皆出其中，马刀兴焉。至高三，虽分离，亦多究题，此TGO之基也。"
     },
     {
+      id: "s5b", juan: "卷五·其二", title: "九省联考",
+      intro: "九省联考，压轴第18题。wonder以牛顿定理破之，时人先贬后服。今日，他要当着你的面，再解一次——你就是那道题。",
+      tip: "wonder独自一人，血量与攻击皆已强化。其血祭两次翻倍，见祭速退。GBC，算不算？",
+      enemies: ["wonder"], allies: [], rule: null, hpScale: 1.35,
+      outro: "答案既出，果wonder之法，六班叹服。wonder拍大腿而叫曰：别叫别叫！",
+      yueks: "音克思曰：wonder之思维甚慢，然思绪精妙，毅力超凡，能思十四节课而不辍。"
+    },
+
+    {
       id: "s6", juan: "卷六", title: "展怡列传",
       intro: "少年展者，祝大展也，有龙凤之姿，探楼发屋，一步两格；可怡心善展，比邻则大展伤害+1且每回合得疗。高中之恋爱者多不就，惟大展成——今汝为不成人之美者。",
       tip: "可怡会为大展疗伤加持，先斩可怡，或以击退拆散二人。大展步幅极大，勿以为距离安全。",
-      enemies: ["dazhan", "keai"], allies: [], rule: { id: "lovers", desc: "可怡与大展相邻时，展伤害+1且每回合回血" }, hpScale: 0.7,
+      enemies: ["dazhan", "keai"], allies: [], rule: { id: "lovers", desc: "可怡与大展相邻时，展伤害+1且每回合回血" }, hpScale: 0.7, unlocks: ["dazhan"],
       outro: "既高考，展与可怡牵之手而行于校园，岂不美哉？",
       yueks: "音克思曰：高中之恋爱者多不就，惟大展成。究其本，乃展之收敛而谨慎也。此之谓：恋爱者必慎也。"
     },
@@ -409,16 +448,25 @@ window.SJI_DATA = (function () {
       id: "s7", juan: "卷七", title: "修逸列传",
       intro: "陈修逸，不知其何许人也，头甚圜，绝类卤蛋。所持陀螺名曰三溴化氮，鲜有败绩；体味绝类鸩毒，中者中毒。免疫击退——官知止而神欲行。三次为捉，四次换家，至今不易其志。",
       tip: "三溴化氮周身AOE+中毒，勿贴身连击。免疫击退，马踢只能伤之不能踢之。其血不厚，稳扎稳打。",
-      enemies: ["touge"], allies: [], rule: null,
+      enemies: ["touge"], allies: [], rule: null, unlocks: ["touge"],
       blocked: [[3, 3]],   // 讲台（头哥正是在此处被为兵逮住）
       outro: "为兵视马刀角色，念曰：豌豆射手，何为豌豆射手？众哄堂大笑。至头哥返校，见其小臂多有伤痕，盖其父母为之。",
       yueks: "音克思曰：余尝闻鲁豪之摆烂，神人之体味，大哥之特立独行。盖修逸者，可谓兼之矣。"
     },
     {
+      id: "s7b", juan: "卷七·其二", title: "宿舍之夜",
+      intro: "头哥与神人同宿舍。夜半，神人弹弓从上铺弹人，头哥怒曰：鼠辈，吾乃汝陈父也！溴味与臭袜齐飞——汝被锁在了中间。",
+      tip: "二臭相加，勿站中央。头哥免疫击退，神人回合末毒害近身者。",
+      enemies: ["touge", "shenren"], allies: [], rule: null,
+      outro: "头哥得一陀螺，名曰三溴化氮，鲜有败绩，以之为豪，常炫之。",
+      yueks: "音克思曰：汝母尚在？——勇珺怒吼之声，犹在耳边。"
+    },
+
+    {
       id: "s8", juan: "卷八", title: "世界马刀协会锦标赛",
       intro: "后，世界马刀协会立，以鲁豪、小川、子琛、大展、翼帆为委员，奉wonder为马刀之神。今为锦标赛制：连胜三阵——先鲁豪，次小川，终子琛。阵间回复四血。",
       tip: "三连战。赛事之间可充分休整，故每阵可放手一搏；子琛的起义会波及全场，留神其第三回合的援军。",
-      enemies: ["luhao"], waves: [["luhao"], ["xiaochuan"], ["zichen"]], allies: [], rule: null, hpScale: 0.68, restFull: true,
+      enemies: ["luhao"], waves: [["luhao"], ["xiaochuan"], ["zichen"]], allies: [], rule: null, hpScale: 0.68, restFull: true, unlocks: ["luhao", "xiaochuan", "zichen"],
       outro: "马刀大兴盛，扩于九班；又于七班兴，与六班合流，始成今日之马刀。汝今列席协会，与有荣焉。",
       yueks: "音克思曰：马刀之消，似于高中之时光也。愿汝此刀，永不消。"
     },
@@ -426,10 +474,19 @@ window.SJI_DATA = (function () {
       id: "s9", juan: "卷九", title: "皇家曼彻斯特传",
       intro: "郭凯宇者，呱宇也，为二楼最帅之男，嗜水如命，疾如电，三成闪避？非也，二成也；隋奕然者，小蛙也，魔方技艺炉火纯青，每回合首次受伤-1，拍肚皮自得其乐。二人同场，帅与清秀并存。",
       tip: "呱宇闪避不低，用必中技能与马踢取之；小蛙首伤-1，连击方可破防。",
-      enemies: ["guayu", "yiran"], allies: [], rule: null,
+      enemies: ["guayu", "yiran"], allies: [], rule: null, unlocks: ["guayu", "yiran"],
       outro: "宇尝四战汶斌，三败而一胜。奕然于班走，捡一发卡，幻想其为梦晨所有。",
       yueks: "音克思曰：呱宇、奕然者，世多其贤。吾考之行事，网罗其闻，知其有奇事也。"
     },
+    {
+      id: "s9b", juan: "卷九·其二", title: "乒乓球期末",
+      intro: "乒乓球期末考试。呱宇与搭档正反手不辨，师长以为其陪考。今日呱宇持拍而立——汝就是那个 unlucky 的搭档。",
+      tip: "呱宇疾如电（二成闪避），球拍如刀。补考三度，方能过二十板。",
+      enemies: ["guayu", "mob", "mob"], allies: [], rule: null,
+      outro: "及至补考，牛逼同学相助，最后一度成二十板，补考乃过。展二人谢牛逼同学而去。",
+      yueks: "音克思曰：尔向用反手，吾以为尔陪考也。——师长亦大惊。"
+    },
+
     {
       id: "s10", juan: "卷十", title: "王子琛世家",
       intro: "王子琛者，故六班之班长也，号曰武，号令两班，政由琛出。其'体育课起义'波及全场，夺话筒而令汝不得行动。第三回合，其心腹二人将入场：凡有责任，在吾一人！",
@@ -443,7 +500,7 @@ window.SJI_DATA = (function () {
       id: "s11", juan: "卷十一", title: "DDB列传",
       intro: "道德帮者，刘鲁豪、颜小川、顾一也。以顾一有德，鲁豪有道，而小川兼通德艺。三人比邻，DDB同德，伤害+1。皇太子每场不死一次，川受伤越痛反击越狠。汝非孤军——毓润强跟之饭，'三带一'是也。",
       tip: "汝有友军毓润（虽其求战心不坚）。三人相邻伤害+1，先破其阵型。顾一有皇太子庇佑，留后手。",
-      enemies: ["luhao", "xiaochuan", "guyin"], allies: ["yurun"], rule: { id: "dyad", desc: "敌人相邻时伤害+1（DDB同德）" },
+      enemies: ["luhao", "xiaochuan", "guyin"], allies: ["yurun"], rule: { id: "dyad", desc: "敌人相邻时伤害+1（DDB同德）" }, unlocks: ["yurun", "guyin"],
       blocked: [[3, 2], [3, 4]],   // 食堂长桌（只因说：吾摆烂矣）
       outro: "川曰：呜呼，高中之人，非有超世之才，未可节外生枝。诚哉川之言也。",
       yueks: "音克思曰：以川之才俊，虽内向，何女不容？才貌如川且若此，况庸碌之人乎？"
@@ -452,18 +509,37 @@ window.SJI_DATA = (function () {
       id: "s12", juan: "卷十二", title: "李帆列传",
       intro: "李帆者，山东青岛人，时人号之曰'李疯'。购刀免费，Say You Say Me使汝笑场不能自持。神教会残部二人随其入场——刘毅立神教时，帆为左护法，凡十四人，以骂神为己任。",
       tip: "帆购刀免费，前期即有刀伤。笑场之歌范围二格，能散则散。先清杂兵，再诛李疯。",
-      enemies: ["lifan", "mob", "mob"], allies: [], rule: null,
+      enemies: ["lifan", "mob", "mob"], allies: [], rule: null, unlocks: ["lifan"],
       outro: "帆任英语课代表之职，誓为同学争权。苹苹怒斥众曰：汝等皆叛徒也！帆窃喜，以苹苹未知其课代表乃叛军之首也。",
       yueks: "音克思曰：予观《李帆传》《头哥传》，越于韩柳之文采。终得一言以评之曰：疯奇。"
     },
     {
+      id: "s12b", juan: "卷十二·其二", title: "禁闭室",
+      intro: "禁闭室，数学组对面的杂物间。李帆因早读私语被为兵停课，置于此处半日——同押的还有钦法巡行至此的你。帆笑：Q=CU。",
+      tip: "禁闭室狭小（中央柜子不可通行）。李帆购刀免费，笑场之歌仍在。",
+      enemies: ["lifan", "qinfa"], allies: [], rule: null,
+      blocked: [[3, 3]],
+      outro: "帆于禁闭室考英语，勇夺19.9分。苹苹果得C等，帆窃喜。",
+      yueks: "音克思曰：帆于禁闭而考19.9，其疯奇如此。"
+    },
+
+    {
       id: "s13", juan: "卷十三", title: "李默相东传",
       intro: "李默者，不知其何班也，走路侧翼加速，状如羚羊，一步两格；吴相东者，实验之奇人也，每逢考试必潜携手机——三成闪避，每场一次致命不死。一场游戏一场梦，此战亦然。",
       tip: "二人皆难捉摸：羚羊步大，相东善逃。封锁其走位（利用城墙与马踢），以范围技逼其现形。",
-      enemies: ["limo", "xiangdong"], allies: [], rule: null,
+      enemies: ["limo", "xiangdong"], allies: [], rule: null, unlocks: ["limo", "xiangdong"],
       outro: "至实验，乘师不备，相东又走。师下令全守卫闭门，卒获之。当时，已十二点矣。",
       yueks: "音克思曰：实验果多神人也。"
     },
+    {
+      id: "s13b", juan: "卷十三·其二", title: "二楼巡征",
+      intro: "李默好重点班，常于二楼徘徊，手提其袋，环视各班。七班过时，辄仰首以观，心向往焉。今日，他巡到了你的面前。",
+      tip: "巡征步幅极大（一步两格），且争食自愈。勿与其恋战，游斗为上。",
+      enemies: ["limo"], allies: [], rule: null, hpScale: 1.25,
+      outro: "默之趋食堂，必先以右足探地，既而狂奔，左右腾挪，状类羚羊。后以此断腿，然仍不改其速。",
+      yueks: "音克思曰：吾之高中，多以为一场游戏一场梦。"
+    },
+
     {
       id: "s14", juan: "卷十四", title: "王崇国本纪",
       intro: "王崇国，即墨实验之校长也，貌丑德薄，苛于师而怠于职。钦法为其爪牙，当场抓获，缴械沉默。崇国'弃车保帅'，濒死复起；'评职称'禁汝施技；'种树'召唤随从——树木虽皆死，今日且种之。为兵为其所贬，今来助阵：终焉之战。",
@@ -477,9 +553,17 @@ window.SJI_DATA = (function () {
       id: "s15", juan: "卷十五", title: "二中番外·党争",
       intro: "二中二十三班有四人焉：谭晟翔、鲁齐岳、李子烨、岳连奇。四人初以学业相近而相善，后以一言相疑，以一人相争，离合反覆，终至交恶。爱者反为仇，仇者复为友——场上四人，各有二成之机误伤'友军'。乱世用重典，唯一人可终结此局。",
       tip: "敌人内讧（二成机率打错人），但四人围攻仍极险。利用党争，逐个诱杀，勿陷中央。",
-      enemies: ["shengxiang", "qiyue", "ziye", "lianqi"], allies: [], rule: { id: "chaos", desc: "敌人二成机率误伤最近的任何人（党争）" },
+      enemies: ["shengxiang", "qiyue", "ziye", "lianqi"], allies: [], rule: { id: "chaos", desc: "敌人二成机率误伤最近的任何人（党争）" }, unlocks: ["shengxiang", "qiyue", "ziye", "lianqi"],
       outro: "向所谓终身之好者，亦不过一时之心。然当其时也，喜怒皆真，故记之。",
       yueks: "音克思曰：流言可以离友，猜疑可以成仇，而人心之变，虽史家亦不能尽知也。靡不有初，鲜克有终，观于四人，信哉！"
+    },
+    {
+      id: "s15b", juan: "卷十五·其二", title: "烧烤摊",
+      intro: "高考后，烧烤摊。齐岳与连奇并肩而坐——三白之后，勉许之；既高考而分，然兄弟仍是兄弟。炭火明灭，如人心难测。",
+      tip: "二人相邻仍有『情比金坚』（刀击与马踢伤害+1）。先分后破，老规矩。",
+      enemies: ["qiyue", "lianqi"], allies: [], rule: { id: "dyad", desc: "敌人相邻时刀击与马踢伤害+1（兄弟并肩）" },
+      outro: "（这结尾我不知道选哪个好了，早晨写了第二个，晚上写了第一个，烧烤中）",
+      yueks: "音克思曰：向所谓终身之好者，亦不过一时之心。然当其时也，喜怒皆真。"
     }
   ];
 
@@ -509,7 +593,7 @@ window.SJI_DATA = (function () {
     { id: "a_laugh", name: "Say You", desc: "用李帆获胜一场。（Q=CU）" },
     { id: "a_ngplus", name: "二周目", desc: "在困难强度下取得一场胜利。（重开重开，再来一遍）" },
     { id: "a_ngplus14", name: "铁人", desc: "在困难强度下通关卷十四·王崇国本纪。（与为兵并肩，再战校长）" },
-    { id: "a_allchar", name: "十七人皆执刀", desc: "以全部十七位可操作角色各取胜一场。（史册之中，人人有传）" },
+    { id: "a_allchar", name: "人人有传", desc: "以全部可操作角色各取胜一场。（史册之中，人人有传）" },
     { id: "a_extreme", name: "以卵击石", desc: "在极难强度下取胜一场。（明知不可为而为之）" },
     { id: "a_extreme_final", name: "尽城墙", desc: "在极难强度下通关卷十四·王崇国本纪。（苔藓覆其上，其高极大以至于不能尽，吾终将尽之）" }
   ];

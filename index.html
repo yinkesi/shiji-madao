@@ -19,6 +19,7 @@
     <div class="title-seal seal">音克思<br>著</div>
     <div class="title-quote">「规则至简，而引人入胜。」——卷八 · 马刀书</div>
     <div class="title-menu">
+      <button class="btn big" id="btn-versus">双人 · 同屏对战</button>
       <button class="btn big" id="btn-resume" style="display:none">继续上局</button>
       <button class="btn big primary" id="btn-story">剧情模式 · 十五卷</button>
       <button class="btn big" id="btn-ngplus" style="display:none">二周目 · 困难</button>
@@ -113,6 +114,13 @@
         <div class="panel" style="flex:1;display:flex;flex-direction:column"><b>战报</b><div id="battle-log" style="margin-top:6px"></div></div>
       </div>
     </div>
+  </div>
+
+  <!-- 双人点将 -->
+  <div class="screen" id="screen-versus">
+    <div class="topbar"><h2 id="versus-title">一号位点将</h2><div class="crumb">本地同屏 · 轮流执刀 · 各自猜拳</div></div>
+    <div class="panel"><div class="char-grid" id="versus-grid"></div></div>
+    <div class="sel-bar"><button class="btn" id="versus-back">返回</button><button class="btn primary" id="versus-go">确定</button></div>
   </div>
 
   <!-- 结算 -->
