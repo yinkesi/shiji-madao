@@ -6,6 +6,7 @@
  * ============================================================ */
 window.SJI_ENGINE = (function () {
   "use strict";
+  const CFG = window.SJI_CONFIG;
   const D = window.SJI_DATA;
   const SIZE = 7;
   const MAX_ROUND = 30;
@@ -627,7 +628,7 @@ window.SJI_ENGINE = (function () {
       if (k === "summon") {
         // 树木皆死：场上至多三株，否则战斗会被无限拖长
         const live = this.units.filter(x => x.alive && x.charId === "tree" && x.side === u.side).length;
-        if (live >= 3) {
+        if (live >= CFG.RULES.TREE_CAP) {
           this.pushLog("崇国欲再种树，然树木皆死，地上已无隙可种。");
           return true;
         }
@@ -885,7 +886,7 @@ window.SJI_ENGINE = (function () {
         }
       }
       if (u.charId === "xinhui" && this.round % 2 === 0) { ap += 1; this.pushLog("「慧」灵光乍现，行动点+1！"); }
-      return Math.max(0, Math.min(8, ap));
+      return Math.max(0, Math.min(CFG.RULES.AP_CAP, ap));
     }
 
     humanSides() {
@@ -939,7 +940,7 @@ window.SJI_ENGINE = (function () {
     async runVersusRound() {
       const ui = window.SJI_UI;
       const humans = this.humanSides().map(side => this.units.find(u => u.side === side)).filter(Boolean);
-      if (this.round > 30) {
+      if (this.round > CFG.RULES.MAX_ROUND) {
         const r1 = this.humans[0] ? this.humans[0].hp / this.humans[0].maxhp : 0;
         const r2 = this.humans[1] ? this.humans[1].hp / this.humans[1].maxhp : 0;
         this.winner = r1 >= r2 ? "p1" : "p2";
@@ -991,7 +992,7 @@ window.SJI_ENGINE = (function () {
         await this._fireTriggers("roundStart");
         if (this.mode === "versus") { await this.runVersusRound(); continue; }
         ui.onState();
-        if (this.round > MAX_ROUND) { this.finish("timeout"); break; }
+        if (this.round > CFG.RULES.MAX_ROUND) { this.finish("timeout"); break; }
         // 起义援军
         if (this.rule && this.rule.id === "uprising" && this.round === 3) await this._spawnReinforcements();
         // 猜拳

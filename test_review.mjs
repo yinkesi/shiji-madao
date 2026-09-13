@@ -6,6 +6,7 @@ window.SJI_UI = { onLog: () => {}, onState: () => {}, snap: () => {}, fxFloat: (
   rpsRound: async () => ({ res: 'win', ap: 4 }), playerPhase: async () => {}, pickBoon: async () => null, onBattleEnd: () => {}, banner: async () => {} };
 window.SJI_AUDIO = new Proxy({}, { get: () => () => {} });
 window.SJI = { settings: { speed: 3 } };
+require('./js/config.js');
 require('./js/data.js');
 const D = window.SJI_DATA;
 require('./js/engine.js');

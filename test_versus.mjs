@@ -7,6 +7,7 @@ window.SJI_UI = { onLog: () => {}, onState: () => {}, snap: () => {}, fxFloat: (
   rpsDuel: async (b, who) => ({ ap: who === 'p1' ? 4 : 3 }) };
 window.SJI_AUDIO = new Proxy({}, { get: () => () => {} });
 window.SJI = { settings: { speed: 3 } };
+require('./js/config.js');
 require('./js/data.js');
 const D = window.SJI_DATA;
 require('./js/engine.js');

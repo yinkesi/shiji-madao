@@ -11,6 +11,7 @@ window.SJI_UI={
 };
 window.SJI_AUDIO=new Proxy({},{get:()=>()=>{}});
 window.SJI={settings:{speed:1}};
+require('./js/config.js');
 require('./js/data.js');
 const D=window.SJI_DATA;
 require('./js/engine.js');

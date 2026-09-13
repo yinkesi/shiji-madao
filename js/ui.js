@@ -4,7 +4,8 @@
 window.SJI_UI = (function () {
   "use strict";
   const D = window.SJI_DATA, E = window.SJI_ENGINE, SAVE = window.SJI_SAVE, AU = window.SJI_AUDIO;
-  const TILE = 96, PAD = 20, CS = E.SIZE * TILE + PAD * 2;
+  const CFG = window.SJI_CONFIG, GRID = CFG.GRID;
+  const TILE = GRID.TILE, PAD = GRID.PAD, CS = GRID.CS;
 
   let battle = null;
   let mode = null;            // null | 'knife' | 'horse' | 'skill'

@@ -5,6 +5,7 @@ window.SJI_SAVE={bump:()=>{}};
 window.SJI_UI={onLog:()=>{},onState:()=>{},snap:()=>{},fxFloat:()=>{},fxHit:()=>{},fxStatus:()=>{},rpsRound:async()=>({res:'win',ap:3}),playerPhase:async()=>{},pickBoon:async()=>null,onBattleEnd:()=>{}};
 window.SJI_AUDIO=new Proxy({},{get:()=>()=>{}});
 window.SJI={settings:{speed:3}};
+require('./js/config.js');
 require('./js/data.js');
 const D=window.SJI_DATA;
 require('./js/engine.js');

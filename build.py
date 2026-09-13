@@ -40,7 +40,7 @@ def build():
     with io.open(OUT, 'w', encoding='utf-8', newline='\n') as f:
         f.write(html)
 
-    for key in ('SJI_DATA', 'SJI_SCENES', 'SJI_ENGINE', 'SJI_UI', 'SJI_SAVE', 'SJI_AUDIO'):
+    for key in ('SJI_CONFIG', 'SJI_DATA', 'SJI_SCENES', 'SJI_ENGINE', 'SJI_UI', 'SJI_SAVE', 'SJI_AUDIO'):
         if key not in html:
             raise SystemExit('打包自检失败：缺少 ' + key)
 
