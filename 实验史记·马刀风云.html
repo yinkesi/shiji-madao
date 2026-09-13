@@ -1,0 +1,4252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实验史记 · 马刀风云</title>
+<style>
+/* ============================================================
+ * 实验史记 · 马刀风云 —— 样式（宣纸 · 墨 · 朱砂）
+ * ============================================================ */
+:root {
+  --paper: #f1e8d3;
+  --paper2: #e9dec4;
+  --ink: #2b2622;
+  --ink2: #5a5248;
+  --seal: #a63a2b;
+  --seal2: #8c2f22;
+  --gold: #9a7b2d;
+  --line: #c9bb9c;
+  --green: #4e7d54;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", "Noto Serif SC", serif;
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.5), transparent 55%),
+    radial-gradient(ellipse at 85% 90%, rgba(166,58,43,.05), transparent 50%),
+    repeating-linear-gradient(0deg, transparent 0 34px, rgba(90,80,60,.035) 34px 35px),
+    repeating-linear-gradient(90deg, transparent 0 34px, rgba(90,80,60,.03) 34px 35px),
+    var(--paper);
+  overflow-x: hidden;
+}
+#app { max-width: 1180px; margin: 0 auto; padding: 10px 14px 40px; }
+
+.screen { display: none; animation: fadeIn .35s ease; }
+.screen.on { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
+
+/* ---------- 通用组件 ---------- */
+.btn {
+  font-family: inherit; font-size: 17px; letter-spacing: 2px;
+  color: var(--ink); background: linear-gradient(180deg, #faf4e4, #efe5cc);
+  border: 1px solid #b9a984; border-bottom-width: 3px; border-radius: 6px;
+  padding: 9px 22px; cursor: pointer; transition: all .12s;
+  box-shadow: 0 1px 0 rgba(255,255,255,.6) inset;
+}
+.btn:hover { filter: brightness(1.06); transform: translateY(-1px); border-color: var(--gold); box-shadow: 0 3px 10px rgba(90,70,40,.18); }
+.btn:active { transform: translateY(1px); border-bottom-width: 1px; }
+.btn.primary { background: linear-gradient(180deg, #b8483a, #93321f); color: #f7ecd7; border-color: #6e2418; text-shadow: 0 1px 2px rgba(0,0,0,.4); }
+.btn.big { font-size: 22px; padding: 13px 40px; }
+.btn.small { font-size: 14px; padding: 5px 12px; letter-spacing: 1px; }
+.btn:disabled { opacity: .4; cursor: not-allowed; transform: none; filter: grayscale(.4); }
+.btn.armed { outline: 3px solid var(--seal); outline-offset: -1px; background: #ffe9c9; }
+
+.panel {
+  background: linear-gradient(180deg, rgba(255,252,242,.75), rgba(240,230,205,.75));
+  border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(80,60,30,.12);
+  padding: 14px 18px;
+}
+.seal {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--seal); color: #f7ecd7; border-radius: 8px;
+  box-shadow: 0 0 0 2px rgba(166,58,43,.35), inset 0 0 8px rgba(0,0,0,.25);
+  font-weight: bold; user-select: none;
+}
+.hr-ink { border: none; height: 2px; background: linear-gradient(90deg, transparent, var(--ink2), transparent); opacity: .4; margin: 14px 0; }
+
+/* ---------- 标题页 ---------- */
+#screen-title { text-align: center; padding-top: 6vh; }
+.title-main {
+  font-size: 88px; letter-spacing: 18px; font-weight: bold;
+  color: var(--ink); text-shadow: 3px 3px 0 rgba(166,58,43,.18);
+}
+.title-sub {
+  font-size: 40px; letter-spacing: 26px; color: var(--seal); margin-top: 6px; text-indent: 26px;
+}
+.title-seal {
+  width: 74px; height: 74px; font-size: 20px; line-height: 1.25; text-align: center;
+  transform: rotate(6deg); margin: 18px auto 4px; padding: 6px; letter-spacing: 2px;
+  animation: stampIn .55s cubic-bezier(.2, 1.5, .4, 1) both .25s;
+}
+@keyframes stampIn {
+  0% { transform: rotate(20deg) scale(2.3); opacity: 0; }
+  70% { opacity: 1; }
+  100% { transform: rotate(6deg) scale(1); opacity: 1; }
+}
+.brush-bar {
+  height: 5px; width: 240px; margin: 8px auto 0;
+  background: linear-gradient(90deg, transparent, #4a4238 12%, #2b2622 50%, #4a4238 88%, transparent);
+  border-radius: 60% 40% 55% 45% / 100% 80% 100% 70%; opacity: .55;
+}
+.title-quote { color: var(--ink2); font-size: 16px; margin-top: 14px; letter-spacing: 1px; }
+.title-menu { margin-top: 34px; display: flex; flex-direction: column; gap: 13px; align-items: center; }
+.title-menu .btn { width: 300px; }
+.title-footer { margin-top: 42px; color: #a2967e; font-size: 13px; letter-spacing: 1px; }
+
+/* ---------- 顶栏 ---------- */
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+.topbar h2 { font-size: 26px; letter-spacing: 4px; }
+.topbar .crumb { color: var(--ink2); font-size: 15px; }
+
+/* ---------- 关卡列表 ---------- */
+.stage-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 12px; }
+.stage-card {
+  background: linear-gradient(180deg, rgba(255,252,242,.8), rgba(240,230,205,.8));
+  border: 1px solid var(--line); border-left: 5px solid var(--gold); border-radius: 8px;
+  padding: 12px 14px; cursor: pointer; transition: all .15s; position: relative;
+}
+.stage-card:hover { transform: translateY(-2px); border-color: var(--gold); box-shadow: 0 4px 12px rgba(80,60,30,.18); }
+.stage-card.locked { opacity: .45; cursor: not-allowed; filter: grayscale(.5); }
+.stage-card.done { border-left-color: var(--green); }
+.stage-card .juan { font-size: 13px; color: var(--seal); letter-spacing: 2px; }
+.stage-card .t { font-size: 20px; letter-spacing: 2px; margin: 3px 0 6px; }
+.stage-card .d { font-size: 13px; color: var(--ink2); line-height: 1.55; max-height: 62px; overflow: hidden; }
+.stage-card .mark { position: absolute; top: 8px; right: 10px; font-size: 14px; color: var(--green); }
+
+/* ---------- 选人 ---------- */
+.char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.char-card {
+  display: flex; gap: 9px; align-items: center;
+  background: rgba(255,252,242,.72); border: 1.5px solid var(--line); border-radius: 8px;
+  padding: 8px 9px; cursor: pointer; transition: all .13s; text-align: left;
+}
+.char-card:hover { border-color: var(--gold); transform: translateY(-1px); }
+.char-card.sel { border-color: var(--seal); box-shadow: 0 0 0 2px rgba(166,58,43,.35); background: #fff3da; }
+.char-card .nm { font-size: 16px; letter-spacing: 1px; }
+.char-card .hao { font-size: 12px; color: var(--ink2); }
+.char-card .jn { font-size: 11px; color: var(--seal); }
+.tokenface {
+  width: 44px; height: 44px; border-radius: 50%; flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 22px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,.45);
+  border: 2px solid rgba(0,0,0,.25); box-shadow: inset -3px -4px 8px rgba(0,0,0,.22), inset 3px 3px 6px rgba(255,255,255,.25);
+}
+.char-card.dim { opacity: .38; pointer-events: none; }
+.sel-bar { margin-top: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.sel-bar .info { color: var(--ink2); font-size: 14px; flex: 1; }
+
+/* ---------- 详情弹层 ---------- */
+.modal-mask {
+  position: fixed; inset: 0; background: rgba(43,38,34,.55); z-index: 60;
+  display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px);
+}
+.modal-mask.on { display: flex; }
+.modal {
+  background: linear-gradient(180deg, #faf4e2, #efe4c8);
+  border: 1px solid #b9a984; border-radius: 12px; max-width: 660px; width: 92%;
+  max-height: 86vh; overflow-y: auto; padding: 22px 26px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.35); animation: popIn .22s ease;
+}
+@keyframes popIn { from { transform: scale(.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal h3 { font-size: 24px; letter-spacing: 3px; margin-bottom: 4px; }
+.modal .sub { color: var(--seal); font-size: 14px; margin-bottom: 10px; letter-spacing: 1px; }
+.modal .quote { border-left: 4px solid var(--gold); padding: 6px 12px; margin: 10px 0; color: var(--ink2); font-size: 15px; background: rgba(154,123,45,.07); border-radius: 0 6px 6px 0; }
+.modal p { line-height: 1.8; font-size: 15px; margin: 8px 0; }
+.modal .btnrow { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end; flex-wrap: wrap; }
+.tag { display: inline-block; font-size: 13px; color: #fff; background: var(--gold); border-radius: 4px; padding: 1px 8px; margin-right: 6px; letter-spacing: 1px; }
+.tag.red { background: var(--seal); }
+
+/* ---------- 猜拳 ---------- */
+#rps-mask .modal { text-align: center; max-width: 560px; }
+.rps-title { font-size: 26px; letter-spacing: 6px; margin-bottom: 6px; }
+.rps-sub { color: var(--ink2); font-size: 14px; margin-bottom: 18px; }
+.rps-btns { display: flex; gap: 16px; justify-content: center; }
+.rps-btn {
+  font-family: inherit; width: 128px; padding: 16px 0 12px; font-size: 17px; letter-spacing: 3px;
+  background: linear-gradient(180deg, #faf4e4, #efe5cc); border: 1px solid #b9a984; border-bottom-width: 4px; border-radius: 10px; cursor: pointer;
+}
+.rps-btn .g { font-size: 42px; display: block; }
+.rps-btn:hover { border-color: var(--seal); transform: translateY(-2px); }
+.rps-result { font-size: 30px; letter-spacing: 4px; margin: 16px 0 6px; min-height: 44px; }
+.rps-vs { font-size: 44px; letter-spacing: 8px; margin-top: 8px; min-height: 60px; }
+
+/* ---------- 战场布局 ---------- */
+#battle-wrap { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
+#battle-left { flex: 1 1 620px; min-width: 320px; }
+#battle-right { flex: 1 1 300px; min-width: 280px; display: flex; flex-direction: column; gap: 10px; }
+#canvas-outer { position: relative; }
+#battle-canvas { width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid #b9a984; box-shadow: 0 4px 18px rgba(80,60,30,.2); cursor: pointer; }
+.phase-banner {
+  position: absolute; top: 42%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 34px; letter-spacing: 10px; color: #fff; padding: 10px 34px;
+  background: rgba(43,38,34,.78); border-radius: 8px; pointer-events: none;
+  opacity: 0; transition: opacity .25s; z-index: 5; white-space: nowrap;
+}
+.phase-banner.on { opacity: 1; }
+
+.actbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.actbar .btn { font-size: 15px; padding: 7px 14px; letter-spacing: 1px; }
+#player-card { display: flex; gap: 12px; align-items: center; margin-top: 10px; }
+.hpbar-outer { flex: 1; height: 16px; background: #d8cba9; border: 1px solid #a99a77; border-radius: 8px; overflow: hidden; position: relative; }
+.hpbar-ghost, .hpbar-inner { position: absolute; left: 0; top: 0; bottom: 0; }
+.hpbar-ghost { background: #efe3c4; transition: width .8s ease .35s; }
+.hpbar-inner { width: 100%; background: linear-gradient(180deg, #7fbe6a, #55954a); transition: width .25s; border-radius: 8px 0 0 8px; }
+#player-card.critical { animation: criticalPulse 1.1s ease-in-out infinite; }
+@keyframes criticalPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(166,58,43,0); }
+  50% { box-shadow: 0 0 0 6px rgba(166,58,43,.28); }
+}
+.hpbar-inner.low { background: linear-gradient(180deg, #e0765a, #b8483a); }
+.hpbar-text { position: absolute; inset: 0; text-align: center; font-size: 12px; line-height: 16px; color: #2b2622; text-shadow: 0 0 3px rgba(255,255,255,.7); }
+.ap-pips { display: flex; gap: 5px; margin-top: 6px; min-height: 16px; }
+.ap-pip { width: 15px; height: 15px; border-radius: 50%; background: #d8cba9; border: 1px solid #a99a77; }
+.ap-pip.on { background: radial-gradient(circle at 35% 30%, #ffd98a, #d8912b); border-color: #a06a1a; }
+.st-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; min-height: 20px; }
+.st-chip { font-size: 12px; padding: 1px 8px; border-radius: 10px; color: #fff; letter-spacing: 1px; }
+
+#battle-log { height: 308px; overflow-y: auto; font-size: 14px; line-height: 1.75; padding: 10px 14px; }
+#battle-log div { border-bottom: 1px dashed rgba(150,130,90,.18); padding: 1px 0; }
+#battle-log .em { color: var(--seal); }
+#battle-log .sys { color: var(--gold); }
+
+.enemy-list { font-size: 13px; }
+.enemy-row { display: flex; align-items: center; gap: 8px; padding: 4px 2px; border-bottom: 1px dashed rgba(150,130,90,.2); }
+.enemy-row .tokenface { width: 28px; height: 28px; font-size: 14px; }
+.enemy-row .ehp { flex: 1; height: 8px; background: #d8cba9; border-radius: 4px; overflow: hidden; }
+.enemy-row .ehp i { display: block; height: 100%; background: #b8483a; transition: width .35s; }
+.ap-mini {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 3px;
+  background: radial-gradient(circle at 35% 30%, #ffd98a, #d8912b); border: 1px solid #a06a1a;
+}
+.enemy-row.dead { opacity: .35; text-decoration: line-through; }
+
+/* ---------- 结算 ---------- */
+#screen-result { text-align: center; padding-top: 4vh; position: relative; overflow: hidden; }
+#result-body { position: relative; z-index: 1; }
+.result-seal {
+  width: 150px; height: 150px; font-size: 84px; margin: 8px auto 10px;
+  transform: rotate(-7deg); animation: stamp .45s cubic-bezier(.2, 1.6, .4, 1);
+}
+@keyframes stamp { 0% { transform: rotate(-7deg) scale(2.4); opacity: 0; } 60% { opacity: 1; } 100% { transform: rotate(-7deg) scale(1); } }
+.result-seal.lose { background: #55504a; }
+.result-title { font-size: 34px; letter-spacing: 8px; }
+.result-stats { margin: 14px auto; display: inline-block; text-align: left; color: var(--ink2); font-size: 15px; line-height: 2; }
+.result-quote { max-width: 620px; margin: 10px auto; text-align: left; }
+.result-yueks { max-width: 620px; margin: 6px auto 16px; text-align: left; color: var(--seal); font-size: 14px; line-height: 1.9; }
+
+/* ---------- 图鉴/成就 ---------- */
+.codex-detail .row { display: flex; gap: 12px; align-items: center; margin-bottom: 6px; }
+.ach-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.ach-card { background: rgba(255,252,242,.72); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+.ach-card.got { border-color: var(--gold); background: #fff3da; }
+.ach-card .an { font-size: 17px; letter-spacing: 1px; }
+.ach-card .an::before { content: "◈ "; color: var(--gold); }
+.ach-card.got .an::before { content: "✦ "; color: var(--seal); }
+.ach-card .ad { font-size: 13px; color: var(--ink2); margin-top: 3px; }
+
+/* ---------- 设置 ---------- */
+.set-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 4px; border-bottom: 1px dashed rgba(150,130,90,.25); max-width: 480px; }
+.set-row .lab { font-size: 17px; letter-spacing: 2px; }
+.seg { display: flex; border: 1px solid #b9a984; border-radius: 6px; overflow: hidden; }
+.seg button { font-family: inherit; border: none; background: #f3ead6; padding: 6px 16px; cursor: pointer; font-size: 15px; letter-spacing: 1px; }
+.seg button.on { background: var(--seal); color: #fff; }
+
+/* ---------- 剧情对话 ---------- */
+.dlg { position: relative; }
+.dlg-head { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.dlg-head .tokenface { width: 52px; height: 52px; font-size: 26px; animation: dlgFace .28s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes dlgFace { from { transform: scale(1.5) rotate(-6deg); } to { transform: none; } }
+.dlg-name { font-size: 22px; letter-spacing: 2px; }
+.dlg-role { font-size: 13px; color: var(--ink2); letter-spacing: 1px; }
+.dlg-text {
+  min-height: 96px; font-size: 17px; line-height: 2; letter-spacing: .5px;
+  padding: 12px 14px; background: rgba(255,250,236,.85);
+  border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 6px;
+}
+.dlg-next { text-align: right; color: var(--seal); font-size: 15px; animation: bob 1s infinite; margin-top: 4px; }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+.dlg #dlg-skip { position: absolute; top: 0; right: 0; }
+
+/* ---------- 浮层杂项 ---------- */
+#toast-wrap { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 99; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.toast {
+  background: rgba(43,38,34,.92); color: #f3ead6; padding: 10px 22px; border-radius: 8px;
+  font-size: 15px; letter-spacing: 1px; box-shadow: 0 4px 16px rgba(0,0,0,.3); animation: toastIn .3s ease;
+  border-left: 4px solid var(--gold); max-width: 86vw;
+}
+@keyframes toastIn { from { transform: translateY(-14px); opacity: 0; } to { transform: none; opacity: 1; } }
+.petals { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.petal {
+  position: absolute; top: -24px;
+  border-radius: 65% 35% 60% 40% / 70% 45% 55% 30%;
+  opacity: .65;
+  animation: fall linear infinite;
+}
+@keyframes fall {
+  0% { transform: translateY(-4vh) translateX(0) rotate(0deg); }
+  50% { transform: translateY(55vh) translateX(6vw) rotate(300deg); }
+  100% { transform: translateY(108vh) translateX(-3vw) rotate(620deg); }
+}
+#screen-title { position: relative; overflow: hidden; }
+#screen-title .title-menu, #screen-title .title-main, #screen-title .title-sub,
+#screen-title .title-seal, #screen-title .title-quote, #screen-title .title-footer { position: relative; z-index: 1; }
+
+#tooltip {
+  position: fixed; z-index: 98; pointer-events: none; display: none;
+  background: rgba(43,38,34,.94); color: #f3ead6; padding: 9px 13px; border-radius: 8px;
+  font-size: 13.5px; line-height: 1.65; max-width: 300px; box-shadow: 0 4px 14px rgba(0,0,0,.35);
+}
+#tooltip .tt-n { color: #ffd98a; font-size: 15px; }
+.boon-btns { display: flex; flex-direction: column; gap: 10px; }
+.boon-btns .btn { text-align: left; letter-spacing: 0; }
+.boon-btns .bn { font-size: 17px; color: var(--seal); letter-spacing: 2px; }
+.boon-btns .bd { display: block; font-size: 13px; color: var(--ink2); margin-top: 2px; }
+
+.menu-note { text-align: center; color: var(--ink2); font-size: 14px; margin-top: 10px; }
+.stat-inline { color: var(--ink2); font-size: 14px; }
+@media (max-width: 760px) {
+  .title-main { font-size: 56px; letter-spacing: 10px; }
+  .title-sub { font-size: 26px; letter-spacing: 14px; }
+  #battle-log { height: 200px; }
+}
+
+</style>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23a63a2b'/><text x='50' y='68' font-size='56' text-anchor='middle' fill='%23f7ecd7' font-family='KaiTi'>刀</text></svg>">
+</head>
+<body>
+<div id="app">
+
+  <!-- 标题 -->
+  <div class="screen on" id="screen-title">
+    <div class="petals" id="title-petals"></div>
+    <div class="title-main">實驗史記</div>
+    <div class="title-sub">馬 刀 風 雲</div>
+    <div class="brush-bar"></div>
+    <div class="title-seal seal">音克思<br>著</div>
+    <div class="title-quote">「规则至简，而引人入胜。」——卷八 · 马刀书</div>
+    <div class="title-menu">
+      <button class="btn big" id="btn-resume" style="display:none">继续上局</button>
+      <button class="btn big primary" id="btn-story">剧情模式 · 十五卷</button>
+      <button class="btn big" id="btn-ngplus" style="display:none">二周目 · 困难</button>
+      <button class="btn big" id="btn-free">乱斗 · 自选敌我</button>
+      <button class="btn big" id="btn-survival">破败城墙 · 生存</button>
+      <button class="btn" id="btn-codex">图鉴 · 史中人</button>
+      <button class="btn" id="btn-ach">成就 · 史评</button>
+      <button class="btn" id="btn-settings">设置</button>
+    </div>
+    <div class="title-footer" id="best-line"></div>
+    <div class="title-footer">据音克思《实验史记》改编 · 马刀玩法见卷八 · 猜拳得行动点，买刀买马，同城马踢，血祭翻倍，活者为王</div>
+  </div>
+
+  <!-- 剧情 -->
+  <div class="screen" id="screen-story">
+    <div class="topbar"><h2>史册 · 十五卷</h2><div class="crumb" id="story-progress"></div></div>
+    <div class="stage-list" id="stage-list"></div>
+    <div class="sel-bar"><button class="btn" id="story-back">返回</button></div>
+  </div>
+
+  <!-- 乱斗 -->
+  <div class="screen" id="screen-free">
+    <div class="topbar"><h2>乱斗</h2><div class="crumb">自选敌我，至多三敌</div></div>
+    <div class="panel"><b>汝之角色</b><div class="char-grid" id="free-pgrid" style="margin-top:8px"></div></div>
+    <div class="panel" style="margin-top:12px"><b>敌军（点选，至多三）</b><div class="char-grid" id="free-egrid" style="margin-top:8px"></div></div>
+    <div class="panel" style="margin-top:12px"><b>难度</b>
+      <div class="seg" id="free-diff" style="margin-top:8px">
+        <button data-v="easy">简单</button><button data-v="normal" class="on">普通</button><button data-v="hard">困难</button>
+      </div>
+    </div>
+    <div class="sel-bar"><button class="btn" id="free-back">返回</button><button class="btn primary" id="free-go">开战</button></div>
+  </div>
+
+  <!-- 选人 -->
+  <div class="screen" id="screen-charselect">
+    <div class="topbar"><h2>点将</h2><div class="crumb">十七人皆可执刀</div></div>
+    <div class="panel"><div class="char-grid" id="charselect-grid"></div></div>
+    <div class="panel" id="cs-diff-panel" style="margin-top:12px"><b>敌方强度</b>
+      <div class="seg" id="cs-diff" style="margin-top:8px">
+        <button data-v="easy">简单</button><button data-v="normal" class="on">普通</button><button data-v="hard">困难</button>
+      </div>
+      <div class="stat-inline" style="margin-top:6px">普通：敌方每回合三动（三人以上两动）。困难：四动（三人以上三动）。</div>
+    </div>
+    <div class="panel" id="cs-info" style="margin-top:12px;min-height:52px"></div>
+    <div class="sel-bar"><button class="btn" id="cs-back">返回</button><button class="btn primary" id="cs-go">出征</button></div>
+  </div>
+
+  <!-- 战斗 -->
+  <div class="screen" id="screen-battle">
+    <div class="topbar">
+      <h2 id="battle-title">战场</h2>
+      <div class="crumb" id="round-no">第 1 回合</div>
+      <div>
+        <button class="btn small" id="b-speed">速×1</button>
+        <button class="btn small" id="b-mute">音</button>
+        <span class="stat-inline" id="ai-label" style="margin-right:6px"></span>
+        <button class="btn small" id="b-surrender">认输</button>
+        <button class="btn small" id="b-exit">离场</button>
+      </div>
+    </div>
+    <div id="battle-wrap">
+      <div id="battle-left">
+        <div id="canvas-outer">
+          <canvas id="battle-canvas"></canvas>
+          <div class="phase-banner" id="phase-banner"></div>
+        </div>
+        <div class="panel" id="player-card">
+          <span class="tokenface" id="pc-face">·</span>
+          <div style="flex:1">
+            <div id="pc-name"></div>
+            <div class="hpbar-outer"><div class="hpbar-ghost" id="pc-hp-ghost"></div><div class="hpbar-inner" id="pc-hp-in"></div><div class="hpbar-text" id="pc-hp-tx"></div></div>
+            <div class="ap-pips" id="ap-pips" title="行动点"></div>
+            <div class="st-chips" id="pc-st"></div>
+          </div>
+        </div>
+        <div class="actbar">
+          <button class="btn" id="b-knife">购刀·1动</button>
+          <button class="btn" id="b-horse">购马·1动</button>
+          <button class="btn" id="b-attack">刀击·1动</button>
+          <button class="btn" id="b-horseatk">马踢·1动</button>
+          <button class="btn" id="b-skill">技能</button>
+          <button class="btn" id="b-undo">撤销移动</button>
+          <button class="btn" id="b-blood">血祭</button>
+          <button class="btn" id="b-wait">待机（空格）</button>
+        </div>
+      </div>
+      <div id="battle-right">
+        <div class="panel enemy-list" id="enemy-panel"><b>敌军</b><div id="enemy-list" style="margin-top:6px"></div></div>
+        <div class="panel" style="flex:1;display:flex;flex-direction:column"><b>战报</b><div id="battle-log" style="margin-top:6px"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 结算 -->
+  <div class="screen" id="screen-result"><div class="petals" id="result-petals"></div><div id="result-body"></div></div>
+
+  <!-- 图鉴 -->
+  <div class="screen" id="screen-codex">
+    <div class="topbar"><h2>图鉴 · 史中人</h2><div class="crumb">凡三十二人</div></div>
+    <div class="panel"><div class="char-grid" id="codex-grid"></div></div>
+    <div class="sel-bar"><button class="btn" id="codex-back">返回</button></div>
+  </div>
+
+  <!-- 成就 -->
+  <div class="screen" id="screen-ach">
+    <div class="topbar"><h2>成就 · 史评</h2><div class="crumb" id="ach-count"></div></div>
+    <div class="ach-list" id="ach-list"></div>
+    <div class="sel-bar"><button class="btn" id="ach-back">返回</button></div>
+  </div>
+
+  <!-- 设置 -->
+  <div class="screen" id="screen-settings">
+    <div class="topbar"><h2>设置</h2></div>
+    <div class="panel">
+      <div class="set-row"><div class="lab">音效</div><button id="set-sfx">开/关</button></div>
+      <div class="set-row"><div class="lab">琴音（背景乐）</div><button id="set-music">开/关</button></div>
+      <div class="set-row"><div class="lab">战斗速度</div><div class="seg" id="set-speed"><button data-v="1">从容</button><button data-v="2">迅捷</button><button data-v="3">风驰</button></div></div>
+      <div class="set-row" style="display:block">
+        <div class="lab" style="margin-bottom:8px">猜拳</div>
+        <div class="seg" id="set-rps">
+          <button data-v="ask">逐回合询问</button><button data-v="auto">自动猜拳</button>
+        </div>
+        <div class="stat-inline" style="margin-top:8px">自动：不再等你出拳，直接以随机结果定行动点（动画也更快）。</div>
+      </div>
+      <div class="set-row" style="display:block">
+        <div class="lab" style="margin-bottom:8px">动效</div>
+        <div class="seg" id="set-fx">
+          <button data-v="full">全效</button><button data-v="lite">精简</button><button data-v="off">关闭</button>
+        </div>
+        <div class="stat-inline" style="margin-top:8px">精简/关闭可去掉粒子、震屏与花瓣，低配设备或对闪光敏感时更舒适。</div>
+      </div>
+      <div class="set-row" style="display:block">
+        <div class="lab" style="margin-bottom:8px">存档（换设备或清缓存前请先导出）</div>
+        <div class="seg" style="border:none;padding:0">
+          <button class="btn small" id="set-export">导出存档</button>
+          <button class="btn small" id="set-import">导入存档</button>
+        </div>
+      </div>
+      <div class="set-row" style="display:block">
+        <div class="lab" style="margin-bottom:8px">AI 进攻性</div>
+        <div class="seg" id="set-aiaggr">
+          <button data-v="passive">消极</button><button data-v="measured">守成</button><button data-v="active">主动</button><button data-v="frenzy">狂攻</button>
+        </div>
+        <div class="stat-inline" id="set-aiaggr-desc" style="margin-top:8px"></div>
+      </div>
+      <div class="set-row"><div class="lab">焚稿（清空存档）</div><button class="btn small" id="set-reset">焚之</button></div>
+    </div>
+    <div class="sel-bar"><button class="btn" id="set-back">返回</button></div>
+  </div>
+
+</div>
+
+<div class="modal-mask" id="modal-mask"><div class="modal" id="modal-box"></div></div>
+<div id="toast-wrap"></div>
+<div id="tooltip"></div>
+
+<script>
+/* ============================================================
+ * 实验史记 · 马刀风云 —— 数据卷
+ * 据音克思《实验史记》改编 · 卷八《马刀书》为玩法蓝本
+ * ============================================================ */
+window.SJI_DATA = (function () {
+  "use strict";
+
+  /* ---------------- 角色 ----------------
+   * 每人：名、号、出处卷、色、字、血、被动、技能
+   * kind: unit=单体 range内 / self=自身 / adj=自身周身AOE / raoe=范围AOE / enemy-all=全场敌方
+   */
+  const CHARACTERS = {
+    /* ============ 可操作 · 十七人 ============ */
+    dage: {
+      id: "dage", name: "贾瀚元", hao: "大哥", juan: "卷一", glyph: "哥",
+      color: "#c06a2c", hp: 10,
+      passive: { name: "城墙之梦", desc: "立于城墙时，刀击伤害+1。（梦破败城墙，苔藓覆其上，终无尽头）" },
+      skill: { name: "护手霜之赠", kind: "unit", range: 3, ap: 2, cd: 3,
+        desc: "距三内一敌受1伤，且下回合跳过。（此乃吾心意也，敬请笑纳——歆慧无语）" },
+      quote: "大哥者，贾瀚元也，其父任于海大，其母亦然。",
+      bio: "实验三异能者之首。为兵谴数十人搬书，及还，谓哥曰：尔搬何书？对曰：吾名为贾瀚元。善之韫、歆慧、梦晨，高考后皆以护手霜与原话表白之。",
+      playable: true, aggr: 0.7
+    },
+    shenren: {
+      id: "shenren", name: "江润翔", hao: "神人", juan: "卷一", glyph: "神",
+      color: "#7a6ba0", hp: 10,
+      passive: { name: "鲍鱼之肆", desc: "每回合结束时，相邻敌人各损1血。（置脏鞋袜与脸盆，久之皆发酵）" },
+      skill: { name: "原神明信片", kind: "unit", range: 2, ap: 1, cd: 3,
+        desc: "距二内一敌下回合跳过。（购原神明信片以贻之，诺然欣然受之）" },
+      quote: "其声阴柔若太监，其目如双缝，以至光发生干涉。",
+      bio: "尝为陌生学童困于厕，啵啵呼于厕，为师者掌掴。神教会十四人以骂神为己任，神闻之，喜不自胜。历史甚善，常于历史课媚师。",
+      playable: true, aggr: 0.6
+    },
+    xiannv: {
+      id: "xiannv", name: "姜付艳", hao: "仙女", juan: "卷一", glyph: "仙",
+      color: "#b0486e", hp: 10,
+      passive: { name: "晨读之声", desc: "免疫跳过与沉默。（吾声响，乃吾勤奋专注也，汝欲吾损声，岂不害我耶？）" },
+      skill: { name: "怒斥滚", kind: "unit", range: 3, ap: 1, cd: 2,
+        desc: "距三内一敌受2伤并击退一格。（歆慧恶之，曰：滚。——仙之声极尖锐，语速极快，远亦及之）" },
+      quote: "仙致于学，常走而饭，走而诵，声极大，使人不得安宁。",
+      bio: "其形神似大哥，态亦似神人，故卓文谓之仙。于宿舍厕所解手从不冲水，曰：事真多！曾怒斥李帆改编己为马刀角色，其声极尖锐，语速极快。",
+      playable: true, aggr: 0.65
+    },
+    touge: {
+      id: "touge", name: "陈修逸", hao: "头哥", juan: "卷七", glyph: "头",
+      color: "#5e7d4f", hp: 12,
+      passive: { name: "球棍意念", desc: "免疫击退。（与球棍意念合一，官知止而神欲行）" },
+      skill: { name: "三溴化氮", kind: "adj", range: 1, ap: 2, cd: 3,
+        desc: "周身所有敌人受2伤并中毒二回合。（陀螺名曰三溴化氮，鲜有败绩；体味绝类鸩毒，故号溴逸）" },
+      quote: "其头甚圜，发短不盈寸，绝类卤蛋。",
+      bio: "面不红，心不跳，若无其事。三次为捉，四次换家。以数学一百四十五高居级部第二，又以语文七十三、英语四十六点五高居榜底，张楠号之神。赛博妻子芙宁娜。",
+      playable: true, aggr: 0.7
+    },
+    lifan: {
+      id: "lifan", name: "李帆", hao: "李疯", juan: "卷十二", glyph: "帆",
+      color: "#3f7d8c", hp: 10,
+      passive: { name: "课代表夺权", desc: "购刀不需行动点。（假英语课代表之职权，聚众阴谋，苹苹果得C等）" },
+      skill: { name: "Say You Say Me", kind: "raoe", range: 2, ap: 1, cd: 3,
+        desc: "距二内所有敌人五成机率下回合跳过。（上台笑场者三，班人皆以say you为乐）" },
+      quote: "初中时举华意志于班，自为戈，奉他人为希，后为主任所毁。",
+      bio: "著《三战史》，做桌游《二战杀》，皆为主任所毁。马刀七班刀之创者，作宝可梦马刀，与六班合流，始成今日之马刀。禁闭室考英语，勇夺19.9分。",
+      playable: true, aggr: 0.6
+    },
+    wonder: {
+      id: "wonder", name: "王元昊", hao: "wonder", juan: "卷五", glyph: "问",
+      color: "#8c5a3c", hp: 10,
+      passive: { name: "马刀之神", desc: "血祭后，接下来两次伤害翻倍。（常人仅一次；血祭血祭血血祭）" },
+      skill: { name: "GBC算不算", kind: "unit", range: 3, ap: 1, cd: 2,
+        desc: "距三内一敌受2伤，若其血量为偶数则+1。（每有新题辄曰：GBC，算不算）" },
+      quote: "究所有自然数之和为负十二分之一，数周，故号之曰wonder，意为想知道。",
+      bio: "TGO之首。能思十四节课而不辍，究一题十四课，卒解之，予汶斌，汶斌秒之，wonder大怒。以牛顿定理破九省联考十八题，六班叹服。",
+      playable: true, aggr: 0.8
+    },
+    wenbin: {
+      id: "wenbin", name: "于汶斌", hao: "狗白菜", juan: "卷五", glyph: "斌",
+      color: "#6d8c3f", hp: 10,
+      passive: { name: "秒之", desc: "刀击有三成机率造成双倍伤害。（wonder究一题十四课，汶斌秒之）" },
+      skill: { name: "弹簧纸箭", kind: "unit", range: 3, ap: 1, cd: 2,
+        desc: "距三内一敌受2伤。（以弹簧串联笔杆，以纸条为箭，射程数米）" },
+      quote: "以面如白菜，故号曰狗白菜（GBC）。",
+      bio: "教主也。铃响而含笑未许下课，径出之：下课铃响，故走往饭，此自然之理也。期中数学150，强基之分轻取第一。后入复旦大学。",
+      playable: true, aggr: 0.6
+    },
+    yurun: {
+      id: "yurun", name: "隋毓润", hao: "joker", juan: "卷五", glyph: "润",
+      color: "#9a7b2d", hp: 10,
+      passive: { name: "清华大志", desc: "血量低于五时伤害+1。（毓润常有大志，目标清华，钦法赞于七班）" },
+      skill: { name: "面包之赠", kind: "self", range: 0, ap: 1, cd: 3,
+        desc: "回复3血。（此面包之韫予我也——之韫见吾而大羞，面红而塞我一面包，诚矣！）" },
+      quote: "吾半年，未尝洗澡。——也诚矣，其味甚于头哥神人。",
+      bio: "仪表堂堂，然卫生可与神人相较。尝持初中化学卷97炫于六班。自诩美才兼备而白于雨佳：盍不从我？雨佳大怒，不语而走。毓润于是大宣扬以成功，众人皆不信。",
+      playable: true, aggr: 0.55
+    },
+    luhao: {
+      id: "luhao", name: "刘鲁豪", hao: "道", juan: "卷十一", glyph: "豪",
+      color: "#4a6d9c", hp: 20,
+      passive: { name: "大腹如斗", desc: "生命上限20，且刀击数值翻倍（马踢与技能不翻倍）。（奕然见鲁豪腹大如斗，乃拍之，觉好玩，拍之不止。道之所在，刀下加倍奉还）" },
+      skill: { name: "锦绣昼行", kind: "unit", range: 3, ap: 1, cd: 3,
+        desc: "距三内一敌受2伤，且其下回合行动点-1。（恋爱而不让人知，如锦绣夜行，谁知之者！今予我纸条，是所谓富贵还乡、锦绣昼行也）" },
+      quote: "恋爱而不让人知，如锦绣夜行，谁知之者！",
+      bio: "道德帮之道。不叠被，五日不叠为看何时查也。因《微积分入门》遭含笑诘。创三国刀，世界马刀协会委员。绍铭叹曰：苟非汝，吾且死也。",
+      playable: true, aggr: 0.6
+    },
+    xiaochuan: {
+      id: "xiaochuan", name: "颜小川", hao: "德艺", juan: "卷十一", glyph: "川",
+      color: "#2e8b74", hp: 10,
+      passive: { name: "卧薪尝胆", desc: "每次受伤后，下一次伤害+1。（卧薪尝胆，报期末之耻，一举夺魁）" },
+      skill: { name: "王霸之气", kind: "unit", range: 2, ap: 1, cd: 3,
+        desc: "距二内一敌受1伤且缴械一回合。（伏于讲桌，邈然俯视，烨然有王霸之气也）" },
+      quote: "夫川，流而不息，水准而不盈，其富在博！",
+      bio: "道德帮之德艺兼修者。数学课代表，多送卷。尝于窗边戏跳鸡你太美，邻舍称妙而遁。欲夺第一，包举六班，几为美人所灭，卒忍痛割爱。",
+      playable: true, aggr: 0.65
+    },
+    guyin: {
+      id: "guyin", name: "顾一", hao: "只因", juan: "卷十一", glyph: "因",
+      color: "#333333", hp: 11,
+      passive: { name: "皇太子", desc: "每场一次，受致命伤时保留1血。（其父顾良任二十班班主任，生皆戏呼顾一为皇太子）" },
+      skill: { name: "坤拳九式", kind: "unit", range: 1, ap: 1, cd: 2,
+        desc: "相邻一敌受2伤，然有一成半机率自伤1。（以第一式攻鲁豪时，误伤己手，遂废此招；今稍加收敛）" },
+      quote: "尝以俚歌鸡你太美闻于班中，遂得此名。",
+      bio: "自创坤拳九式，专好啄人。每自言吾摆烂矣，然暗中勤学不辍。及榜发，竟为级部第一。痴嗜原神，尝十连抽得双黄。后入东南大学。",
+      playable: true, aggr: 0.75
+    },
+    zichen: {
+      id: "zichen", name: "王子琛", hao: "武", juan: "卷十", glyph: "琛",
+      color: "#7d4a6b", hp: 10,
+      passive: { name: "班长之威", desc: "相邻敌人对琛伤害-1，至少为1。（号令两班，政由琛出，威震天下）" },
+      skill: { name: "体育课起义", kind: "raoe", range: 99, ap: 2, cd: 4,
+        desc: "所有敌人受1伤且下回合行动点-1。（夺其话筒：马上解散，毋恐担责，凡有责任，在吾一人！）" },
+      quote: "子琛者，大事可与焉，然必教之引之。",
+      bio: "故六班班长。物竞如痴如狂。欲于体育课起义，先告含笑：此通知尔，非求建议也。含笑大怒：尔敢为此，吾誓杀汝。后入香港中文大学。",
+      playable: true, aggr: 0.6
+    },
+    shaoming: {
+      id: "shaoming", name: "刘绍铭", hao: "铭", juan: "卷三", glyph: "铭",
+      color: "#8a3b3b", hp: 11,
+      passive: { name: "不怒自威", desc: "对半血以下敌人伤害+1。（仪表堂堂，不怒自威）" },
+      skill: { name: "歆慧纸条", kind: "unit", range: 3, ap: 1, cd: 2,
+        desc: "距三内一敌受3伤。（纸条之多，少有过之者。毓润心害之，遂置桌洞以害铭）" },
+      quote: "急击勿失。——鲁豪为之奈何之答也。",
+      bio: "潮海之冠。QQ友列唯歆慧一人（然QQ已用数年）。挟卓本以买饭，分纸条以自现，毁鲁豪以自保。冷暴力致决裂，长叹：怎能不悔也！",
+      playable: true, aggr: 0.7
+    },
+    xinhui: {
+      id: "xinhui", name: "武歆慧", hao: "慧", juan: "卷三", glyph: "慧",
+      color: "#a0527d", hp: 11,
+      passive: { name: "灵光乍现", desc: "每第二回合行动点+1。（小学以诗词闻名，号为神童；右手断，以左手书之，得奖）" },
+      skill: { name: "一声滚", kind: "unit", range: 2, ap: 1, cd: 2,
+        desc: "距二内一敌受2伤并击退两格。（歆慧恶之，曰：滚。——大哥于是遂走）" },
+      quote: "貌美晔丽，风韵婉转。",
+      bio: "右手断，以左手书之，得作文大赛奖。既黑铭，吾觉未有之爽也。高考英语137.5，让大哥的128.5黯然失色。后入同济大学。",
+      playable: true, aggr: 0.6
+    },
+    guayu: {
+      id: "guayu", name: "郭凯宇", hao: "呱宇", juan: "卷九", glyph: "呱",
+      color: "#c2942f", hp: 10,
+      passive: { name: "疾如电", desc: "二成机率闪避一切伤害。（飞身出班，疾如电，行如风雨）" },
+      skill: { name: "提壶狂奔", kind: "self", range: 0, ap: 1, cd: 2,
+        desc: "立即获得2行动点，且下次伤害+1。（径提水壶而出班，疾如电，行如风雨。何以携水壶？——顺道）" },
+      quote: "为人英俊挺拔，为二楼最帅之男。",
+      bio: "嗜水如命，如不饮，必不活。如厕必携水壶。与汶斌四战，三败一胜，所亡失者以十数（饮料）。体育常冠于班，破百。后入复旦大学。",
+      playable: true, aggr: 0.6
+    },
+    yiran: {
+      id: "yiran", name: "隋奕然", hao: "小蛙", juan: "卷九", glyph: "蛙",
+      color: "#5a8c46", hp: 10,
+      passive: { name: "魔方宗师", desc: "每回合首次受伤-1。（技艺炉火纯青，为兵以监控视之，破门而入，碎之万段）" },
+      skill: { name: "拍肚皮", kind: "unit", range: 1, ap: 1, cd: 2,
+        desc: "相邻一敌受2伤，自愈1血。（见鲁豪腹大如斗，乃拍之，觉好玩，拍之不止）" },
+      quote: "何只有凯宇一男也！——师竟未认出奕然亦男也。",
+      bio: "梦晨谓之神青蛙，广超改曰小蛙，奕然甚喜此号。捡一发卡，幻想其为梦晨所有，四处求问，闻是仙女的，甩手弃掷于地，若为蝎子所蛰。后入北京理工大学。",
+      playable: true, aggr: 0.6
+    },
+    dazhan: {
+      id: "dazhan", name: "祝大展", hao: "少年展", juan: "卷六", glyph: "展",
+      color: "#7c5cd6", hp: 12,
+      passive: { name: "探楼发屋", desc: "一次移动可走两格。（探科技楼，门把手无不摸，走廊无不走，亡处不寻）" },
+      skill: { name: "玉米为刃", kind: "unit", range: 1, ap: 1, cd: 2,
+        desc: "相邻一敌受3伤。（乃幻想玉米为刃，欲以杀人，拔玉米而舞）" },
+      quote: "少年展者，祝大展也。有龙凤之姿。",
+      bio: "编程之能未有过之者。月考睡过头，除姓名外靡不毕缪，卒得109。乒乓球正反手不辨，师长以为其陪考。惟高中恋爱成者，与可怡也。后入南京大学。",
+      playable: true, aggr: 0.7
+    },
+
+    /* ============ BOSS / 剧情角色 ============ */
+    hanxiao: {
+      id: "hanxiao", name: "孙含笑", hao: "上", juan: "卷二", glyph: "上",
+      color: "#a44a3f", hp: 12, boss: true,
+      passive: { name: "班主任之威", desc: "受到的一切伤害-1，至少为1。（训声百转，属引恐怖，绕窗数日而不绝）" },
+      skill: { name: "遣返回家", kind: "unit", range: 3, ap: 2, cd: 3,
+        desc: "距三内一敌被遣返回家一回合。（其子峻还家计二周，而期末级部十一）" },
+      quote: "高考者，非假期耳，是上课也！",
+      bio: "95年生，烟台海阳人。敢复读，有勇耳；去支教，有见耳。以酸奶贻封控学生，得学生欢。夫香味为臭味稀百倍，臭味为香味浓百倍，今以香掩臭，犹抱薪救火。",
+      playable: false, aggr: 0.65
+    },
+    weibing: {
+      id: "weibing", name: "为兵", hao: "老班", juan: "卷一", glyph: "兵",
+      color: "#5d5d5d", hp: 12, boss: true,
+      passive: { name: "监控之眼", desc: "其攻击无视闪避与减伤，且目标无法免疫跳过。（以监控视之，大怒，破门而入）" },
+      skill: { name: "破门而入", kind: "unit", range: 99, ap: 2, cd: 3,
+        desc: "瞬至全场任一敌相邻并缴械其刀一回合。（遽扑之，夺其魔方，碎之万段于垃圾桶）" },
+      quote: "尔等安有如修逸折正二十面体者乎？",
+      bio: "成绩斐然，数创实验纪录。尝与办公室斗地主，仅余四K，为一生瞥来问题所误，乃知其败，骤然作色曰：尔之不善思甚矣！欲往高一从其子而教之，崇国不许，贬其任美术老师。",
+      playable: false, aggr: 0.7
+    },
+    shibo: {
+      id: "shibo", name: "张世波", hao: "大师", juan: "卷四", glyph: "波",
+      color: "#4f6d8c", hp: 10, boss: true,
+      passive: { name: "吸东来之紫气", desc: "每回合回复1血。（没升旗必做气功，序万物之阴阳）" },
+      skill: { name: "口诀震场", kind: "raoe", range: 2, ap: 2, cd: 2,
+        desc: "距二内所有敌人受2伤。（面面垂直找交线，找到交线找垂线！）" },
+      quote: "指数找好友，对数单身狗。",
+      bio: "仙风道骨，鹤发童颜。钦法旁听其课，喟然叹曰：苟吾遇之早，吾数学可有成也。晚自习偏心六班：六班留22分而八班18分，钦法叹曰：此真数学老师也。",
+      playable: false, aggr: 0.6
+    },
+    weirong: {
+      id: "weirong", name: "杨为荣", hao: "破伤风", juan: "卷四", glyph: "荣",
+      color: "#6b4f8c", hp: 10, boss: true,
+      passive: { name: "黑棒无双", desc: "刀击伤害+1。（有翼帆者，一棍而不能坐，力度之强，技巧之深，未有过之者）" },
+      skill: { name: "奇彪无比", kind: "unit", range: 3, ap: 1, cd: 3,
+        desc: "距三内一敌下回合行动点-2。（有错简单题者，辄曰：奇彪无比）" },
+      quote: "众人皆错，则曰：拖拉机上炕——惊人。",
+      bio: "物理老师，上课甚幽默。其有一黑棒，不盈尺，而威力无双，子琛谓之破伤风棒：苟有得痔疮者离击，或已死。绍铭班倒一，为荣大怒，以戒尺笃之，阴谓课代表曰：此恋爱乎？",
+      playable: false, aggr: 0.65
+    },
+    qinfa: {
+      id: "qinfa", name: "钦法", hao: "主任", juan: "卷十四", glyph: "法",
+      color: "#3d4a5c", hp: 9, boss: true,
+      passive: { name: "穷追猛打", desc: "对半血以下敌人伤害+1。（头哥复为钦法所逮者再，谴之还家者有三）" },
+      skill: { name: "当场抓获", kind: "unit", range: 3, ap: 1, cd: 3,
+        desc: "距三内一敌缴械一回合（该回合不能刀击）。（此何课也？自习。何以看书耶？——头哥不语）" },
+      quote: "汝乃何人？——陈修逸。——此何课也？——自习。",
+      bio: "级部主任，深恶看闲书者。收头哥之书，通报于电子班牌。令绍歆互相揭发而自破，绍歆不语，卒予二人记过。",
+      playable: false, aggr: 0.7
+    },
+    chongguo: {
+      id: "chongguo", name: "王崇国", hao: "校长", juan: "卷十四", glyph: "国",
+      color: "#2f3d2f", hp: 11, boss: true,
+      passive: { name: "弃车保帅", desc: "每场一次，致命伤时保留1血并回复3血。（居二中之时，事败，辄弃车保帅以自全）" },
+      skills: [
+        { name: "评职称", kind: "raoe", range: 99, ap: 2, cd: 3,
+          desc: "所有敌人本回合不能施技。（不为班主任者不得评职称——一出，天下皆惊）" },
+        { name: "种树", kind: "summon", ap: 1, cd: 2,
+          desc: "召唤一名'树'随从。（多种树木，树木皆死，时人谓之种树校长）" }
+      ],
+      quote: "为师者，吾之属地也，有师敢不从吾乎？",
+      bio: "即墨实验之校长也。入实验前举于官场。苛于师而厚于生：免生打水之费，然以热水器加装于教师宿舍者，无之。师生稍背离之。",
+      playable: false, aggr: 0.6
+    },
+    wanzhen: {
+      id: "wanzhen", name: "万震", hao: "六班之首", juan: "卷五", glyph: "震",
+      color: "#6a8577", hp: 10,
+      passive: { name: "潜心至学", desc: "免疫跳过与沉默。（潜心至学，六班无有与之争锋者，无多事）" },
+      skill: { name: "数学之首", kind: "unit", range: 2, ap: 1, cd: 2,
+        desc: "距二内一敌受2伤。（六班数学之首也，无多事）" },
+      quote: "万震者，六班数学之首也，潜心至学，无多事。",
+      bio: "TGO成员。wonder每有新题辄曰：wonder震，来不来。后入哈尔滨工业大学。",
+      playable: false, aggr: 0.5
+    },
+    keai: {
+      id: "keai", name: "可怡", hao: "大展之怡", juan: "卷六", glyph: "怡",
+      color: "#c76b98", hp: 10,
+      passive: { name: "心善展", desc: "与大展相邻时，大展伤害+1，且每回合为其疗1血。（大展正道直行，关切同学）" },
+      skill: { name: "一糖之恩", kind: "unit", range: 2, ap: 1, cd: 2,
+        desc: "距二内一友军回复2血。（与尔一糖，毋有心伤）" },
+      quote: "可怡大感功，心益善大展。",
+      bio: "于抽转盘未得奖，展乃与一糖。火锅席间数欲夹展饭，展拒之。二人俱玩4399，怡忽念抱展，展狼扑之，撞之于衣柜。后入中国农业大学。",
+      playable: false, aggr: 0.4
+    },
+    limo: {
+      id: "limo", name: "李默", hao: "羚羊", juan: "卷十三", glyph: "羚",
+      color: "#8f8f5c", hp: 9,
+      passive: { name: "巡征", desc: "一次移动可走两格。（每吃饭必疾往，先以右足探地，既而狂奔，状类羚羊）" },
+      skill: { name: "争食", kind: "unit", range: 2, ap: 1, cd: 2,
+        desc: "距二内一敌受1伤并自愈1血。（每有小零食，默必先索而食之）" },
+      quote: "吾之高中，多以为一场游戏一场梦。",
+      bio: "好重点班，常于二楼徘徊，时手提其袋，时举其水壶，时人谓之巡征。食诺如而中毒，伏于地板翻滚，哀号灼然，然终躺地以听课。",
+      playable: false, aggr: 0.6
+    },
+    xiangdong: {
+      id: "xiangdong", name: "吴相东", hao: "潜逃者", juan: "卷十三", glyph: "东",
+      color: "#555577", hp: 9,
+      passive: { name: "潜逃", desc: "四分之一机率闪避，且每场一次致命伤不死。（不告而离校，卒潜逃回家，二月不返）" },
+      skill: { name: "级部第一", kind: "unit", range: 3, ap: 1, cd: 4,
+        desc: "距三内一敌受2伤。（或退步，辄取级部第一，时人侧目而视）" },
+      quote: "每逢考试，必潜携手机。",
+      bio: "实验之奇人。一夜潜于走读生之队中混出实验，已行至台城，为当班者识其校服，卒寻于其家门前，押而归，乘师不备又走。",
+      playable: false, aggr: 0.6
+    },
+    mob: {
+      id: "mob", name: "实验学子", hao: "路人", juan: "各卷", glyph: "生",
+      color: "#8c8577", hp: 8,
+      passive: { name: "无", desc: "无。" },
+      skill: { name: "围观", kind: "unit", range: 1, ap: 1, cd: 3, desc: "相邻一敌受1伤。" },
+      quote: "凡马刀，规则至简，而引人入胜。",
+      bio: "马刀大兴，扩于九班，又于七班兴。师察生于考试前多痴迷马刀，于是大怒，强令禁之，然亦多有马刀者。",
+      playable: false, aggr: 0.5, mob: true
+    },
+    tree: {
+      id: "tree", name: "树", hao: "崇国所种", juan: "卷十四", glyph: "木",
+      color: "#4c6b3c", hp: 1,
+      passive: { name: "树木皆死", desc: "无。" },
+      skill: { name: "无", kind: "unit", range: 1, ap: 1, cd: 9, desc: "相邻一敌受1伤。" },
+      quote: "多种树木。树木皆死。",
+      bio: "崇国走，复入二中，多种树木。树木皆死，时人谓之种树校长。",
+      playable: false, aggr: 0.9, mob: true
+    },
+    /* 二中四人（卷十五） */
+    shengxiang: {
+      id: "shengxiang", name: "谭晟翔", hao: "义", juan: "卷十五", glyph: "翔",
+      color: "#7a4f4f", hp: 7,
+      passive: { name: "能让不能明", desc: "无。（晟翔有义无勇）" },
+      skill: { name: "彻夜苦练", kind: "unit", range: 2, ap: 1, cd: 3, desc: "距二内一敌受2伤。（彻夜苦练朵莉亚至四点）" },
+      quote: "吾皆为同学，无为如此！",
+      bio: "于班德高望重，人有随之而恶连奇。以三百金市五十之机，痴情付之。齐岳复与之为兄弟，于是复与之饭。",
+      playable: false, aggr: 0.55
+    },
+    qiyue: {
+      id: "qiyue", name: "鲁齐岳", hao: "痴", juan: "卷十五", glyph: "岳",
+      color: "#4f6e7a", hp: 7,
+      passive: { name: "有痴无断", desc: "无。（齐岳多情而少断）" },
+      skill: { name: "纸条投书", kind: "unit", range: 2, ap: 1, cd: 3, desc: "距二内一敌受2伤。（乃投其书于子烨，子烨蔑之，弃其纸条如草芥）" },
+      quote: "一妇人而已，和足挂之！——尔无能知之。",
+      bio: "初好子烨，断后好连奇，计不满一月。三白之，连奇勉许之，既高考而分。",
+      playable: false, aggr: 0.7
+    },
+    ziye: {
+      id: "ziye", name: "李子烨", hao: "媚", juan: "卷十五", glyph: "烨",
+      color: "#8c6a2f", hp: 7,
+      passive: { name: "有媚无诚", desc: "无。（子烨有媚无诚）" },
+      skill: { name: "谗言", kind: "unit", range: 2, ap: 1, cd: 3, desc: "距二内一敌受1伤且下回合行动点-1。（乃阴谗言于连奇：若华为人阴险，不可与之为谋）" },
+      quote: "子烨好评头论足，玲珑可爱。",
+      bio: "与他有罅，乃阴谗言。九人联合发朋友圈以阴阳之，子烨闻之大怒，乃告于老师。",
+      playable: false, aggr: 0.6
+    },
+    lianqi: {
+      id: "lianqi", name: "岳连奇", hao: "断", juan: "卷十五", glyph: "奇",
+      color: "#5c5c8c", hp: 7,
+      passive: { name: "有断无柔", desc: "无。（连奇有断无柔）" },
+      skill: { name: "二择", kind: "unit", range: 2, ap: 1, cd: 3, desc: "距二内一敌受2伤。（予尔二择：a朋友，b陌路，尔其当之）" },
+      quote: "高考且至，吾不欲吾二人难堪。",
+      bio: "念齐岳成绩卓越，乃许其入派。连奇派多女生，悉恶子烨。",
+      playable: false, aggr: 0.65
+    }
+  };
+
+  const PLAYABLE = ["dage","shenren","xiannv","touge","lifan","wonder","wenbin","yurun","luhao","xiaochuan","guyin","zichen","shaoming","xinhui","guayu","yiran","dazhan"];
+
+  /* ---------------- 剧情关卡（十五卷 + 序章） ---------------- */
+  const STAGES = [
+    {
+      id: "s0", juan: "序章", title: "马刀书",
+      intro: "wonder引马刀于TGO，于体育课玩，于是马刀得散。规则至简，而引人入胜。世界马刀协会既立，奉wonder为马刀之神。今汝初执马刀，对手乃潜心至学之万震——无多事，善。",
+      tip: "猜拳胜得四动，和得三动，负得二动。行动可：买刀、买马、移动、刀击、马踢、血祭、用技。同城（城墙）上马踢，扣三血并踢下城。",
+      enemies: ["wanzhen"], allies: [], rule: null,
+      outro: "万震败，曰：善。",
+      yueks: "音克思曰：马刀之所以引人入胜，在于马刀之人也。既毕业，无复有刀者，悲哉！今以刀会友，善。"
+    },
+    {
+      id: "s1", juan: "卷一", title: "三异能者列传",
+      intro: "实验有三异能者，谓之大哥、神人、仙女。与人不善，神情固执，边幅不修，然为师所善，得'卫生标兵''正能量之星'之誉。今三子轮番上阵：先大哥，次神人，终仙女——切记各别其能。",
+      tip: "三阵连战，阵间回复四血。大哥立于城墙则伤害+1，诱其下城；神人体味蚀人，勿恋近身；仙女免疫晕眩，其声不可惑。",
+      enemies: ["dage", "shenren", "xiannv"], waves: [["dage"], ["shenren"], ["xiannv"]], allies: [], rule: null,
+      outro: "后哥以综评入香港中文大学，神入北京电子科技大学——马刀场上，亦复如是。",
+      yueks: "音克思曰：向使大哥不贪女色，神重于仪表，仙以礼待人，何至于为人所恶也？然马刀场上，异能者自有异能之用。"
+    },
+    {
+      id: "s2", juan: "卷二", title: "含笑本纪",
+      intro: "含笑者，孙含笑也，予称之为'上'。上查寝，见汝未当床；上诘之，汝狡辨曰：吾在通济。上怒曰：尔在何处？实验高中耳！——今上亲至马刀场，'遣返回家'之罚，汝且试之。",
+      tip: "上受一切伤害-1，且会遣返回家（移出战场一回合）。此乃持久战，血祭抢攻未必明智。",
+      enemies: ["hanxiao"], allies: [], rule: null,
+      outro: "上诫学生曰：余日一中返家上网，而吾等于宿舍焉，落后甚多，尔当勉自而学也！",
+      yueks: "音克思曰：贤哉含笑！敢复读，有勇耳；去支教，有见耳。勇见兼备，序他班而朝同列，无敌于实验。号曰文，可谓谊哉！"
+    },
+    {
+      id: "s3", juan: "卷三", title: "绍歆列传",
+      intro: "绍铭仪表堂堂，歆慧貌美晔丽。初，鲁豪感绍铭曰：急击勿失。于是绍歆自此游。二人比邻，则情比金坚，伤害+1——欲破其阵，先分其人。歆慧一声'滚'，能退汝两格。汝之友军，正是媒人鲁豪。",
+      tip: "二人相邻时各伤害+1，勿让其聚首。鲁豪会为你顶刀，但别指望他输出。",
+      enemies: ["shaoming", "xinhui"], allies: ["luhao"], rule: { id: "dyad", desc: "敌人相邻时伤害+1（情比金坚）" },
+      outro: "铭沉默良久，长叹曰：怎能不悔也！慧既黑铭，曰：吾觉未有之爽也。",
+      yueks: "音克思曰：吾闻之大展曰：恋爱多出于地理近。绍歆岂不类乎？欲以己之一厢情愿而恋爱，卒亡其慧，尚不觉寐而不自省，过矣。"
+    },
+    {
+      id: "s4", juan: "卷四", title: "六班老师传",
+      intro: "张世波者，大师也，仙风道骨，鹤发童颜，每回合吸东来之紫气自愈；杨为荣者，物理老师也，黑棒不盈尺而威力无双，刀击+1。二师授课于马刀场。汝非孤军——汶斌在侧：下课铃响，故走往饭，此自然之理也！",
+      tip: "大师会回血，集火先斩之。为荣黑棒刀刀入肉（刀击+1），勿与之纠缠。",
+      enemies: ["shibo", "weirong"], allies: ["wenbin"], rule: null,
+      blocked: [[2, 2], [2, 4], [4, 2], [4, 4]],   // 六班教室的课桌
+      outro: "为荣见绍铭班倒一，以戒尺笃之，而阴谓课代表曰：绍铭今班倒一，此恋爱乎？",
+      yueks: "音克思曰：凡六班之老师，无不爱岗敬业，知识渊博，此六班强盛之基也。"
+    },
+    {
+      id: "s5", juan: "卷五", title: "TGO列传",
+      intro: "TGO者，tiganorganization也，数学题感无双。今逐一领教：先会教主汶斌——秒解题，弹簧纸箭射程数米；再战马刀之神wonder——血祭翻倍两次，勿使其近身血祭。每有新题，wonder辄曰：GBC，算不算？",
+      tip: "两阵连战，阵间回复四血。汶斌之箭与wonder之神算皆远及三格，近身则其刀亦利。wonder血祭后两击双倍，见祭速退！",
+      enemies: ["wonder", "wenbin"], waves: [["wenbin"], ["wonder"]], allies: [], rule: null,
+      outro: "Wonder每算错，即拍大腿而叫曰：别叫别叫。汶斌有诗赞之曰：打完响指拍大腿，大喊一声别叫了。",
+      yueks: "音克思曰：TGO为六班数学之冠，奇思妙想皆出其中，马刀兴焉。至高三，虽分离，亦多究题，此TGO之基也。"
+    },
+    {
+      id: "s6", juan: "卷六", title: "展怡列传",
+      intro: "少年展者，祝大展也，有龙凤之姿，探楼发屋，一步两格；可怡心善展，比邻则大展伤害+1且每回合得疗。高中之恋爱者多不就，惟大展成——今汝为不成人之美者。",
+      tip: "可怡会为大展疗伤加持，先斩可怡，或以击退拆散二人。大展步幅极大，勿以为距离安全。",
+      enemies: ["dazhan", "keai"], allies: [], rule: { id: "lovers", desc: "可怡与大展相邻时，展伤害+1且每回合回血" }, hpScale: 0.7,
+      outro: "既高考，展与可怡牵之手而行于校园，岂不美哉？",
+      yueks: "音克思曰：高中之恋爱者多不就，惟大展成。究其本，乃展之收敛而谨慎也。此之谓：恋爱者必慎也。"
+    },
+    {
+      id: "s7", juan: "卷七", title: "修逸列传",
+      intro: "陈修逸，不知其何许人也，头甚圜，绝类卤蛋。所持陀螺名曰三溴化氮，鲜有败绩；体味绝类鸩毒，中者中毒。免疫击退——官知止而神欲行。三次为捉，四次换家，至今不易其志。",
+      tip: "三溴化氮周身AOE+中毒，勿贴身连击。免疫击退，马踢只能伤之不能踢之。其血不厚，稳扎稳打。",
+      enemies: ["touge"], allies: [], rule: null,
+      blocked: [[3, 3]],   // 讲台（头哥正是在此处被为兵逮住）
+      outro: "为兵视马刀角色，念曰：豌豆射手，何为豌豆射手？众哄堂大笑。至头哥返校，见其小臂多有伤痕，盖其父母为之。",
+      yueks: "音克思曰：余尝闻鲁豪之摆烂，神人之体味，大哥之特立独行。盖修逸者，可谓兼之矣。"
+    },
+    {
+      id: "s8", juan: "卷八", title: "世界马刀协会锦标赛",
+      intro: "后，世界马刀协会立，以鲁豪、小川、子琛、大展、翼帆为委员，奉wonder为马刀之神。今为锦标赛制：连胜三阵——先鲁豪，次小川，终子琛。阵间回复四血。",
+      tip: "三连战。赛事之间可充分休整，故每阵可放手一搏；子琛的起义会波及全场，留神其第三回合的援军。",
+      enemies: ["luhao"], waves: [["luhao"], ["xiaochuan"], ["zichen"]], allies: [], rule: null, hpScale: 0.68, restFull: true,
+      outro: "马刀大兴盛，扩于九班；又于七班兴，与六班合流，始成今日之马刀。汝今列席协会，与有荣焉。",
+      yueks: "音克思曰：马刀之消，似于高中之时光也。愿汝此刀，永不消。"
+    },
+    {
+      id: "s9", juan: "卷九", title: "皇家曼彻斯特传",
+      intro: "郭凯宇者，呱宇也，为二楼最帅之男，嗜水如命，疾如电，三成闪避？非也，二成也；隋奕然者，小蛙也，魔方技艺炉火纯青，每回合首次受伤-1，拍肚皮自得其乐。二人同场，帅与清秀并存。",
+      tip: "呱宇闪避不低，用必中技能与马踢取之；小蛙首伤-1，连击方可破防。",
+      enemies: ["guayu", "yiran"], allies: [], rule: null,
+      outro: "宇尝四战汶斌，三败而一胜。奕然于班走，捡一发卡，幻想其为梦晨所有。",
+      yueks: "音克思曰：呱宇、奕然者，世多其贤。吾考之行事，网罗其闻，知其有奇事也。"
+    },
+    {
+      id: "s10", juan: "卷十", title: "王子琛世家",
+      intro: "王子琛者，故六班之班长也，号曰武，号令两班，政由琛出。其'体育课起义'波及全场，夺话筒而令汝不得行动。第三回合，其心腹二人将入场：凡有责任，在吾一人！",
+      tip: "第三回合有二路人入场，勿被围殴。班长之威使近身者伤害-1，以技能与马踢远程取之。",
+      enemies: ["zichen"], allies: [], rule: { id: "uprising", desc: "第三回合敌人援军二人入场（起义）" },
+      blocked: [[1, 1], [1, 5], [5, 1], [5, 5]],   // 操场四角的器械
+      outro: "琛既上书，言于含笑曰：吾师，今事已毕，起义大成。含笑瞪目。琛忙释：非汝之所想也。",
+      yueks: "音克思曰：子琛起于六班，续位于七班。号令两班，政由琛出，威震天下。位终，且近古以来未之有也。"
+    },
+    {
+      id: "s11", juan: "卷十一", title: "DDB列传",
+      intro: "道德帮者，刘鲁豪、颜小川、顾一也。以顾一有德，鲁豪有道，而小川兼通德艺。三人比邻，DDB同德，伤害+1。皇太子每场不死一次，川受伤越痛反击越狠。汝非孤军——毓润强跟之饭，'三带一'是也。",
+      tip: "汝有友军毓润（虽其求战心不坚）。三人相邻伤害+1，先破其阵型。顾一有皇太子庇佑，留后手。",
+      enemies: ["luhao", "xiaochuan", "guyin"], allies: ["yurun"], rule: { id: "dyad", desc: "敌人相邻时伤害+1（DDB同德）" },
+      blocked: [[3, 2], [3, 4]],   // 食堂长桌（只因说：吾摆烂矣）
+      outro: "川曰：呜呼，高中之人，非有超世之才，未可节外生枝。诚哉川之言也。",
+      yueks: "音克思曰：以川之才俊，虽内向，何女不容？才貌如川且若此，况庸碌之人乎？"
+    },
+    {
+      id: "s12", juan: "卷十二", title: "李帆列传",
+      intro: "李帆者，山东青岛人，时人号之曰'李疯'。购刀免费，Say You Say Me使汝笑场不能自持。神教会残部二人随其入场——刘毅立神教时，帆为左护法，凡十四人，以骂神为己任。",
+      tip: "帆购刀免费，前期即有刀伤。笑场之歌范围二格，能散则散。先清杂兵，再诛李疯。",
+      enemies: ["lifan", "mob", "mob"], allies: [], rule: null,
+      outro: "帆任英语课代表之职，誓为同学争权。苹苹怒斥众曰：汝等皆叛徒也！帆窃喜，以苹苹未知其课代表乃叛军之首也。",
+      yueks: "音克思曰：予观《李帆传》《头哥传》，越于韩柳之文采。终得一言以评之曰：疯奇。"
+    },
+    {
+      id: "s13", juan: "卷十三", title: "李默相东传",
+      intro: "李默者，不知其何班也，走路侧翼加速，状如羚羊，一步两格；吴相东者，实验之奇人也，每逢考试必潜携手机——三成闪避，每场一次致命不死。一场游戏一场梦，此战亦然。",
+      tip: "二人皆难捉摸：羚羊步大，相东善逃。封锁其走位（利用城墙与马踢），以范围技逼其现形。",
+      enemies: ["limo", "xiangdong"], allies: [], rule: null,
+      outro: "至实验，乘师不备，相东又走。师下令全守卫闭门，卒获之。当时，已十二点矣。",
+      yueks: "音克思曰：实验果多神人也。"
+    },
+    {
+      id: "s14", juan: "卷十四", title: "王崇国本纪",
+      intro: "王崇国，即墨实验之校长也，貌丑德薄，苛于师而怠于职。钦法为其爪牙，当场抓获，缴械沉默。崇国'弃车保帅'，濒死复起；'评职称'禁汝施技；'种树'召唤随从——树木虽皆死，今日且种之。为兵为其所贬，今来助阵：终焉之战。",
+      tip: "先斩钦法，绝其抓获。崇国血厚且有免死，血祭爆发务必一次到位。其召唤之树，一踢即散。",
+      enemies: ["qinfa", "chongguo"], allies: ["weibing"], rule: null, hpScale: 0.78,
+      blocked: [[2, 3], [4, 3]],   // 校长室的办公桌与文件柜
+      outro: "后崇国走，复入二中，多种树木。树木皆死，时人谓之'种树校长'。为兵亦复其职，未几，再接新班。",
+      yueks: "音克思曰：荣国轻师而重生，犹植木于沙，欲其茂而不得其土。嗟乎，苟能推此心以待师，何至于天下共怨也？"
+    },
+    {
+      id: "s15", juan: "卷十五", title: "二中番外·党争",
+      intro: "二中二十三班有四人焉：谭晟翔、鲁齐岳、李子烨、岳连奇。四人初以学业相近而相善，后以一言相疑，以一人相争，离合反覆，终至交恶。爱者反为仇，仇者复为友——场上四人，各有二成之机误伤'友军'。乱世用重典，唯一人可终结此局。",
+      tip: "敌人内讧（二成机率打错人），但四人围攻仍极险。利用党争，逐个诱杀，勿陷中央。",
+      enemies: ["shengxiang", "qiyue", "ziye", "lianqi"], allies: [], rule: { id: "chaos", desc: "敌人二成机率误伤最近的任何人（党争）" },
+      outro: "向所谓终身之好者，亦不过一时之心。然当其时也，喜怒皆真，故记之。",
+      yueks: "音克思曰：流言可以离友，猜疑可以成仇，而人心之变，虽史家亦不能尽知也。靡不有初，鲜克有终，观于四人，信哉！"
+    }
+  ];
+
+  /* ---------------- 成就 ---------------- */
+  const ACHIEVEMENTS = [
+    { id: "a_first", name: "初执马刀", desc: "完成第一场战斗的胜利。" },
+    { id: "a_tutorial", name: "协会列席", desc: "通关序章·马刀书。" },
+    { id: "a_s1", name: "异能者退散", desc: "通关卷一·三异能者列传。" },
+    { id: "a_s2", name: "上之意", desc: "通关卷二·含笑本纪。" },
+    { id: "a_s5", name: "别叫别叫", desc: "通关卷五·TGO列传。" },
+    { id: "a_s14", name: "种树校长", desc: "通关卷十四·王崇国本纪。" },
+    { id: "a_all", name: "马刀之神", desc: "通关全部十五卷剧情。" },
+    { id: "a_blood", name: "血祭血祭", desc: "使用血祭并赢得该场战斗。" },
+    { id: "a_reopen", name: "重开重开", desc: "战败一次。（胜负乃兵家常事）" },
+    { id: "a_wall", name: "破败城墙", desc: "全程不离城墙而获胜。（苔藓覆其上，终无尽头）" },
+    { id: "a_1hp", name: "高考激励", desc: "曾在仅剩1血时存活，并最终获胜。（此不类高考乎？吾终将尽城墙）" },
+    { id: "a_noskill", name: "卫生标兵", desc: "不使用技能获胜。（为兵所授，佯作打扫卫生状）" },
+    { id: "a_nohorse", name: "正能量之星", desc: "不买马而获胜。（为兵欢，授之）" },
+    { id: "a_1v3", name: "神教会", desc: "以一敌三并获胜。（凡十四人，以骂神为己任）" },
+    { id: "a_rush", name: "急击勿失", desc: "单回合造成至少5点伤害。" },
+    { id: "a_fast", name: "强基第一", desc: "五回合内获胜。（强基之分轻取第一）" },
+    { id: "a_walk", name: "巡征", desc: "累计移动50格。（时手提其袋，时举其水壶）" },
+    { id: "a_heal", name: "搬水者气概也", desc: "累计回复10点血。（搬水者，气概也）" },
+    { id: "a_surv10", name: "台城", desc: "破败城墙（生存）抵达第10波。（不告而离校，已行至台城矣）" },
+    { id: "a_surv20", name: "苔藓不尽", desc: "破败城墙（生存）抵达第20波。（吾走之其上久，终无尽头）" },
+    { id: "a_free", name: "乱刀齐发", desc: "在乱斗模式获胜一次。" },
+    { id: "a_laugh", name: "Say You", desc: "用李帆获胜一场。（Q=CU）" },
+    { id: "a_ngplus", name: "二周目", desc: "在困难强度下取得一场胜利。（重开重开，再来一遍）" },
+    { id: "a_ngplus14", name: "铁人", desc: "在困难强度下通关卷十四·王崇国本纪。（与为兵并肩，再战校长）" },
+    { id: "a_allchar", name: "十七人皆执刀", desc: "以全部十七位可操作角色各取胜一场。（史册之中，人人有传）" }
+  ];
+
+  /* ---------------- 生存模式增益 ---------------- */
+  const BOONS = [
+    { id: "b_hp", name: "奋进新征程", desc: "生命上限+2并回复2血。（八千余字，其志甚坚）" },
+    { id: "b_knife", name: "刀锋所向", desc: "刀击伤害+1。（买刀）" },
+    { id: "b_horse", name: "马踏连营", desc: "马踢伤害+1。（买马）" },
+    { id: "b_regen", name: "吸东来之紫气", desc: "每回合回复1血。（世波气功，序万物之阴阳）" },
+    { id: "b_dodge", name: "疾如电", desc: "获得15%闪避。（飞身出班，行如风雨）" },
+    { id: "b_blood", name: "马刀之神", desc: "血祭后翻倍两次。（wonder亲传）" },
+    { id: "b_cd", name: "秒之", desc: "技能冷却-1。（汶斌秒之）" },
+    { id: "b_move", name: "探楼发屋", desc: "移动距离+1。（门把手无不摸，走廊无不走）" },
+    { id: "b_ap", name: "下课铃响", desc: "每回合行动点+1。（故走往饭，此自然之理也）" },
+
+    /* ---- 稀有（质变型）：每局最多出现一次 ---- */
+    { id: "b_bloodfree", rare: true, name: "以道代血", desc: "血祭不再损血，只耗行动点。（道之所在，血不轻洒）" },
+    { id: "b_cleave", rare: true, name: "刀扫一片", desc: "刀击同时波及相邻的另一名敌人。（马刀本是横扫之术）" },
+    { id: "b_horsereach", rare: true, name: "长杆马刀", desc: "马踢射程+1（同城四格之内皆可踢）。（加长一寸，强出一分）" },
+    { id: "b_killheal", rare: true, name: "庆功之宴", desc: "击破敌人回复4血（原为2）。（大胜而归，理当加餐）" },
+    { id: "b_shield", rare: true, name: "班主任的偏爱", desc: "开局获得3点护盾。（含笑素善大哥，此之谓也）" },
+    { id: "b_firststrike", rare: true, name: "先手刀", desc: "每回合首次刀击伤害+1。（早读查得严，唯快不破）" }
+  ];
+
+  /* ---------------- 乱斗地图名 ---------------- */
+  const FREE_MAPS = [
+    { id: "standard", name: "实验标准场", desc: "中空地，外城墙，正经马刀场。" }
+  ];
+
+  return { CHARACTERS, PLAYABLE, STAGES, ACHIEVEMENTS, BOONS, FREE_MAPS };
+})();
+
+</script>
+<script>
+/* ============================================================
+ * 实验史记 · 马刀风云 —— 剧本卷
+ * 序章 / 终章 / 十六卷对话剧 / 战中触发台词
+ * 台词多取《实验史记》原文，稍加剪裁。
+ * ============================================================ */
+window.SJI_SCENES = (function () {
+  "use strict";
+
+  const speakers = {
+    "史": { name: "音克思", glyph: "史", color: "#a63a2b" }
+  };
+
+  const prologue = [
+    ["史", "两年了。清理文件的时候，我又翻到了这部《实验史记》。"],
+    ["史", "时间真不愧是世界上最强大的东西。若不是这几天整理文件，我都快忘了它。"],
+    ["史", "高考那年去图书馆自习，书看多了，就有了自己写点什么的想法。于是挥笔写下《大哥列传》——五六百字，文笔远不如现在。"],
+    ["史", "有人说：在社交中，人们会伪装；但在书和画里，人会毫无防范地暴露自己。"],
+    ["史", "我想知道，这些字到底能不能照出他们——顺便，照出我自己。"],
+    ["史", "至于马刀——卷八有云：规则至简，而引人入胜。"],
+    ["史", "既毕业，无复有刀者，悲哉。"],
+    ["史", "那么——在这里，重开重开。"]
+  ];
+
+  const epilogue = [
+    ["史", "至此，十五卷成。"],
+    ["史", "后来，我把纸质版打成电子版，打到手酸——电子版终究只有纸质版的三分之二。"],
+    ["史", "前几天清理文件，我又翻到它，不由自主心生感慨。于是写了这篇序——补全史记的最后一块拼图。"],
+    ["史", "在书里，人毫无防范地暴露自己。我看见了大哥、神人、仙女，看见了含笑、头哥、wonder——也看见了我自己。"],
+    ["史", "高考完了，大家都去了很好的大学。AI 读了我的史记，说分析出来的人物，和我心目中的一模一样。"],
+    ["史", "这文学实在是太过奇妙。"],
+    ["史", "既毕业，无复有刀者，悲哉。"],
+    ["史", "——所以，替他们，把这把刀，多握一会儿。"],
+    ["史", "（实验史记 · 终）"]
+  ];
+
+  const stages = {
+    s0: {
+      intro: [
+        ["震", "……汝来做什么。"],
+        ["史", "万震，六班数学之首。潜心至学，无多事。今日特来讨教一刀。"],
+        ["震", "马刀者，开局人皆位于己城，中有空地。以猜拳定行动：胜四动，和三动，负二动。"],
+        ["震", "行动可买刀、买马、移动。同区以刀击之，扣一血；同在城墙，以马踢之，扣三血并踢下城。"],
+        ["震", "血祭者，扣当前之半血，而令下次伤害翻倍。——记住了？"],
+        ["史", "记住了。规则至简，而引人入胜。"],
+        ["震", "……那，开刀吧。"]
+      ],
+      victory: [
+        ["震", "……善。"],
+        ["史", "六班数学之首，胜不骄，败亦无多言。"],
+        ["史", "世界马刀协会既立，奉wonder为马刀之神——今日起，委员会里也给史官留一把交椅。"]
+      ],
+      defeat: [["史", "无多事，输了也无多事。重开重开。"]]
+    },
+
+    s1: {
+      intro: [
+        ["史", "实验有三异能者，谓之大哥、神人、仙女。"],
+        ["史", "与人不善，神情固执，边幅不修——然为师所善，得'卫生标兵''正能量之星'之誉。"],
+        ["大哥", "尔搬何书？——吾名为贾瀚元！"],
+        ["史", "高二时我对大哥的印象极深，事件也典型——第一卷，自然从大哥写起。"]
+      ],
+      triggers: [
+        { when: "waveStart", wave: 2, lines: [
+          ["神人", "悲夫！吾当一人任所有班委之职，吾不忍他人无职可任——"],
+          ["史", "神人江润翔，其目如双缝，以至光发生干涉。其味如鲍鱼之肆——慎近身。"]
+        ] },
+        { when: "waveStart", wave: 3, lines: [
+          ["仙女", "关尔屁事！吾声响，乃吾勤奋专注也！"],
+          ["史", "仙女姜付艳，免疫晕眩——道理是讲不通的，只能打赢。"]
+        ] }
+      ],
+      victory: [
+        ["史", "后哥以综评入香港中文大学，神入北京电子科技大学。"],
+        ["史", "音克思曰：向使三子重视卫生，以礼待人，何至于为人所恶也？"],
+        ["史", "——但马刀场上，异能者，果然有异能。"]
+      ],
+      defeat: [["史", "大哥曰：吾梦破败城墙，苔藓覆其上，终无尽头……吾连第一卷都写不动。重开。"]]
+    },
+
+    s2: {
+      intro: [
+        ["上", "尔在何处？"],
+        ["史", "实验高中……耳。"],
+        ["上", "高中者，非假期耳！高考者，上课也！国家未尝高考予汝假！"],
+        ["史", "含笑者，孙含笑也，予称之为'上'。敢复读，有勇；去支教，有见。"],
+        ["上", "今日迟至此者——遣返回家。毋谓吾言之不预也。"]
+      ],
+      triggers: [
+        { when: "playerLow", lines: [["上", "痛，方能记住。吾是为汝好。"]] }
+      ],
+      victory: [
+        ["上", "善。孺子可教也。"],
+        ["史", "封控时，上恐学生惧，以酸奶贻之。吾记其严厉，也记其酸奶。"],
+        ["史", "音克思曰：贤哉含笑！勇见兼备，序他班而朝同列，无敌于实验。"]
+      ],
+      defeat: [["上", "遣返回家！再犯，吾定抱尔被至教室！"]]
+    },
+
+    s3: {
+      intro: [
+        ["豪", "急击勿失。"],
+        ["史", "鲁豪，绍歆之媒也。今日亦为吾之友军——此之谓：二带一。"],
+        ["铭", "歆慧，吾之所与也！"],
+        ["慧", "滚。"],
+        ["史", "绍铭仪表堂堂，歆慧貌美晔丽。二人比邻，情比金坚，伤害+1——先分其阵，再破其阵。"]
+      ],
+      triggers: [
+        { when: "enemyLow", char: "shaoming", lines: [["铭", "怎能不悔也！"]] }
+      ],
+      victory: [
+        ["史", "铭长叹曰：怎能不悔也！慧既黑铭，曰：吾觉未有之爽也。"],
+        ["史", "高中不捅窗户纸。俟高考后，牵之手而行于校园，岂不美哉？"],
+        ["史", "——可惜少年的道理，总是考完才懂。"]
+      ],
+      defeat: [["史", "小川叹曰：噫，为歆慧玩弄于鼓掌之间矣——吾亦被玩弄了。重开。"]]
+    },
+
+    s4: {
+      intro: [
+        ["波", "面面垂直找交线，找到交线找垂线——"],
+        ["荣", "奇彪无比！"],
+        ["史", "大师世波，升旗必做气功，吸东来之紫气，故每回合自愈；为荣老师，黑棒不盈尺，威力无双。"],
+        ["斌", "老师，铃响了。下课往饭，此自然之理也。"],
+        ["荣", "苟无吾之许，毋得下课！——罢了，汶斌，今日汝助史官一阵。"]
+      ],
+      victory: [
+        ["史", "钦法尝旁听世波之课，喟然叹曰：苟吾遇之早，吾数学可有成也。"],
+        ["史", "音克思曰：凡六班之老师，无不爱岗敬业，知识渊博——此六班强盛之基也。"]
+      ],
+      defeat: [["荣", "尔之不善战甚矣！盍不问奕然！"]]
+    },
+
+    s5: {
+      intro: [
+        ["史", "TGO者，数学题感无双也。今日逐一领教：先会教主，再战马刀之神。"],
+        ["斌", "吾以弹簧为弓，纸条为箭，射程数米。汝，接得住吗？"]
+      ],
+      triggers: [
+        { when: "waveStart", wave: 2, lines: [
+          ["问", "GBC，算不算。wonder震，来不来。"],
+          ["史", "wonder究一题十四课，卒解之。汝血量为偶时，其伤害+1——数学之感，可怕如斯。"],
+          ["史", "见他血祭，速退。马刀之神血祭翻倍，可翻两次。"]
+        ] },
+        { when: "enemyLow", char: "wonder", lines: [["问", "别叫别叫！"]] }
+      ],
+      victory: [
+        ["问", "别叫别叫……"],
+        ["史", "打完响指拍大腿，大喊一声别叫了。——汶斌有诗赞之。"],
+        ["史", "音克思曰：TGO为六班数学之冠，奇思妙想皆出其中，马刀兴焉。"]
+      ],
+      defeat: [["史", "wonder究一题十四课，予之汶斌，汶斌秒之——吾连题都不如。重开重开。"]]
+    },
+
+    s6: {
+      intro: [
+        ["展", "与尔一糖，毋有心伤。"],
+        ["怡", "大展正道直行，关切同学！"],
+        ["史", "少年展，有龙凤之姿，一步两格；可怡心善展，比邻则为其疗伤。"],
+        ["史", "高中之恋爱者多不就，惟大展成。——今日，只好请史官做一回不成人之美的人。"]
+      ],
+      triggers: [
+        { when: "enemyLow", char: "dazhan", lines: [["展", "探楼发屋，门把手无不摸，走廊无不走——亡处不寻！"]] }
+      ],
+      victory: [
+        ["史", "既高考，展与怡牵之手，行于校园。岂不美哉？"],
+        ["史", "音克思曰：究其本，乃展之收敛而谨慎也。此之谓：恋爱者必慎也。"]
+      ],
+      defeat: [["史", "展梦可怡引刀刺之，怖甚——吾梦展与可怡引刀刺吾。重开。"]]
+    },
+
+    s7: {
+      intro: [
+        ["头", "鼠辈，吾乃汝陈父也！"],
+        ["史", "头哥陈修逸，头甚圜，绝类卤蛋。三次为捉，四次换家，至今不易其志。"],
+        ["头", "此乃吾之三溴化氮！鲜有败绩！——休要走近，中者溴毒！"],
+        ["史", "免疫击退——官知止而神欲行。稳扎稳打。"]
+      ],
+      triggers: [
+        { when: "playerLow", lines: [["头", "面不红，心不跳，若无其事。"]] }
+      ],
+      victory: [
+        ["史", "为兵视其马刀角色，念曰：豌豆射手，何为豌豆射手？众哄堂大笑。"],
+        ["史", "音克思曰：余尝闻鲁豪之摆烂，神人之体味，大哥之特立独行。盖修逸者，可谓兼之矣。"]
+      ],
+      defeat: [["头", "巴啦啦小裤头，穿着真舒爽——那感觉简直一级棒！"]]
+    },
+
+    s8: {
+      intro: [
+        ["史", "世界马刀协会锦标赛：连胜三阵——先鲁豪，次小川，终子琛。"],
+        ["豪", "恋爱而不让人知，如锦绣夜行，谁知之者！今日，昼行！"],
+        ["川", "夫川，流而不息，水准而不盈，其富在博。"],
+        ["琛", "凡有责任，在吾一人。"]
+      ],
+      triggers: [
+        { when: "waveStart", wave: 3, lines: [["琛", "心腹何在！夺其话筒——马上解散，毋恐担责！"]] }
+      ],
+      victory: [
+        ["史", "委员五人：鲁豪、小川、子琛、大展、翼帆——今日起，添一史官。"],
+        ["史", "音克思曰：马刀之消，似于高中之时光也。愿汝此刀，永不消。"]
+      ],
+      defeat: [["史", "一鼓作气，再而衰，三而竭……不，锦标赛可以重来。重开。"]]
+    },
+
+    s9: {
+      intro: [
+        ["呱", "让我喝完。"],
+        ["蛙", "得无梦晨善吾矣？——啊不对，得无汝善吾矣？"],
+        ["史", "呱宇，二楼最帅之男，嗜水如命，疾如电；小蛙奕然，魔方炉火纯青，拍肚皮自得其乐。"]
+      ],
+      triggers: [
+        { when: "enemyDown", char: "yiran", lines: [["蛙", "吾捡一发卡，幻想其为梦晨所有……原来是仙女的。若为蝎子所蛰，不过如此。"]] }
+      ],
+      victory: [
+        ["呱", "顺道。"],
+        ["史", "凯宇四战汶斌，三败一胜，所亡失饮料以十数——今日败于史官，不亏。"],
+        ["史", "音克思曰：呱宇、奕然者，世多其贤。然史料少，众多事未得闻也。"]
+      ],
+      defeat: [["呱", "尔何以携水壶？——顺道。（赢一场，喝一口。）"]]
+    },
+
+    s10: {
+      intro: [
+        ["琛", "今体育课辄跑操，无自由之时间。吾乃欲变此——欲起义。"],
+        ["史", "王子琛，号曰武。举事之前，先告含笑：此通知尔，非求建议也。"],
+        ["琛", "含笑曰：尔敢为此，吾誓杀汝。——但今日是马刀场，不是体育课。"],
+        ["史", "第三回合，其心腹二人将入场。先斩班长，后清余党。"]
+      ],
+      triggers: [
+        { when: "roundStart", round: 3, lines: [["琛", "心腹何在！占跑道，夺话筒——马上解散，毋恐担责，凡有责任，在吾一人！"]] }
+      ],
+      victory: [
+        ["史", "琛既上书，言于含笑曰：吾师，今事已毕，起义大成。"],
+        ["史", "含笑瞪目。琛忙释：非汝之所想也。含笑乃安。"],
+        ["史", "音克思曰：号令两班，政由琛出，威震天下。位终，近古以来未之有也。"]
+      ],
+      defeat: [["琛", "尔敢起事，吾誓杀汝——不对，此话今日该我说。重开。"]]
+    },
+
+    s11: {
+      intro: [
+        ["豪", "吾，道德帮之道。"],
+        ["川", "吾，兼通德艺。"],
+        ["因", "吾，有德。只因有德。"],
+        ["史", "道德帮，DDB——三人比邻，同德则强，伤害+1。先破其阵，再逐一击破。"],
+        ["润", "史官！带吾一阵！以吾二人之兄弟情，怎不敌一个DDB！"],
+        ["史", "……好，三带一。毓润，盯住顾一——他的坤拳，有三成机率误伤己手。"]
+      ],
+      triggers: [
+        { when: "playerLow", lines: [["因", "尔敢毁我宝物，吾必倾尔家，灭尔族！"]] }
+      ],
+      victory: [
+        ["史", "川曰：高中之人，非有超世之才，未可节外生枝。诚哉川之言也。"],
+        ["史", "音克思曰：以川之才俊，虽内向，何女不容？才貌如川且若此，况庸碌之人乎？"]
+      ],
+      defeat: [["因", "吾摆烂矣。——（然暗中勤学不辍。重开。）"]]
+    },
+
+    s12: {
+      intro: [
+        ["帆", "何人与吾玩王者？吾选班主任！"],
+        ["生", "吾禁维坤也。"],
+        ["史", "李帆，时人号曰'李疯'。购刀免费——课代表夺权，分文不取。"],
+        ["帆", "Say You, Say Me~——上台笑场者三，然吾未曾怯场！"]
+      ],
+      triggers: [
+        { when: "playerLow", lines: [["帆", "适可而止！"]] }
+      ],
+      victory: [
+        ["史", "苹苹怒斥众曰：汝等皆叛徒也！帆窃喜——苹苹未知其课代表，乃叛军之首也。"],
+        ["史", "音克思曰：予观《李帆传》《头哥传》，越于韩柳之文采。终得一言以评之曰：疯奇。"]
+      ],
+      defeat: [["帆", "Q=CU！哈哈哈——（史官笑场者四。重开。）"]]
+    },
+
+    s13: {
+      intro: [
+        ["羚", "吾之高中，多以为一场游戏一场梦。"],
+        ["东", "每逢考试，必潜携手机。"],
+        ["史", "羚羊李默，一步两格；相东吴某，四分之一闪避，每场一次不死。"],
+        ["史", "一场游戏一场梦——但梦，也要打赢。"]
+      ],
+      victory: [
+        ["史", "相东潜逃，已行至台城，为当班者识其校服。卒寻于家门前，押而归。时已十二点矣。"],
+        ["史", "音克思曰：实验果多神人也。"]
+      ],
+      defeat: [["史", "一场游戏一场梦……吾连梦都输了。重开。"]]
+    },
+
+    s14: {
+      intro: [
+        ["法", "汝乃何人？此何课也？何以看书耶！"],
+        ["史", "钦法，级部主任。头哥三次为其所捉；绍歆记过，出于其手。"],
+        ["国", "为师者，吾之属地也。有师敢不从吾乎？"],
+        ["史", "王崇国，校长也。貌丑德薄，苛于师。弃车保帅，种树皆死。"],
+        ["兵", "吾以成绩斐然，数创实验纪录。以其子升入高一，吾欲往高一教之——崇国不许，固请之，乃贬吾任美术老师。"],
+        ["兵", "今日不排课表了。取刀来。"],
+        ["史", "为兵助阵——终焉之战，先斩钦法，绝其'当场抓获'；再战校长，血祭务必一次到位。"]
+      ],
+      triggers: [
+        { when: "enemyLow", char: "chongguo", lines: [["国", "弃车保帅！吾之术，未尝败也！"]] }
+      ],
+      victory: [
+        ["史", "崇国走，复入二中，多种树木。树木皆死。时人谓之'种树校长'。"],
+        ["史", "音克思曰：轻师而重生，犹植木于沙，欲其茂而不得其土。"]
+      ],
+      defeat: [["国", "尔等——悉数评职称去吧！"]]
+    },
+
+    s15: {
+      intro: [
+        ["翔", "吾皆为同学，无为如此！"],
+        ["岳", "尔叛徒也！"],
+        ["烨", "吾素善遇尔，尔何当如此！"],
+        ["奇", "予尔二择：a朋友，b陌路。尔其当之。"],
+        ["史", "二中二十三班。爱者反为仇，仇者复为友——他们各有二成之机，打错'友军'。"],
+        ["史", "乱世用重典。唯一人，可终结此局。"]
+      ],
+      triggers: [
+        { when: "enemyDown", char: "any", lines: [["史", "向所谓终身之好者，亦不过一时之心。然当其时也，喜怒皆真。"]] }
+      ],
+      victory: [
+        ["史", "流言可以离友，猜疑可以成仇；而人心之变，虽史家亦不能尽知也。"],
+        ["史", "靡不有初，鲜克有终。观于四人，信哉。"]
+      ],
+      defeat: [["史", "党争之起，起于谗言；谗言之起，起于闲谈——吾败于闲谈。重开。"]]
+    }
+  };
+
+  return { speakers, prologue, epilogue, stages };
+})();
+
+</script>
+<script>
+/* ============================================================
+ * 实验史记 · 马刀风云 —— 音律（WebAudio 程序合成，无外部资源）
+ * ============================================================ */
+window.SJI_AUDIO = (function () {
+  "use strict";
+  let ctx = null, master = null, sfxOn = true, musicOn = true;
+  let musicTimer = null, musicStep = 0;
+
+  function ensure() {
+    if (ctx) return ctx;
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain();
+      master.gain.value = 0.28;
+      master.connect(ctx.destination);
+    } catch (e) { ctx = null; }
+    return ctx;
+  }
+
+  function tone(freq, dur, type, vol, delay, slide) {
+    if (!ctx || !sfxOn) return;
+    const t0 = ctx.currentTime + (delay || 0);
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || "sine";
+    o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.5, t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master);
+    o.start(t0); o.stop(t0 + dur + 0.05);
+  }
+
+  function noise(dur, vol, delay) {
+    if (!ctx || !sfxOn) return;
+    const t0 = ctx.currentTime + (delay || 0);
+    const len = Math.floor(ctx.sampleRate * dur);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const g = ctx.createGain(); g.gain.value = vol || 0.3;
+    const f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 900;
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start(t0);
+  }
+
+  /* 五声音阶（宫商角徵羽）拨弦 */
+  const PENTA = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.26];
+
+  function pluck(freq, dur, vol, delay) {
+    if (!ctx || !musicOn) return;
+    const t0 = ctx.currentTime + (delay || 0);
+    const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "triangle"; o2.type = "sine";
+    o.frequency.value = freq; o2.frequency.value = freq * 2;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.16, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + (dur || 1.4));
+    o.connect(g); o2.connect(g); g.connect(master);
+    o.start(t0); o2.start(t0); o.stop(t0 + 1.6); o2.stop(t0 + 1.6);
+  }
+
+  const api = {
+    setSfx(v) { sfxOn = !!v; },
+    setMusic(v) {
+      musicOn = !!v;
+      if (!musicOn) api.stopMusic();
+    },
+    unlock() { const c = ensure(); if (c && c.state === "suspended") c.resume(); },
+
+    click() { ensure(); tone(660, 0.07, "square", 0.12); },
+    select() { ensure(); tone(520, 0.09, "triangle", 0.2); tone(780, 0.09, "triangle", 0.12, 0.05); },
+
+    hit() { ensure(); noise(0.14, 0.5); tone(160, 0.12, "square", 0.3, 0, 80); },
+    crit() { ensure(); noise(0.2, 0.65); tone(120, 0.2, "sawtooth", 0.35, 0, 60); tone(880, 0.1, "square", 0.15, 0.02); },
+    heal() { ensure(); tone(523, 0.12, "sine", 0.2); tone(659, 0.14, "sine", 0.18, 0.08); tone(784, 0.2, "sine", 0.15, 0.16); },
+    dodge() { ensure(); tone(980, 0.06, "sine", 0.2, 0, 1400); },
+    sacrifice() { ensure(); tone(110, 0.5, "sawtooth", 0.35, 0, 45); noise(0.35, 0.4); },
+    rpsWin() { ensure(); tone(523, 0.1, "square", 0.22); tone(659, 0.1, "square", 0.22, 0.09); tone(784, 0.16, "square", 0.22, 0.18); },
+    rpsLose() { ensure(); tone(392, 0.14, "square", 0.2); tone(311, 0.22, "square", 0.2, 0.12); },
+    rpsDraw() { ensure(); tone(440, 0.12, "triangle", 0.2); },
+    skill() { ensure(); tone(700, 0.1, "triangle", 0.2, 0, 1000); tone(500, 0.15, "sine", 0.18, 0.06); },
+    kick() { ensure(); noise(0.18, 0.6); tone(90, 0.25, "square", 0.4, 0, 50); },
+    die() { ensure(); tone(300, 0.4, "sawtooth", 0.3, 0, 60); noise(0.3, 0.4, 0.05); },
+
+    victory() {
+      ensure();
+      [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.22, "triangle", 0.25, i * 0.13));
+      [523, 659, 784].forEach((f, i) => pluck(f, 1.2, 0.12, 0.55 + i * 0.05));
+    },
+    defeat() {
+      ensure();
+      [392, 330, 262, 196].forEach((f, i) => tone(f, 0.3, "triangle", 0.22, i * 0.18));
+    },
+
+    startMusic() {
+      ensure();
+      if (musicTimer || !ctx) return;
+      musicStep = 0;
+      musicTimer = setInterval(() => {
+        if (!musicOn || !ctx) return;
+        musicStep++;
+        const beat = musicStep % 16;
+        if (beat % 4 === 0) pluck(PENTA[0] / 2, 1.6, 0.09);
+        if (Math.random() < 0.62) {
+          const f = PENTA[Math.floor(Math.random() * PENTA.length)];
+          pluck(f, 1.8, 0.055 + Math.random() * 0.04);
+        }
+      }, 700);
+    },
+    stopMusic() { if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } }
+  };
+  return api;
+})();
+
+</script>
+<script>
+/* ============================================================
+ * 实验史记 · 马刀风云 —— 存档（localStorage）
+ * ============================================================ */
+window.SJI_SAVE = (function () {
+  "use strict";
+  const KEY = "shiji_madao_v1";
+  const DEF = {
+    progress: {},          // stageId -> true
+    charWins: {},          // charId -> 胜场数（角色挑战成就）
+    ach: {},               // achId -> true
+    bestSurvival: 0,
+    totals: { moves: 0, heals: 0, kills: 0, wins: 0, losses: 0 },
+    settings: { sfx: true, music: true, speed: 1, aiAggr: "active", rpsMode: "ask", fx: "full", ngPlus: false }
+  };
+  let data = load();
+  let achLog = [];
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return JSON.parse(JSON.stringify(DEF));
+      const d = JSON.parse(raw);
+      return Object.assign(JSON.parse(JSON.stringify(DEF)), d, {
+        totals: Object.assign({}, DEF.totals, d.totals || {}),
+        settings: Object.assign({}, DEF.settings, d.settings || {})
+      });
+    } catch (e) { return JSON.parse(JSON.stringify(DEF)); }
+  }
+  function persist() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
+
+  return {
+    get data() { return data; },
+    get settings() { return data.settings; },
+    isCleared(id) { return !!data.progress[id]; },
+    allCleared() { return window.SJI_DATA.STAGES.every(s => !!data.progress[s.id]); },
+    clearedCount() { return Object.keys(data.progress).length; },
+    clearStage(id) { data.progress[id] = true; persist(); },
+    hasAch(id) { return !!data.ach[id]; },
+    unlockAch(id) {
+      if (data.ach[id]) return false;
+      data.ach[id] = true; persist();
+      achLog.push(id);
+      const a = window.SJI_DATA.ACHIEVEMENTS.find(x => x.id === id);
+      if (a && window.SJI_UI) window.SJI_UI.toast("成就达成 「" + a.name + "」：" + a.desc);
+      return true;
+    },
+    bump(k, n) { data.totals[k] = (data.totals[k] || 0) + (n || 1); persist(); },
+    bumpCharWin(cid) {
+      if (!data.charWins) data.charWins = {};
+      data.charWins[cid] = (data.charWins[cid] || 0) + 1;
+      persist();
+    },
+    allCharsWon() {
+      const w = data.charWins || {};
+      return window.SJI_DATA.PLAYABLE.every(c => (w[c] || 0) > 0);
+    },
+    setBestSurvival(n) { if (n > data.bestSurvival) { data.bestSurvival = n; persist(); return true; } return false; },
+    setSetting(k, v) { data.settings[k] = v; persist(); },
+    markPrologue() { data.prologueSeen = true; persist(); },
+
+    /* ---- 成就：本场解锁记录（供结算页展示） ---- */
+    beginAchLog() { achLog = []; },
+    takeAchLog() { const l = achLog.slice(); achLog = []; return l; },
+
+    /* ---- 循环存档导出 / 导入 ---- */
+    exportJSON() { return JSON.stringify(data); },
+    importJSON(txt) {
+      try {
+        const obj = JSON.parse(txt);
+        if (!obj || typeof obj !== "object" || !obj.settings) return { ok: false, err: "内容不是本游戏的存档" };
+        data = Object.assign(JSON.parse(JSON.stringify(DEF)), obj, {
+          totals: Object.assign({}, DEF.totals, obj.totals || {}),
+          settings: Object.assign({}, DEF.settings, obj.settings || {})
+        });
+        persist();
+        return { ok: true };
+      } catch (e) { return { ok: false, err: "无法解析：" + e.message }; }
+    },
+
+    /* ---- 战斗中断点续战 ---- */
+    saveBattle(snap) { try { localStorage.setItem(KEY + "_battle", JSON.stringify(snap)); } catch (e) {} },
+    loadBattle() {
+      try { const raw = localStorage.getItem(KEY + "_battle"); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
+    },
+    clearBattle() { try { localStorage.removeItem(KEY + "_battle"); } catch (e) {} },
+    reset() { data = JSON.parse(JSON.stringify(DEF)); persist(); }
+  };
+})();
+
+</script>
+<script>
+/* ============================================================
+ * 实验史记 · 马刀风云 —— 战斗引擎（据卷八《马刀书》）
+ * 规则：开局人皆位于己城，中有空地。以猜拳定行动：胜三动、和二动、负一动。
+ * 行动：买刀、买马、用技、行动、血祭。猜拳胜四动、和三动、负二动。同城（城墙）以马踢之，扣三血并踢下城；
+ * 同区以刀击之，扣一血。血祭者，扣当前之半血而令下次伤害翻倍。活者为王。
+ * ============================================================ */
+window.SJI_ENGINE = (function () {
+  "use strict";
+  const D = window.SJI_DATA;
+  const SIZE = 7;
+  const MAX_ROUND = 30;
+
+  const isWall = (r, c) => r === 0 || r === SIZE - 1 || c === 0 || c === SIZE - 1;
+  const inB = (r, c) => r >= 0 && r < SIZE && c >= 0 && c < SIZE;
+  const cheb = (a, b) => Math.max(Math.abs(a.r - b.r), Math.abs(a.c - b.c));
+  const manh = (a, b) => Math.abs(a.r - b.r) + Math.abs(a.c - b.c);
+  const adj = (a, b) => cheb(a, b) === 1;
+  const DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+  const SPAWNS = [[0,0],[0,6],[6,0],[6,6],[0,3],[6,3],[3,0],[3,6]];
+
+  function sleep(ms) {
+    const mult = [1, 0.6, 0.3][(window.SJI.settings && window.SJI.settings.speed) ? window.SJI.settings.speed - 1 : 0];
+    return new Promise(res => setTimeout(res, Math.max(16, ms * mult)));
+  }
+
+  function makeUnit(charId, side, idx) {
+    const ch = D.CHARACTERS[charId];
+    return {
+      uid: side + "_" + idx, ch, charId, side,
+      hp: ch.hp, maxhp: ch.hp,
+      r: 0, c: 0, rx: 0, ry: 0,
+      alive: true, offField: 0,
+      hasKnife: false, hasHorse: false,
+      st: { skip: 0, poison: 0, apMod: 0, disarm: 0, silence: 0, seal: 0, shield: 0, bloodlust: 0, grudge: 0, empower: 0 },
+      cds: {}, usedSave: false,
+      apNow: 0, roundDealt: 0, dampUsed: false,
+      boons: { knife: 0, horse: 0, move: 0, dodge: 0, regen: 0, apBonus: 0, cdReduce: 0, blood2: false,
+               bloodFree: false, cleave: 0, horseRange: 0, killHeal: 0, shield: 0, firstStrike: 0 },
+      minHpSeen: null,
+      aggr: ch.aggr || 0.6
+    };
+  }
+
+  class Battle {
+    /* cfg: {mode:'story'|'free'|'survival', stage, playerChar, enemies[], allies[], diff, survivalWave} */
+    constructor(cfg) {
+      this.cfg = cfg;
+      this.mode = cfg.mode;
+      this.diff = cfg.diff || "normal";
+      this.rule = cfg.rule || null;
+      this.triggers = (cfg.triggers || []).map(t => Object.assign({}, t, { fired: false }));
+      this.aiAggr = cfg.aiAggr || "active";
+      this.boonsTaken = [];
+      // 地形：关卡可用 blocked 指定障碍格（桌子/讲台等），不可通行、不可站立
+      const blk = (cfg.stage && cfg.stage.blocked) ? cfg.stage.blocked : [];
+      this.blocked = new Set(blk.map(rc => rc[0] + "," + rc[1]));
+      this.round = 0;
+      this.over = false;
+      this.result = null; // 'win'|'lose'|'timeout'
+      this.log = [];
+      this.units = [];
+      this.waveIndex = 0;
+      this.waves = cfg.waves || [cfg.enemies];
+      this.stats = {
+        usedSkill: false, boughtHorse: false, usedBlood: false, minHp: undefined,
+        everLeftWall: false, moves: 0, heals: 0, kills: 0, rushHit: false,
+        startEnemies: 0
+      };
+      this._build();
+    }
+
+    /* ---------- 场地与生成 ---------- */
+    _build() {
+      // 玩家
+      const p = makeUnit(this.cfg.playerChar, "player", 0);
+      // 友军
+      const allies = (this.cfg.allies || []).map((id, i) => makeUnit(id, "ally", i));
+      // 敌人（首波）
+      const wave = this.waves[0] || [];
+      // 生存模式：程序生成
+      let enemyIds = wave;
+      if (this.mode === "survival") { enemyIds = this._survivalWave(1); this.survivalWaveNo = 1; }
+      const enemies = enemyIds.map((id, i) => makeUnit(id, "enemy", i));
+      this.stats.startEnemies = enemies.length;
+
+      const spots = SPAWNS.slice();
+      // 玩家固定下方，友军其侧，敌人远端
+      const playerSpot = [6, 3];
+      spots.splice(spots.findIndex(s => s[0] === 6 && s[1] === 3), 1);
+      this._place(p, playerSpot);
+      const ok = spots.filter(sp => this.passable(sp[0], sp[1]));
+      const far = ok.filter(sp => sp[0] <= 2);
+      const near = ok.filter(sp => sp[0] > 2);
+      // 洗牌
+      const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+      shuf(far); shuf(near);
+      allies.forEach(u => this._place(u, near.pop() || [3, 3]));
+      enemies.forEach(u => this._place(u, far.pop() || this._randomFree()));
+
+      // 乱斗难度血量修正
+      if (this.mode === "free") {
+        const mult = this.diff === "easy" ? 0.8 : (this.diff === "hard" ? 1.2 : 1);
+        enemies.forEach(u => { if (!u.ch.boss) { u.maxhp = Math.max(4, Math.round(u.maxhp * mult)); u.hp = u.maxhp; } });
+      } else {
+        // 剧情/生存：敌方血池随人数递减，避免一对多时输出不敷
+        const stg = (this.cfg && this.cfg.stage) ? this.cfg.stage : null;
+        const k = (stg && stg.hpScale !== undefined) ? stg.hpScale
+          : (enemies.length >= 4 ? 0.62 : (enemies.length === 3 ? 0.7 : (enemies.length === 2 ? 0.85 : 1)));
+        if (k !== 1) enemies.forEach(u => { u.maxhp = Math.max(4, Math.round(u.maxhp * k)); u.hp = u.maxhp; });
+        this._hpScale = k;
+      }
+
+      this.units = [p, ...allies, ...enemies];
+      this.player = p;
+      if (p.boons.shield > 0) p.st.shield += p.boons.shield;
+      this._trackMinHp(p);
+      this.roundDealt = 0;
+      this.pushLog("—— 马刀场开。规则至简，而引人入胜。——");
+    }
+
+    _place(u, rc) { u.r = rc[0]; u.c = rc[1]; u.rx = u.c; u.ry = u.r; }
+
+    _randomFree() {
+      for (let t = 0; t < 120; t++) {
+        const r = Math.floor(Math.random() * SIZE), c = Math.floor(Math.random() * SIZE);
+        if (this.passable(r, c)) return [r, c];
+      }
+      for (let r = 0; r < SIZE; r++) for (let c = 0; c < SIZE; c++) if (this.passable(r, c)) return [r, c];
+      return [3, 3];
+    }
+
+    _survivalWave(n) {
+      const list = [];
+      const count = Math.min(1 + Math.ceil(n / 2), 4);
+      for (let i = 0; i < count; i++) list.push("mob");
+      if (n === 5) list.push("hanxiao");
+      if (n === 10) list.push("wonder");
+      if (n === 15) list.push("chongguo");
+      if (n === 20) list.push("weibing");
+      if (n > 20 && n % 5 === 0) list.push(["hanxiao", "wonder", "chongguo", "weibing", "touge"][n / 5 % 5 | 0]);
+      return list;
+    }
+
+    /* 可通行：在界内、非障碍、无单位（不含城墙——城墙是"同城"语义，可走） */
+    passable(r, c) {
+      return inB(r, c) && !this.blocked.has(r + "," + c) && !this.unitAt(r, c);
+    }
+
+    unitAt(r, c) {
+      if (!this.units) return null;   // 布阵阶段 units 尚未装配
+      return this.units.find(u => u.alive && u.offField <= 0 && u.r === r && u.c === c) || null;
+    }
+    living(side) { return this.units.filter(u => u.alive && u.offField <= 0 && (!side || u.side === side)); }
+    opponentsOf(u) {
+      const hostile = u.side === "enemy" ? ["player", "ally"] : ["enemy"];
+      return this.units.filter(x => x.alive && x.offField <= 0 && hostile.includes(x.side));
+    }
+
+    pushLog(s) { this.log.push(s); if (this.log.length > 120) this.log.shift(); if (window.SJI_UI) window.SJI_UI.onLog(s); }
+
+    /* ---------- 伤害核心 ---------- */
+    _passiveImmuneStun(u) { return u.charId === "xiannv" || u.charId === "wanzhen"; }
+
+    calcDamage(att, def, base, opts = {}) {
+      let dmg = base;
+      const t = opts.type || "knife";
+      if (t === "knife") {
+        if (att.charId === "dage" && isWall(att.r, att.c)) dmg += 1;
+        if (att.charId === "weirong") dmg += 1;
+        dmg += att.boons.knife || 0;
+      }
+      if (t === "horse") dmg += att.boons.horse || 0;
+      if (att.charId === "luhao" && t === "knife") dmg *= 2;   // 大腹如斗：刀击数值翻倍
+      if (att.boons && att.boons.firstStrike && t === "knife" && !att._usedFirstStrike) {
+        att._usedFirstStrike = true; dmg += att.boons.firstStrike;
+      }
+      if (att.charId === "wenbin" && t === "knife" && Math.random() < 0.3) {   // 秒之：三成机率双倍
+        dmg *= 2;
+        this.pushLog("「斌」秒之！一笔算出，伤害翻倍。");
+        window.SJI_UI.fxFloat(def, "秒之！", "#ffd98a");
+      }
+      if (att.st.bloodlust > 0 && !opts.noBlood) { dmg *= 2; att.st.bloodlust--; }
+      if (att.st.empower > 0) { dmg += att.st.empower; att.st.empower = 0; }
+      if (att.st.grudge > 0) { dmg += att.st.grudge; att.st.grudge = 0; }
+      if (att.charId === "yurun" && att.hp < 5) dmg += 1;
+      if (att.charId === "shaoming" && def.hp <= def.maxhp / 2) dmg += 1;
+      if (att.charId === "qinfa" && def.hp <= def.maxhp / 2) dmg += 1;
+      if (att.charId === "dazhan" && this._keaiAdjacent(att)) dmg += 1;
+      // 剧情规则：敌人相邻同门
+      if (opts.dyad && (opts.type === "knife" || opts.type === "horse") && att.side === "enemy" && this.living("enemy").length === 2 && this._friendlyAdjacent(att)) dmg += 1;
+      if (att.side === "enemy" && !opts.noScale) {
+        const sc = this.enemyDmgScale();
+        if (sc !== 1) dmg = Math.max(1, Math.round(dmg * sc));
+      }
+      // 守方减伤
+      if (!opts.pierce) {
+        if (def.charId === "hanxiao") dmg -= 1;
+        if (def.charId === "zichen" && adj(att, def)) dmg -= 1;
+        if (def.charId === "yiran" && !def.dampUsed) { dmg -= 1; def.dampUsed = true; }
+        if (def.st.shield > 0) { const ab = Math.min(def.st.shield, dmg); def.st.shield -= ab; dmg -= ab; }
+      }
+      return Math.max(opts.min0 ? 0 : 1, dmg);
+    }
+
+    _friendlyAdjacent(u) {
+      const same = u.side === "enemy" ? "enemy" : u.side;
+      return this.living(same).some(x => x !== u && adj(x, u));
+    }
+    _keaiAdjacent(dazhan) {
+      return this.units.some(x => x.alive && x.offField <= 0 && x.charId === "keai" && x.side === dazhan.side && adj(x, dazhan));
+    }
+
+    async dealDamage(att, def, base, opts = {}) {
+      if (!def.alive || def.offField > 0 || this.over) return 0;
+      if (window.SJI_UI && window.SJI_UI.fxAttack) window.SJI_UI.fxAttack(att, def, { type: opts.type || "knife" });
+      const pierce = opts.pierce || (att && att.charId === "weibing");
+      // 闪避
+      if (!pierce && !opts.noDodge) {
+        let dodge = 0;
+        if (def.charId === "guayu") dodge += 0.2;
+        if (def.charId === "xiangdong") dodge += 0.25;
+        dodge += def.boons.dodge || 0;
+        if (dodge > 0 && Math.random() < dodge) {
+          this.pushLog("「" + def.ch.hao + "」疾如电，避之！");
+          window.SJI_UI.fxFloat(def, "闪避！", "#7fb2ff");
+          window.SJI_AUDIO.dodge();
+          return 0;
+        }
+      }
+      let dmg = this.calcDamage(att, def, base, { ...opts, pierce });
+      def.hp -= dmg;
+      this._trackMinHp(def);
+      if (att.side === "player") { this.roundDealt += dmg; att.roundDealt = (att.roundDealt || 0) + dmg; }
+      // 小川被动
+      if (def.charId === "xiaochuan" && dmg > 0) def.st.grudge = Math.min(2, def.st.grudge + 1);
+      if (def.alive && def.hp > 0 && def.hp <= def.maxhp / 2) {
+        if (def.side === "player") this._checkTriggers("playerLow");
+        else if (def.side === "enemy") this._checkTriggers("enemyLow", def.charId);
+      }
+      window.SJI_UI.fxHit(def, dmg, opts);
+      window.SJI_AUDIO[(opts.type === "horse") ? "kick" : (dmg >= 3 ? "crit" : "hit")]();
+      const verb = opts.type === "horse" ? "以马踢之" : (opts.type === "skill" ? "以技击之" : (opts.type === "poison" ? "受毒" : "以刀击之"));
+      const src = att ? "「" + att.ch.hao + "」" + verb + "「" + def.ch.hao + "」，损" + dmg + "血。" : "「" + def.ch.hao + "」损" + dmg + "血。";
+      this.pushLog(src);
+      if (att && att.side === "player" && att.roundDealt >= 5) { att.roundDealt = -999; this.stats.rushHit = true; }
+      if (def.hp <= 0) {
+        if (!opts.pierce && this._tryLethalSave(def)) return dmg;
+        def.hp = 0; def.alive = false;
+        this.pushLog("「" + def.ch.hao + "」倒下了！");
+        window.SJI_AUDIO.die();
+        if (def.side === "enemy") {
+          this.stats.kills++;
+          if (att && att.side === "player") this.heal(this.player, 2 + (att.boons.killHeal || 0), "大胜而归，");
+          this._checkTriggers("enemyDown", def.charId);
+        }
+        if (window.SJI_UI && window.SJI_UI.fxDeath) window.SJI_UI.fxDeath(def);
+      }
+      return dmg;
+    }
+
+    /* 记录玩家全程最低血量（成就「破败城墙」用） */
+    _trackMinHp(u) {
+      if (u !== this.player) return;
+      const cur = Math.max(0, u.hp);
+      this.stats.minHp = (this.stats.minHp === undefined) ? cur : Math.min(this.stats.minHp, cur);
+    }
+
+    _tryLethalSave(def) {
+      if (def.charId === "guyin" && !def.usedSave) { def.usedSave = true; def.hp = 1; this.pushLog("皇太子庇佑！「因」保留一血。"); window.SJI_UI.fxFloat(def, "皇太子！", "#ffd700"); return true; }
+      if (def.charId === "xiangdong" && !def.usedSave) { def.usedSave = true; def.hp = 1; this.pushLog("「东」乘乱潜逃，保留一血！"); window.SJI_UI.fxFloat(def, "潜逃！", "#9db8ff"); return true; }
+      if (def.charId === "chongguo" && !def.usedSave) { def.usedSave = true; def.hp = 3; this.pushLog("「国」弃车保帅，回复三血！"); window.SJI_UI.fxFloat(def, "弃车保帅！", "#9dff9d"); return true; }
+      return false;
+    }
+
+    rawHurt(def, n, why) {
+      if (!def.alive) return;
+      def.hp -= n;
+      this._trackMinHp(def);
+      window.SJI_UI.fxHit(def, n, { poison: why === "毒" });
+      this.pushLog("「" + def.ch.hao + "」" + why + "，损" + n + "血。");
+      if (def.hp <= 0) {
+        if (this._tryLethalSave(def)) return;
+        def.hp = 0; def.alive = false;
+        this.pushLog("「" + def.ch.hao + "」倒下了！");
+        window.SJI_AUDIO.die();
+        if (def.side === "enemy") { this.stats.kills++; this._checkTriggers("enemyDown", def.charId); }
+        if (window.SJI_UI && window.SJI_UI.fxDeath) window.SJI_UI.fxDeath(def);
+      }
+    }
+
+    heal(u, n, why) {
+      if (!u.alive) return;
+      const real = Math.min(n, u.maxhp - u.hp);
+      if (real <= 0) return;
+      u.hp += real;
+      if (u.side === "player") {
+        this.stats.heals += real;
+        if (window.SJI_SAVE && window.SJI_SAVE.bump) window.SJI_SAVE.bump("heals", real);
+      }
+      window.SJI_UI.fxFloat(u, "+" + real, "#7fe08a");
+      window.SJI_AUDIO.heal();
+      this.pushLog("「" + u.ch.hao + "」" + (why || "回复") + real + "血。");
+    }
+
+    stun(u, rounds, why) {
+      if (this._passiveImmuneStun(u)) { this.pushLog("「" + u.ch.hao + "」朗声诵书，不为所动！"); return; }
+      u.st.skip = Math.max(u.st.skip, rounds);
+      this.pushLog("「" + u.ch.hao + "」" + (why || "被惑") + "，下回合跳过。");
+    }
+
+    async pushUnit(u, fromR, fromC, steps) {
+      if (u.charId === "touge") { this.pushLog("「头」与球棍意念合一，岿然不动。"); return; }
+      const dr = Math.sign(u.r - fromR), dc = Math.sign(u.c - fromC);
+      let moved = 0;
+      for (let i = 0; i < steps; i++) {
+        const nr = u.r + (dr || 0), nc = u.c + (dc || 0);
+        if (!this.passable(nr, nc)) break;
+        u.r = nr; u.c = nc; moved++;
+        window.SJI_UI.snap(u);
+        await sleep(90);
+      }
+      if (moved > 0) this.pushLog("「" + u.ch.hao + "」被击退" + moved + "格。");
+    }
+
+    /* ---------- 行动原语 ---------- */
+    /* 记录可撤销的移动快照（仅玩家、仅本回合、且此后未造成伤害） */
+    _pushUndo(u) {
+      if (!u._undo) u._undo = [];
+      if (u._undo.length > 12) u._undo.shift();
+      u._undo.push({ r: u.r, c: u.c, apNow: u.apNow });
+    }
+
+    undoMove() {
+      const p = this.player;
+      if (!p._undo || !p._undo.length) return false;
+      const st = p._undo.pop();
+      p.r = st.r; p.c = st.c; p.apNow = st.apNow;
+      this.stats.moves = Math.max(0, this.stats.moves - 1);
+      if (window.SJI_SAVE && window.SJI_SAVE.bump) window.SJI_SAVE.bump("moves", -1);
+      if (window.SJI_UI && window.SJI_UI.snap) window.SJI_UI.snap(p);
+      this.pushLog("「" + p.ch.hao + "」退回原位（行动点已退还）。");
+      return true;
+    }
+
+    /* 任何"会造成影响"的行动都会封住撤销（避免用撤销试探信息） */
+    lockUndo() {
+      for (const u of this.units) if (u._undo) u._undo.length = 0;
+    }
+
+    async doMove(u, r, c) {
+      if (u.apNow <= 0) return false;
+      if (!this.passable(r, c)) return false;
+      if (u.side === "player") this._pushUndo(u);
+      u.apNow--; u.r = r; u.c = c;
+      if (u.side === "player") {
+        this.stats.moves++;
+        window.SJI_SAVE.bump("moves");
+        if (!isWall(r, c)) this.stats.everLeftWall = true;
+      }
+      window.SJI_AUDIO.click();
+      this.pushLog("「" + u.ch.hao + "」" + (isWall(r, c) ? "行于城墙" : "行于空地") + "。");
+      return true;
+    }
+
+    async doBuyKnife(u) {
+      const free = u.charId === "lifan";
+      if (u.hasKnife || (!free && u.apNow <= 0)) return false;
+      if (!free) u.apNow--;
+      u.hasKnife = true;
+      window.SJI_AUDIO.select();
+      this.pushLog("「" + u.ch.hao + "」市刀。" + (free ? "（课代表夺权，分文不取）" : ""));
+      return true;
+    }
+
+    async doBuyHorse(u) {
+      if (u.hasHorse || u.apNow <= 0) return false;
+      u.apNow--;
+      this.lockUndo();
+      u.hasHorse = true;
+      if (u.side === "player") this.stats.boughtHorse = true;
+      window.SJI_AUDIO.select();
+      this.pushLog("「" + u.ch.hao + "」市马。");
+      return true;
+    }
+
+    async doKnife(u, t) {
+      if (!u.hasKnife || u.apNow <= 0 || !t || !t.alive) return false;
+      if (u.st.seal > 0) {
+        if (u.side === "player") this.pushLog("「" + u.ch.hao + "」之刀被缴，此回合不能击。");
+        return false;
+      }
+      if (!adj(u, t)) return false;
+      u.apNow--;
+      this.lockUndo();
+      const dyad = !!this.rule && this.rule.id === "dyad";
+      const extra = u.boons.cleave || 0;
+      // 刀势横扫：波及"主目标"的相邻者（不含主目标自身与攻击者）
+      const splash = extra ? this.opponentsOf(u).filter(f => f !== t && adj(t, f)).slice(0, extra) : [];
+      await this.dealDamage(u, t, 1, { type: "knife", dyad });
+      for (const f of splash) {
+        if (!f.alive) continue;
+        this.pushLog("刀势未歇，波及「" + f.ch.hao + "」！");
+        await this.dealDamage(u, f, 1, { type: "knife" });
+      }
+      return true;
+    }
+
+    async doHorse(u, t) {
+      if (!u.hasHorse || u.apNow <= 0 || !t || !t.alive) return false;
+      if (!isWall(u.r, u.c) || !isWall(t.r, t.c) || manh(u, t) > 3 + (u.boons.horseRange || 0)) return false;
+      u.apNow--;
+      this.lockUndo();
+      const dealt = await this.dealDamage(u, t, 3, { type: "horse" });
+      if (t.alive) {
+        // 踢下城：寻相邻空地
+        let best = null;
+        for (const [dr, dc] of DIRS) {
+          const nr = t.r + dr, nc = t.c + dc;
+          if (this.passable(nr, nc) && !isWall(nr, nc)) { best = [nr, nc]; break; }
+        }
+        if (best) {
+          t.r = best[0]; t.c = best[1];
+          window.SJI_UI.snap(t);
+          this.pushLog("「" + t.ch.hao + "」被踢下城墙！");
+          if (t.side === "player") this.stats.everLeftWall = true;
+        } else {
+          this.rawHurt(t, 1, "撞墙");
+        }
+      }
+      return dealt >= 0;
+    }
+
+    async doSacrifice(u) {
+      if (u.apNow <= 0 || (!u.boons.bloodFree && u.hp < 2)) return false;
+      u.apNow--;
+      this.lockUndo();
+      const loss = u.boons.bloodFree ? 0 : Math.floor(u.hp / 2);
+      u.hp -= loss;
+      this._trackMinHp(u);
+      u.st.bloodlust += (u.charId === "wonder" || u.boons.blood2) ? 2 : 1;
+      if (u.side === "player") this.stats.usedBlood = true;
+      window.SJI_UI.fxFloat(u, "-" + loss + " 血祭", "#ff5a5a");
+      window.SJI_UI.fxStatus(u, "血祭！");
+      if (window.SJI_UI && window.SJI_UI.fxVignette) window.SJI_UI.fxVignette("166,58,43");
+      window.SJI_AUDIO.sacrifice();
+      this.pushLog("「" + u.ch.hao + "」血祭！" + (loss ? "损" + loss + "血，" : "以道代血，毫发无伤，")
+        + "下次伤害翻倍" + (u.st.bloodlust > 1 ? "（两度）" : "") + "。");
+      if (u.hp <= 0) { u.hp = 0; u.alive = false; this.pushLog("「" + u.ch.hao + "」血祭过甚，倒下了！"); }
+      return true;
+    }
+
+    /* ---------- 技能 ---------- */
+    skillOf(u, idx) {
+      const ch = u.ch;
+      if (ch.skills) return ch.skills[idx || 0];
+      return ch.skill;
+    }
+    skillReady(u, idx) {
+      const sk = this.skillOf(u, idx);
+      if (!sk) return false;
+      return (u.cds[idx || 0] || 0) <= 0;
+    }
+    skillCd(u, idx) { return u.cds[idx || 0] || 0; }
+    _startCd(u, idx) {
+      const sk = this.skillOf(u, idx);
+      u.cds[idx || 0] = Math.max(1, (sk.cd || 1) - (u.boons.cdReduce || 0));
+    }
+
+    async doSkill(u, idx, target) {
+      const sk = this.skillOf(u, idx);
+      if (!sk || !this.skillReady(u, idx) || u.apNow < (sk.ap || 1)) return false;
+      if (u.st.silence > 0) { this.pushLog("「" + u.ch.hao + "」被沉默，技不能出。"); return false; }
+      const k = sk.kind;
+      const dyad = !!this.rule && this.rule.id === "dyad";
+      u.apNow -= (sk.ap || 1);
+      this.lockUndo();
+      this._startCd(u, idx);
+      if (u.side === "player") this.stats.usedSkill = true;
+      window.SJI_AUDIO.skill();
+      this.pushLog("「" + u.ch.hao + "」施「" + sk.name + "」！");
+
+      const foes = this.opponentsOf(u);
+      if (k === "unit") {
+        if (!target || !target.alive) return false;
+        switch (u.charId) {
+          case "dage":
+            await this.dealDamage(u, target, 1, { type: "skill", dyad }); this.stun(target, 1, "得护手霜而惑");
+            break;
+          case "shenren": this.stun(target, 1, "得原神明信片，欣然把玩"); break;
+          case "xiannv":
+            await this.dealDamage(u, target, 2, { type: "skill", dyad });
+            if (target.alive) await this.pushUnit(target, u.r, u.c, 1);
+            break;
+          case "wonder": {
+            const bonus = (target.hp % 2 === 0) ? 1 : 0;
+            if (bonus) this.pushLog("其血为偶，数学之感，伤害+1！");
+            await this.dealDamage(u, target, 2 + bonus, { type: "skill", dyad });
+            break;
+          }
+          case "wenbin": await this.dealDamage(u, target, 2, { type: "skill", dyad }); break;
+          case "luhao":
+            await this.dealDamage(u, target, 2, { type: "skill", dyad });
+            if (target.alive) { target.st.apMod -= 1; this.pushLog("锦绣昼行！「" + target.ch.hao + "」下回合行动-1。"); }
+            break;
+          case "xiaochuan":
+            await this.dealDamage(u, target, 1, { type: "skill", dyad });
+            if (target.alive) { target.st.seal = Math.max(target.st.seal, 1); this.pushLog("王霸之气！「" + target.ch.hao + "」下回合不能攻击。"); }
+            break;
+          case "guyin": {
+            await this.dealDamage(u, target, 2, { type: "skill", dyad });
+            if (u.alive && Math.random() < 0.15) { this.pushLog("误伤己手！"); this.rawHurt(u, 1, "坤拳误伤"); }
+            break;
+          }
+          case "shaoming": await this.dealDamage(u, target, 3, { type: "skill", dyad }); break;
+          case "xinhui":
+            await this.dealDamage(u, target, 2, { type: "skill", dyad });
+            if (target.alive) await this.pushUnit(target, u.r, u.c, 2);
+            break;
+          case "yiran":
+            await this.dealDamage(u, target, 2, { type: "skill", dyad });
+            this.heal(u, 1, "拍肚皮自得，");
+            break;
+          case "dazhan": await this.dealDamage(u, target, 3, { type: "skill", dyad }); break;
+          case "limo":
+            await this.dealDamage(u, target, 1, { type: "skill", dyad });
+            this.heal(u, 1, "争食而肥，");
+            break;
+          case "xiangdong": await this.dealDamage(u, target, 2, { type: "skill", dyad }); break;
+          case "wanzhen": await this.dealDamage(u, target, 2, { type: "skill", dyad }); break;
+          case "weirong":
+            target.st.apMod -= 2;
+            this.pushLog("「" + target.ch.hao + "」奇彪无比！下回合行动-2。");
+            break;
+          case "qinfa":
+            target.st.seal = Math.max(target.st.seal, 1);
+            this.pushLog("当场抓获！「" + target.ch.hao + "」下回合不能攻击。");
+            break;
+          case "weibing": {
+            // 破门而入：瞬移至目标相邻
+            const spot = DIRS.map(([dr, dc]) => [target.r + dr, target.c + dc])
+              .find(([r, c]) => this.passable(r, c));
+            if (spot) { u.r = spot[0]; u.c = spot[1]; window.SJI_UI.snap(u); }
+            target.st.disarm = Math.max(target.st.disarm, 1);
+            this.pushLog("破门而入！「" + target.ch.hao + "」之刀被没收一回合。");
+            await this.dealDamage(u, target, 1, { type: "skill", pierce: true });
+            break;
+          }
+          case "hanxiao":
+            if (this._passiveImmuneStun(target)) { this.pushLog("不为所动！"); break; }
+            if (target.offField > 0) { this.pushLog("「" + target.ch.hao + "」已在家中。"); break; }
+            target.homeR = target.r; target.homeC = target.c;
+            target.offField = 1;
+            this.pushLog("「" + target.ch.hao + "」被遣返回家，跳过下个回合后归位！");
+            window.SJI_UI.fxFloat(target, "遣返回家！", "#ffb14e");
+            break;
+          case "keai": this.heal(target, 2, "得一糖，"); break;
+          case "shengxiang": await this.dealDamage(u, target, 2, { type: "skill", dyad }); break;
+          case "qiyue": await this.dealDamage(u, target, 2, { type: "skill", dyad }); break;
+          case "lianqi": await this.dealDamage(u, target, 2, { type: "skill", dyad }); break;
+          case "ziye":
+            await this.dealDamage(u, target, 1, { type: "skill", dyad });
+            if (target.alive) { target.st.apMod -= 1; this.pushLog("谗言入耳！「" + target.ch.hao + "」下回合行动-1。"); }
+            break;
+          case "tree": await this.dealDamage(u, target, 1, { type: "skill", dyad }); break;
+          default: await this.dealDamage(u, target, 1, { type: "skill", dyad });
+        }
+        return true;
+      }
+      if (k === "self") {
+        if (u.charId === "yurun") this.heal(u, 3, "得面包，");
+        if (u.charId === "guayu") {
+          u.st.empower += 1;
+          u.apNow += 2;   // 立即多出2行动点（可即刻再行两步）
+          this.pushLog("提壶狂奔！「呱」行动点+2，下次伤害+1。");
+          window.SJI_UI.fxFloat(u, "+2 动", "#ffd98a");
+        }
+        return true;
+      }
+      if (k === "adj") {
+        for (const f of foes.filter(f => cheb(u, f) <= 1).slice()) {
+          await this.dealDamage(u, f, 2, { type: "skill", dyad });
+          if (f.alive && u.charId === "touge") { f.st.poison = Math.max(f.st.poison, 2); this.pushLog("「" + f.ch.hao + "」中溴毒！"); }
+        }
+        return true;
+      }
+      if (k === "raoe") {
+        const rng = sk.range || 2;
+        for (const f of foes.filter(f => cheb(u, f) <= rng).slice()) {
+          if (u.charId === "lifan") {
+            if (Math.random() < 0.5) this.stun(f, 1, "闻Say You而笑场");
+          } else if (u.charId === "zichen") {
+            await this.dealDamage(u, f, 1, { type: "skill", dyad });
+            if (f.alive) { f.st.apMod -= 1; }
+          } else if (u.charId === "shibo") {
+            await this.dealDamage(u, f, 2, { type: "skill", dyad });
+          } else if (u.charId === "chongguo") {
+            if (!this._passiveImmuneStun(f)) {
+              f.st.silence = Math.max(f.st.silence, 1);
+              this.pushLog("「" + f.ch.hao + "」被评职称所困，本回合不能施技！");
+            } else {
+              this.pushLog("「" + f.ch.hao + "」不为所动！");
+            }
+          }
+        }
+        if (u.charId === "zichen") this.pushLog("夺话筒：马上解散，毋恐担责，凡有责任，在吾一人！");
+        return true;
+      }
+      if (k === "summon") {
+        // 树木皆死：场上至多三株，否则战斗会被无限拖长
+        const live = this.units.filter(x => x.alive && x.charId === "tree" && x.side === u.side).length;
+        if (live >= 3) {
+          this.pushLog("崇国欲再种树，然树木皆死，地上已无隙可种。");
+          return true;
+        }
+        const spot = DIRS.map(([dr, dc]) => [u.r + dr, u.c + dc]).find(([r, c]) => this.passable(r, c));
+        if (spot) {
+          const tr = makeUnit("tree", u.side, this.units.length);
+          this._place(tr, spot);
+          this.units.push(tr);
+          this.pushLog("崇国种树一株！它看起来……快要死了。");
+          window.SJI_UI.snap(tr);
+        }
+        return true;
+      }
+      return false;
+    }
+
+    /* ---------- AI ---------- */
+    _reachable(u, budget) {
+      const seen = new Set([u.r + "," + u.c]);
+      let frontier = [[u.r, u.c]];
+      const dist = { [u.r + "," + u.c]: 0 };
+      for (let d = 0; d < budget; d++) {
+        const next = [];
+        for (const [r, c] of frontier) {
+          for (const [dr, dc] of DIRS) {
+            const nr = r + dr, nc = c + dc;
+            const key = nr + "," + nc;
+            if (!this.passable(nr, nc) || seen.has(key)) continue;
+            seen.add(key); dist[key] = d + 1; next.push([nr, nc]);
+          }
+        }
+        frontier = next;
+      }
+      return { keys: [...seen], dist };
+    }
+
+    moveRange(u) {
+      let mv = 1;
+      if (u.charId === "dazhan" || u.charId === "limo") mv = 2;
+      mv += u.boons.move || 0;
+      return mv;
+    }
+
+    _stepToward(u, target) {
+      const budget = this.moveRange(u);
+      const reach = this._reachable(u, budget);
+      let best = null, bestD = manh(u, target);
+      for (const key of reach.keys) {
+        const [r, c] = key.split(",").map(Number);
+        if (this.unitAt(r, c)) continue;
+        const d = Math.abs(r - target.r) + Math.abs(c - target.c);
+        if (d < bestD || (d === bestD && best && reach.dist[key] < reach.dist[best])) { best = key; bestD = d; }
+      }
+      if (!best) return null;
+      return best.split(",").map(Number);
+    }
+
+    aiPickSkill(u) {
+      const ch = u.ch;
+      // 治疗/辅助类技能（如可怡「一糖之恩」）目标应是己方，而非对手
+      if (u.charId === "keai") {
+        const allies = this.units.filter(x => x.alive && x.offField <= 0 && x.side === u.side);
+        const hurt = allies.filter(a => a.hp < a.maxhp).sort((a, b) => a.hp - b.hp)[0];
+        if (hurt && this.skillReady(u, 0) && u.apNow >= (this.skillOf(u, 0).ap || 1)) return { idx: 0, target: hurt };
+        return null;
+      }
+      const idxs = ch.skills ? [0, 1] : [0];
+      const foes = this.opponentsOf(u);
+      for (const i of idxs) {
+        const sk = this.skillOf(u, i);
+        if (!sk || !this.skillReady(u, i) || u.apNow < (sk.ap || 1) || u.st.silence > 0) continue;
+        if (sk.kind === "self") { if (u.hp <= u.maxhp - 2) return { idx: i, target: null }; continue; }
+        if (sk.kind === "summon") return { idx: i, target: null };
+        const rng = sk.kind === "adj" ? 1 : (sk.range || 2);
+        const inRange = foes.filter(f => cheb(u, f) <= (sk.kind === "raoe" ? rng : (sk.kind === "adj" ? 1 : rng)));
+        if (sk.kind === "adj") { if (foes.some(f => adj(u, f))) return { idx: i, target: null }; continue; }
+        if (sk.kind === "raoe") { if (inRange.length >= (u.charId === "lifan" ? 1 : 1)) return { idx: i, target: null }; continue; }
+        if (inRange.length) {
+          inRange.sort((a, b) => a.hp - b.hp);
+          return { idx: i, target: inRange[0] };
+        }
+      }
+      return null;
+    }
+
+    async aiAct(u) {
+      // 回合开始状态结算
+      if (u.offField > 0) {
+        u.offField--; u.apNow = 0;
+        if (u.offField <= 0) this._returnHome(u);
+        else this.pushLog("「" + u.ch.hao + "」犹在返家途中……");
+        return;
+      }
+      if (this._tickStatusStart(u)) {
+        this.pushLog("「" + u.ch.hao + "」晕眩/被惑，跳过此回合。");
+        window.SJI_UI.fxFloat(u, "跳过", "#cccc88");
+        this._tickStatusEnd(u);
+        return;
+      }
+      window.SJI_UI.onState();
+      await sleep(240);
+      let guard = 0;
+      const prof = (u.side === "ally") ? { skill: 0.9, sac: 0.4, retreat: 0.1, keep: 0, focus: "weakest", horse: 1 } : this.aiProfile();
+      while (u.apNow > 0 && u.alive && !this.over && guard++ < 10) {
+        const foes = this.opponentsOf(u);
+        if (!foes.length) break;
+        let target = this._pickTarget(u, foes, prof.focus);
+        // 党争：二成机率打最近之任何人
+        if (this.rule && this.rule.id === "chaos" && u.side === "enemy" && Math.random() < 0.2) {
+          const all = this.units.filter(x => x.alive && x.offField <= 0 && x !== u && x.side !== "enemy");
+          const allies = this.units.filter(x => x.alive && x.offField <= 0 && x !== u && x.side === "enemy");
+          const pool = [...all, ...allies];
+          if (pool.length) {
+            target = pool.slice().sort((a, b) => manh(u, a) - manh(u, b))[0];
+            this.pushLog("党争起！「" + u.ch.hao + "」认错了人……");
+          }
+        }
+        // 买刀
+        if (!u.hasKnife) { await this.doBuyKnife(u); await sleep(180); continue; }
+        // 残血撤退（消极/守成）
+        if (prof.retreat > 0 && u.hp <= u.maxhp * 0.34 && Math.random() < prof.retreat) {
+          const back = this._stepAway(u, target);
+          if (back && !(back[0] === u.r && back[1] === u.c)) {
+            await this.doMove(u, back[0], back[1]);
+            this.pushLog("「" + u.ch.hao + "」见势不妙，退避三舍。");
+            await sleep(260);
+            continue;
+          }
+        }
+        // 技能（按进攻性决定使用意愿）
+        const skillP = Math.max(0.05, Math.min(1, prof.skill + (u.aggr - 0.6) * 0.25));
+        if (Math.random() < skillP) {
+          const pick = this.aiPickSkill(u);
+          if (pick) { await this.doSkill(u, pick.idx, pick.target); await sleep(320); continue; }
+        }
+        // 血祭抢攻（按进攻性）
+        if (u.st.bloodlust <= 0 && adj(u, target) && u.hp >= 5 && Math.random() < prof.sac) {
+          await this.doSacrifice(u); await sleep(300); continue;
+        }
+        // 刀击
+        if (u.hasKnife && u.st.seal <= 0 && adj(u, target)) {
+          await this.doKnife(u, target); await sleep(300); continue;
+        }
+        // 马踢（同城）
+        if (u.hasHorse && isWall(u.r, u.c) && isWall(target.r, target.c) && manh(u, target) <= 3) {
+          await this.doHorse(u, target); await sleep(300); continue;
+        }
+        // 买马：城墙之上、或目标在城墙上、或尚有余动（消极者不热衷）
+        if (!u.hasHorse && u.apNow >= 2 && Math.random() < prof.horse && (isWall(u.r, u.c) || isWall(target.r, target.c))) {
+          await this.doBuyHorse(u); await sleep(200); continue;
+        }
+        // 移动：消极者可能逡巡不前，其余逼近
+        if (prof.keep > 0 && Math.random() < prof.keep && manh(u, target) > 2) {
+          const idle = this._stepAway(u, target);
+          if (idle && !(idle[0] === u.r && idle[1] === u.c)) {
+            await this.doMove(u, idle[0], idle[1]);
+            this.pushLog("「" + u.ch.hao + "」逡巡不前。");
+            await sleep(260);
+            continue;
+          }
+        }
+        const step = this._stepToward(u, target);
+        if (step && !(step[0] === u.r && step[1] === u.c)) { await this.doMove(u, step[0], step[1]); await sleep(260); continue; }
+        // 无路可进时，若有余动则买马备战
+        if (!u.hasHorse && u.apNow >= 1) { await this.doBuyHorse(u); await sleep(200); continue; }
+        break;
+      }
+      this._tickStatusEnd(u);   // 该单位本回合结束：缴械/沉默到期
+    }
+
+    /* ---------- 断点续战：序列化 ---------- */
+    serialize() {
+      return {
+        v: 1,
+        cfg: {
+          mode: this.mode, diff: this.diff, aiAggr: this.aiAggr,
+          playerChar: this.cfg.playerChar,
+          stageId: (this.cfg.stage && this.cfg.stage.id) || null,
+          enemies: this.cfg.enemies || null,
+          allies: this.cfg.allies || [],
+          free: this.cfg.mode === "free",
+          enemyIds: this.cfg.mode === "free" ? (this.cfg.enemies || []) : null
+        },
+        round: this.round, waveIndex: this.waveIndex, survivalWaveNo: this.survivalWaveNo || 1,
+        boonsTaken: this.boonsTaken,
+        result: this.result, over: false,
+        stats: this.stats,
+        units: this.units.map(u => ({
+          charId: u.charId, side: u.side, uid: u.uid, hp: u.hp, maxhp: u.maxhp,
+          r: u.r, c: u.c, alive: u.alive, offField: u.offField,
+          hasKnife: u.hasKnife, hasHorse: u.hasHorse,
+          st: u.st, cds: u.cds, usedSave: u.usedSave, boons: u.boons,
+          homeR: u.homeR, homeC: u.homeC, apNow: u.apNow,
+          _undo: u._undo, minHpSeen: u.minHpSeen
+        })),
+        log: this.log.slice(-40)
+      };
+    }
+
+    static fromSave(snap, stages) {
+      const stg = snap.cfg.stageId ? stages.find(x => x.id === snap.cfg.stageId) : null;
+      const cfg = {
+        mode: snap.cfg.mode, diff: snap.cfg.diff, aiAggr: snap.cfg.aiAggr,
+        playerChar: snap.cfg.playerChar, stage: stg || undefined,
+        enemies: snap.cfg.enemies || [], allies: snap.cfg.allies || [],
+        rule: stg ? stg.rule : null, waves: stg ? stg.waves : undefined,
+        triggeredReset: true
+      };
+      const b = new Battle(cfg);
+      // 还原单位（按 uid 对齐，缺者忽略，多者丢弃）
+      const saved = new Map(snap.units.map(u => [u.uid, u]));
+      const keep = [];
+      for (const u of b.units) {
+        const su = saved.get(u.uid);
+        if (!su) continue;
+        Object.assign(u, {
+          hp: su.hp, maxhp: su.maxhp, r: su.r, c: su.c, rx: su.c, ry: su.r,
+          alive: su.alive, offField: su.offField, hasKnife: su.hasKnife, hasHorse: su.hasHorse,
+          st: Object.assign({}, u.st, su.st), cds: su.cds || {}, usedSave: !!su.usedSave,
+          boons: Object.assign({}, u.boons, su.boons), homeR: su.homeR, homeC: su.homeC,
+          apNow: su.apNow || 0, _undo: su._undo || []
+        });
+        keep.push(u);
+      }
+      b.units = keep;
+      b.player = keep.find(u => u.side === "player") || b.units[0];
+      b.round = snap.round; b.waveIndex = snap.waveIndex;
+      b.survivalWaveNo = snap.survivalWaveNo;
+      b.boonsTaken = snap.boonsTaken || [];
+      b.stats = Object.assign(b.stats, snap.stats || {});
+      b.log = (snap.log || []).slice();
+      return b;
+    }
+
+    /* ---------- 行动点 ---------- */
+    calcAP(u, base) {
+      let ap = base + (u.boons.apBonus || 0);
+      ap += u.st.apMod || 0; u.st.apMod = 0;
+      // 以寡敌众：每多一名敌人，玩家多得一点行动（至多+3），使一对多仍有输出
+      if (u.side === "player") {
+        const n = this.living("enemy").length;
+        if (n > 1) {
+          const bonus = Math.min(3, n - 1);
+          ap += bonus;
+          const hpBonus = Math.min(2, n - 1);
+          if (!u._outnumberedHp) {
+            u._outnumberedHp = hpBonus;
+            u.maxhp += hpBonus; u.hp += hpBonus;
+            this.pushLog("以寡敌众：行动点+" + bonus + "，血上限+" + hpBonus + "。");
+          }
+        }
+      }
+      if (u.charId === "xinhui" && this.round % 2 === 0) { ap += 1; this.pushLog("「慧」灵光乍现，行动点+1！"); }
+      return Math.max(0, Math.min(8, ap));
+    }
+
+    enemyBaseAP() {
+      const big = this.living("enemy").length >= 3;
+      if (this.mode === "survival") return big ? 2 : 3;
+      if (this.diff === "easy") return big ? 1 : 2;
+      if (this.diff === "hard") return big ? 2 : 4;
+      return big ? 2 : 3;
+    }
+
+    /* AI 进攻性档位：影响技能使用、血祭、目标选择与是否撤退 */
+    aiProfile() {
+      const T = {
+        passive:  { skill: 0.35, sac: 0.04, retreat: 0.7, keep: 0.55, focus: "nearest", horse: 0.3 },
+        measured: { skill: 0.65, sac: 0.20, retreat: 0.35, keep: 0.25, focus: "nearest", horse: 0.7 },
+        active:   { skill: 0.90, sac: 0.40, retreat: 0.10, keep: 0, focus: "weakest", horse: 1 },
+        frenzy:   { skill: 1.00, sac: 0.75, retreat: 0, keep: 0, focus: "weakest", horse: 1 }
+      };
+      return T[this.aiAggr] || T.active;
+    }
+
+    _pickTarget(u, foes, focus) {
+      if (!foes.length) return null;
+      if (focus === "weakest") {
+        return foes.slice().sort((a, b) => (a.hp - b.hp) || (manh(u, a) - manh(u, b)))[0];
+      }
+      return foes.slice().sort((a, b) => manh(u, a) - manh(u, b))[0];
+    }
+
+    /* 远离某目标的可达格（消极/守成在残血时用） */
+    _stepAway(u, threat) {
+      const reach = this._reachable(u, this.moveRange(u));
+      let best = null, bestScore = -1e9;
+      for (const key of reach.keys) {
+        const [r, c] = key.split(",").map(Number);
+        if (this.unitAt(r, c)) continue;
+        const d = Math.abs(r - threat.r) + Math.abs(c - threat.c);
+        const near = this.opponentsOf(u).filter(f => Math.max(Math.abs(f.r - r), Math.abs(f.c - c)) <= 1).length;
+        const sc = d * 2 - near * 4;
+        if (sc > bestScore) { bestScore = sc; best = [r, c]; }
+      }
+      return best;
+    }
+
+    /* 敌方伤害缩放：以少打多为常态，人多则单体伤害递减，避免围殴瞬杀 */
+    enemyDmgScale() {
+      const n = this.living("enemy").length;
+      let base = n >= 4 ? 0.65 : (n === 3 ? 0.75 : (n === 2 ? 0.88 : 0.9));
+      if (this.mode === "survival") base *= 0.9;
+      if (this.diff === "hard") base *= 1.15;
+      else if (this.diff === "easy") base *= 0.7;
+      return base;
+    }
+
+    /* ---------- 回合循环 ---------- */
+    async run() {
+      const ui = window.SJI_UI;
+      while (!this.over) {
+        this.round++;
+        this.units.forEach(u => u.dampUsed = false);
+        if (this.player._undo) this.player._undo.length = 0;
+        for (const u of this.units) u._usedFirstStrike = false;
+        await this._fireTriggers("roundStart");
+        ui.onState();
+        if (this.round > MAX_ROUND) { this.finish("timeout"); break; }
+        // 起义援军
+        if (this.rule && this.rule.id === "uprising" && this.round === 3) await this._spawnReinforcements();
+        // 猜拳
+        const rps = await ui.rpsRound(this);
+        if (this.over) break;
+        this.player.apNow = this.calcAP(this.player, rps.ap);
+        this.living("ally").forEach(u => u.apNow = this.calcAP(u, 2));
+        this.living("enemy").forEach(u => u.apNow = this.calcAP(u, this.enemyBaseAP()));
+        ui.onState();
+        // 玩家阶段（返家者本回合不得入场）
+        if (this.player.offField > 0) {
+          this.player.offField--;
+          this.pushLog("「" + this.player.ch.hao + "」返家途中，此回合不得入场。");
+          if (this.player.offField <= 0) this._returnHome(this.player);
+          ui.onState();
+          if (ui.banner) await ui.banner("返家途中", 900);
+        } else if (this._tickStatusStart(this.player)) {
+          // 被惑/晕眩：本回合跳过（此前玩家不经 aiAct，该项从未生效）
+          this.pushLog("「" + this.player.ch.hao + "」晕眩/被惑，此回合跳过。");
+          ui.onState();
+          if (ui.banner) await ui.banner("此回合跳过", 900);
+        } else {
+          await ui.playerPhase(this);
+        }
+        // 缴械与沉默只封"本回合"，到此解除（否则会永久封锁）
+        this._tickStatusEnd(this.player);
+        ui.onState();
+        if (this.over) break;
+        // 友军
+        for (const u of this.living("ally")) { await this.aiAct(u); if (this.over) break; }
+        // 敌人
+        for (const u of this.living("enemy")) { await this.aiAct(u); if (this.over) break; }
+        if (this.over) break;
+        await this._endRound();
+      }
+      return this.result;
+    }
+
+    async _spawnReinforcements() {
+      this.pushLog("—— 起义！子琛之心腹二人入场：马上解散，毋恐担责！——");
+      for (let i = 0; i < 2; i++) {
+        const m = makeUnit("mob", "enemy", 100 + i);
+        m.hp = m.maxhp = 9;
+        const spot = this._freeNear(this.player.r, this.player.c, 3);
+        this._place(m, spot);
+        this.units.push(m);
+        window.SJI_UI.snap(m);
+      }
+      ui_onState();
+      function ui_onState() { window.SJI_UI.onState(); }
+    }
+
+    _freeNear(r, c, maxD) {
+      for (let d = 1; d <= maxD + 3; d++) {
+        for (let dr = -d; dr <= d; dr++) for (let dc = -d; dc <= d; dc++) {
+          const nr = r + dr, nc = c + dc;
+          if (this.passable(nr, nc)) return [nr, nc];
+        }
+      }
+      return this._randomFree();
+    }
+
+    _returnHome(u) {
+      if (!u.alive) return;
+      const hr = (u.homeR !== undefined) ? u.homeR : u.r;
+      const hc = (u.homeC !== undefined) ? u.homeC : u.c;
+      // 占位判定须排除自身（归位时其 offField 已归零，会被 unitAt 误判为占位者）
+      const taken = (r, c) => this.units.some(x => x !== u && x.alive && x.offField <= 0 && x.r === r && x.c === c);
+      if (!taken(hr, hc)) { u.r = hr; u.c = hc; }
+      else {
+        let best = null, bd = 999;
+        for (let r = 0; r < SIZE; r++) for (let c = 0; c < SIZE; c++) {
+          if (taken(r, c)) continue;
+          const d = Math.abs(r - hr) + Math.abs(c - hc);
+          if (d < bd) { bd = d; best = [r, c]; }
+        }
+        if (best) { u.r = best[0]; u.c = best[1]; this.pushLog("「" + u.ch.hao + "」原位被占，就近归队。"); }
+      }
+      if (window.SJI_UI.fxFloat) window.SJI_UI.fxFloat(u, "归来", "#7fe08a");
+      this.pushLog("「" + u.ch.hao + "」返家归来，归于原位。");
+    }
+
+    /* ---------- 状态计时（玩家与 AI 共用） ---------- */
+    /* 回合开始：若处于"跳过"，消耗一层并返回 true（本回合不得行动） */
+    _tickStatusStart(u) {
+      if (u.st.skip > 0) { u.st.skip--; u.apNow = 0; return true; }
+      return false;
+    }
+
+    /* 回合结束：缴械与沉默恰好覆盖"受害者自己的这一个回合"，到此解除 */
+    _tickStatusEnd(u) {
+      if (u.st.seal > 0) u.st.seal--;
+      if (u.st.silence > 0) u.st.silence--;
+    }
+
+    async _fireTriggers(when) {
+      for (const t of this.triggers) {
+        if (t.fired || t.when !== when) continue;
+        if (when === "roundStart" && t.round !== this.round) continue;
+        if (when === "waveStart" && t.wave !== this.waveIndex + 1) continue;
+        t.fired = true;
+        if (window.SJI_UI && window.SJI_UI.showDialogue) await window.SJI_UI.showDialogue(t.lines);
+      }
+    }
+
+    _checkTriggers(when, arg) {
+      for (const t of this.triggers) {
+        if (t.fired || t.when !== when) continue;
+        if (when === "enemyLow" && t.char !== arg) continue;
+        if (when === "enemyDown" && t.char && t.char !== "any" && t.char !== arg) continue;
+        t.fired = true;
+        if (window.SJI_UI && window.SJI_UI.showDialogue) window.SJI_UI.showDialogue(t.lines);
+      }
+    }
+
+    async _endRound() {
+      this._trackMinHp(this.player);
+      // 回合结束被动
+      for (const u of this.living()) {
+        if (u.charId === "shibo") this.heal(u, 1, "吸东来之紫气，");
+        if (u.boons.regen) this.heal(u, u.boons.regen, "吐纳，");
+        if (u.charId === "keai") {
+          const dz = this.units.find(x => x.alive && x.charId === "dazhan" && x.side === u.side);
+          if (dz && adj(u, dz)) this.heal(dz, 1, "可怡心善展，");
+        }
+      }
+      for (const u of this.living()) {
+        if (u.charId === "shenren") {
+          const foes = this.opponentsOf(u).filter(f => adj(u, f));
+          for (const f of foes) { this.rawHurt(f, 1, "近鲍鱼之肆而受毒"); await sleep(120); }
+        }
+        if (u.st.poison > 0) {
+          u.st.poison--;
+          this.rawHurt(u, 1, "毒发");
+          await sleep(120);
+        }
+      }
+      // 冷却
+      for (const u of this.units) {
+        for (const k of Object.keys(u.cds)) if (u.cds[k] > 0) u.cds[k]--;
+        u.roundDealt = 0;
+      }
+      this.roundDealt = 0;
+      ui_onState2();
+      function ui_onState2() { window.SJI_UI.onState(); }
+      // 断点续战：每回合末写一次快照（玩家可在标题页"继续上局"）
+      if (window.SJI_SAVE && window.SJI_SAVE.saveBattle) {
+        try { window.SJI_SAVE.saveBattle(this.serialize()); } catch (e) {}
+      }
+      await sleep(260);
+      await this._checkBattleEnd();   // 必须等待：增益选择等弹层需在下一回合猜拳前结束
+    }
+
+    async _checkBattleEnd() {
+      if (this.over) return;
+      const foes = this.living("enemy");
+      if (!this.player.alive) { this.finish("lose"); return; }
+      if (foes.length === 0) {
+        if (this.mode === "survival" || (this.waves.length > 1 && this.waveIndex < this.waves.length - 1)) {
+          await this._nextWave();   // 等待波次流程（含增益选择）完毕
+        } else {
+          this.finish("win");
+        }
+      }
+    }
+
+    async _nextWave() {
+      this.waveIndex++;
+      if (this.mode === "survival") {
+        this.survivalWaveNo = this.waveIndex + 1;
+        this.pushLog("—— 第" + this.survivalWaveNo + "波将至，苔藓不尽…… ——");
+        // 选增益
+        const boon = await window.SJI_UI.pickBoon(this);
+        if (boon) this._applyBoon(this.player, boon);
+        this.heal(this.player, 3, "战间休整，");
+        const ids = this._survivalWave(this.survivalWaveNo);
+        const scale = 1 + 0.05 * (this.survivalWaveNo - 1);
+        ids.forEach((id, i) => {
+          const m = makeUnit(id, "enemy", 200 + this.waveIndex * 10 + i);
+          m.maxhp = Math.round(m.maxhp * scale); m.hp = m.maxhp;
+          const spot = this._freeSpawnFar();
+          this._place(m, spot);
+          this.units.push(m);
+          window.SJI_UI.snap(m);
+        });
+        this.pushLog("第" + this.survivalWaveNo + "波：" + ids.length + "人入场。");
+        window.SJI_UI.onState();
+      } else {
+        const stgR = (this.cfg && this.cfg.stage) ? this.cfg.stage : null;
+        if (stgR && stgR.restFull) {
+          this.pushLog("—— 下一阵！赛事之间，得以充分休整。——");
+          this.heal(this.player, this.player.maxhp, "充分休整，");
+        } else {
+          const rest = Math.max(4, Math.ceil(this.player.maxhp * 0.6));
+          this.pushLog("—— 下一阵！阵间休整回复" + rest + "血。——");
+          this.heal(this.player, rest, "阵间休整，");
+        }
+        const ids = this.waves[this.waveIndex] || [];
+        const stg2 = (this.cfg && this.cfg.stage) ? this.cfg.stage : null;
+        const k = (stg2 && stg2.hpScale !== undefined) ? stg2.hpScale
+          : (ids.length >= 4 ? 0.62 : (ids.length === 3 ? 0.7 : (ids.length === 2 ? 0.85 : 1)));
+        ids.forEach((id, i) => {
+          const m = makeUnit(id, "enemy", 300 + this.waveIndex * 10 + i);
+          if (k !== 1) { m.maxhp = Math.max(4, Math.round(m.maxhp * k)); m.hp = m.maxhp; }
+          const spot = this._freeSpawnFar();
+          this._place(m, spot);
+          this.units.push(m);
+          window.SJI_UI.snap(m);
+        });
+        window.SJI_UI.onState();
+        await this._fireTriggers("waveStart");
+      }
+      // 清负面
+      const p = this.player;
+      Object.assign(p.st, { skip: 0, poison: 0, apMod: 0, disarm: 0, silence: 0, seal: 0 });
+    }
+
+    _freeSpawnFar() {
+      const spots = SPAWNS.filter(s => this.passable(s[0], s[1]) && manh({ r: s[0], c: s[1] }, this.player) >= 3);
+      if (spots.length) return spots[Math.floor(Math.random() * spots.length)];
+      return this._freeNear(0, 3, 3);
+    }
+
+    _applyBoon(u, boon) {
+      this.boonsTaken.push(boon.id);
+      switch (boon.id) {
+        case "b_hp": u.maxhp += 2; this.heal(u, 2, "奋进，"); break;
+        case "b_bloodfree": u.boons.bloodFree = true; break;
+        case "b_cleave": u.boons.cleave = Math.max(1, u.boons.cleave); break;
+        case "b_horsereach": u.boons.horseRange += 1; break;
+        case "b_killheal": u.boons.killHeal = 2; break;
+        case "b_shield": u.boons.shield += 3; u.st.shield += 3; break;
+        case "b_firststrike": u.boons.firstStrike += 1; break;
+        case "b_knife": u.boons.knife += 1; break;
+        case "b_horse": u.boons.horse += 1; break;
+        case "b_regen": u.boons.regen += 1; break;
+        case "b_dodge": u.boons.dodge += 0.15; break;
+        case "b_blood": u.boons.blood2 = true; break;
+        case "b_cd": u.boons.cdReduce += 1; break;
+        case "b_move": u.boons.move += 1; break;
+        case "b_ap": u.boons.apBonus += 1; break;
+      }
+      this.pushLog("得增益「" + boon.name + "」：" + boon.desc);
+    }
+
+    finish(result) {
+      if (this.over) return;
+      this.over = true;
+      this.result = result;
+      if (window.SJI_SAVE && window.SJI_SAVE.clearBattle) window.SJI_SAVE.clearBattle();
+      this.pushLog(result === "win" ? "—— 活者为王！——" : (result === "timeout" ? "—— 高考终了，胜负未分，视为败绩。——" : "—— 汝倒下了。重开重开！——"));
+      if (window.SJI_UI) window.SJI_UI.onBattleEnd(this);
+    }
+  }
+
+  return { Battle, isWall, inB, cheb, manh, adj, SIZE, makeUnit };
+})();
+
+</script>
+<script>
+/* ============================================================
+ * 实验史记 · 马刀风云 —— 界面与渲染
+ * ============================================================ */
+window.SJI_UI = (function () {
+  "use strict";
+  const D = window.SJI_DATA, E = window.SJI_ENGINE, SAVE = window.SJI_SAVE, AU = window.SJI_AUDIO;
+  const TILE = 96, PAD = 20, CS = E.SIZE * TILE + PAD * 2;
+
+  let battle = null;
+  let mode = null;            // null | 'knife' | 'horse' | 'skill'
+  let skillIdx = 0;
+  let hoverTile = null;
+  let floaters = [], banner = null;
+  let rafOn = false, bgCanvas = null;
+  let currentCtx = null;      // {type:'story'|'free'|'survival', stage?, enemies?, diff?}
+  let freeSel = { player: null, enemies: [], diff: "normal" };
+
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+
+  /* ---------------- 屏幕管理 ---------------- */
+  function showScreen(id) {
+    $$(".screen").forEach(s => s.classList.remove("on"));
+    const el = $("#screen-" + id);
+    if (el) el.classList.add("on");
+    window.scrollTo(0, 0);
+  }
+
+  function toast(text) {
+    const t = document.createElement("div");
+    t.className = "toast"; t.textContent = text;
+    $("#toast-wrap").appendChild(t);
+    setTimeout(() => { t.style.opacity = "0"; t.style.transition = "opacity .4s"; setTimeout(() => t.remove(), 420); }, 2800);
+  }
+
+  function modal(html, opts) {
+    const mask = $("#modal-mask"), box = $("#modal-box");
+    box.innerHTML = html;
+    mask.classList.add("on");
+    if (!opts) opts = {};
+    if (!opts.keepMask) mask.onclick = null;
+    return box;
+  }
+  function closeModal() { $("#modal-mask").classList.remove("on"); }
+
+  /* 弹层串行化：猜拳 / 增益三选一 / 剧情对话共用 #modal-box，
+     排队执行以免后开的弹层覆盖前一个（如增益选择被猜拳顶掉）。 */
+  let modalChain = Promise.resolve();
+  function queueModal(open) {
+    const run = () => Promise.resolve().then(open);
+    const p = modalChain.then(run, run);
+    modalChain = p.then(() => {}, () => {});
+    return p;
+  }
+
+  function face(ch, extraCls) {
+    return '<span class="tokenface ' + (extraCls || "") + '" style="background:' + ch.color + '">' + ch.glyph + "</span>";
+  }
+
+  /* ---------------- 花瓣 ---------------- */
+  function spawnPetals(container, n, colors) {
+    if (!container) return;
+    container.innerHTML = "";
+    for (let i = 0; i < n; i++) {
+      const d = document.createElement("div");
+      d.className = "petal";
+      d.style.left = Math.random() * 100 + "%";
+      d.style.background = colors[i % colors.length];
+      d.style.animationDuration = (7 + Math.random() * 8) + "s";
+      d.style.animationDelay = -(Math.random() * 12) + "s";
+      const sz = 7 + Math.random() * 8;
+      d.style.width = sz + "px"; d.style.height = sz * 0.72 + "px";
+      container.appendChild(d);
+    }
+  }
+
+  /* ---------------- 主菜单 ---------------- */
+  function initTitle() {
+    $("#best-line").textContent = (SAVE.data.bestSurvival > 0 ? "破败城墙最远：第" + SAVE.data.bestSurvival + "波 · " : "") + "史册已成" + SAVE.clearedCount() + "/" + D.STAGES.length + "卷";
+    const snap = SAVE.loadBattle();
+    const rb = $("#btn-resume");
+    if (rb) {
+      rb.style.display = snap ? "block" : "none";
+      rb.onclick = () => {
+        AU.unlock(); AU.click();
+        const b = battleFromSave(snap);
+        if (!b) { toast("上局已无法恢复"); SAVE.clearBattle(); initTitle(); return; }
+        resumeBattle(b);
+      };
+    }
+    const ng = $("#btn-ngplus");
+    if (ng) {
+      ng.style.display = SAVE.allCleared() ? "block" : "none";
+      ng.onclick = () => { AU.unlock(); AU.click(); SAVE.setSetting("ngPlus", true); renderStory(); showScreen("story"); toast("二周目：敌方强度默认困难"); };
+    }
+    spawnPetals($("#title-petals"), 14, ["#c98a8a", "#b86868", "#d8b28a"]);
+    $("#btn-story").onclick = () => { AU.unlock(); AU.click(); renderStory(); showScreen("story"); };
+    $("#btn-free").onclick = () => { AU.unlock(); AU.click(); renderFree(); showScreen("free"); };
+    $("#btn-survival").onclick = () => { AU.unlock(); AU.click(); openCharSelect("survival"); };
+    $("#btn-codex").onclick = () => { AU.unlock(); AU.click(); renderCodex(); showScreen("codex"); };
+    $("#btn-ach").onclick = () => { AU.unlock(); AU.click(); renderAch(); showScreen("ach"); };
+    $("#btn-settings").onclick = () => { AU.unlock(); AU.click(); renderSettings(); showScreen("settings"); };
+    $("#best-line").textContent = (SAVE.data.bestSurvival > 0 ? "破败城墙最远：第" + SAVE.data.bestSurvival + "波 · " : "") + "史册已成" + SAVE.clearedCount() + "/" + D.STAGES.length + "卷";
+  }
+
+  function battleFromSave(snap) {
+    try { return E.Battle.fromSave(snap, D.STAGES); } catch (e) { console.error(e); return null; }
+  }
+
+  /* 从快照恢复战斗（不进点将页，直接回战场） */
+  function resumeBattle(b) {
+    mode = null; floaters = []; banner = null;
+    battle = b;
+    window.SJI.battle = b;
+    const stg = b.cfg.stage ? D.STAGES.find(x => x.id === b.cfg.stage.id) : null;
+    $("#battle-title").textContent = stg ? (stg.juan + " · " + stg.title + "（续）")
+      : (b.mode === "survival" ? "破败城墙 · 生存（续）" : "乱斗（续）");
+    $("#battle-log").innerHTML = "";
+    (b.log || []).forEach(onLog);
+    b.triggers = (b.triggers || []).map(t => Object.assign({}, t, { fired: true }));
+    buildBG();
+    startRaf();
+    updateAll();
+    showScreen("battle");
+    toast("已继续上局：第 " + b.round + " 回合");
+    b.run().catch(err => { console.error(err); toast("战场出了差池：" + err.message); });
+  }
+
+  function renderStory() {
+    const list = $("#stage-list");
+    list.innerHTML = "";
+    let prevDone = true;
+    D.STAGES.forEach(st => {
+      const done = SAVE.isCleared(st.id);
+      const locked = !prevDone && !done;
+      prevDone = done;
+      const card = document.createElement("div");
+      card.className = "stage-card" + (done ? " done" : "") + (locked ? " locked" : "");
+      card.innerHTML =
+        '<div class="juan">' + st.juan + (done ? ' · 已成' : "") + '</div>' +
+        '<div class="t">' + st.title + "</div>" +
+        '<div class="d">' + st.intro.slice(0, 60) + "……</div>" +
+        (done ? '<div class="mark">✓</div>' : "");
+      if (!locked) card.onclick = () => { AU.click(); openStageIntro(st); };
+      list.appendChild(card);
+    });
+    $("#story-progress").textContent = "已成 " + SAVE.clearedCount() + " / " + D.STAGES.length + " 卷";
+  }
+
+  async function openStageIntro(st) {
+    if (st.id === "s0" && !SAVE.data.prologueSeen && !(window.SJI_DEBUG && window.SJI_DEBUG.skipScenes)) {
+      await showDialogue(window.SJI_SCENES.prologue);
+      SAVE.markPrologue();
+    }
+    const enemiesHtml = st.enemies.map(id => face(D.CHARACTERS[id])).join("");
+    const alliesHtml = (st.allies || []).map(id => face(D.CHARACTERS[id])).join(" ");
+    const ruleHtml = st.rule ? '<p><span class="tag red">特则</span>' + st.rule.desc + "</p>" : "";
+    modal(
+      '<h3>' + st.juan + " · " + st.title + "</h3>" +
+      '<div class="sub">据《实验史记》' + st.juan + "改编</div>" +
+      '<p style="line-height:1.9">' + st.intro + "</p>" + ruleHtml +
+      (st.tip ? '<p class="quote">锦囊：' + st.tip + "</p>" : "") +
+      '<p class="stat-inline">敌军：' + enemiesHtml + (alliesHtml ? "　友军：" + alliesHtml : "") + "</p>" +
+      '<div class="btnrow"><button class="btn" id="m-cancel">且慢</button><button class="btn primary" id="m-go">点将出征</button></div>'
+    );
+    $("#m-cancel").onclick = closeModal;
+    $("#m-go").onclick = () => { closeModal(); openCharSelect("story", st); };
+  }
+
+  /* ---------------- 选人 ---------------- */
+  function openCharSelect(type, stage) {
+    currentCtx = { type, stage };
+    const grid = $("#charselect-grid");
+    grid.innerHTML = "";
+    let sel = null;
+    let diff = SAVE.settings.lastDiff || (SAVE.settings.ngPlus ? "hard" : "normal");
+    // 难度选择（剧情/生存可选，乱斗自有难度）
+    $("#cs-diff-panel").style.display = "block";
+    $$("#cs-diff button").forEach(b => {
+      b.classList.toggle("on", b.dataset.v === diff);
+      b.onclick = () => {
+        diff = b.dataset.v;
+        SAVE.setSetting("lastDiff", diff);
+        $$("#cs-diff button").forEach(x => x.classList.toggle("on", x === b));
+        AU.click();
+      };
+    });
+    D.PLAYABLE.forEach(id => {
+      const ch = D.CHARACTERS[id];
+      const card = document.createElement("div");
+      card.className = "char-card";
+      card.innerHTML = face(ch) + '<div><div class="nm">' + ch.name + '</div><div class="hao">' + ch.hao + " · " + ch.juan + '</div><div class="jn">' + ch.passive.name + "</div></div>";
+      card.onclick = () => {
+        AU.select();
+        $$("#charselect-grid .char-card").forEach(c => c.classList.remove("sel"));
+        card.classList.add("sel");
+        sel = id;
+        $("#cs-info").innerHTML = "<b>" + ch.name + "</b>（" + ch.hao + "）　被动「" + ch.passive.name + "」：" + ch.passive.desc + "　技「" + ch.skill.name + "」：" + ch.skill.desc;
+      };
+      grid.appendChild(card);
+    });
+    $("#cs-info").textContent = "点选一人，执刀入场。";
+    $("#cs-go").onclick = () => {
+      if (!sel) { toast("先点选一人"); return; }
+      AU.click();
+      if (type === "story") {
+        const scn = (window.SJI_SCENES && window.SJI_SCENES.stages[stage.id]) || {};
+        startBattle({ mode: "story", stage, playerChar: sel, diff, aiAggr: SAVE.settings.aiAggr, enemies: stage.enemies, allies: stage.allies || [], rule: stage.rule, waves: stage.waves,
+          introScene: scn.intro, victoryScene: scn.victory, defeatScene: scn.defeat, triggers: scn.triggers || [] });
+      }
+      else if (type === "survival") startBattle({ mode: "survival", playerChar: sel, diff, aiAggr: SAVE.settings.aiAggr });
+      showScreen("battle");
+    };
+    $("#cs-back").onclick = () => { AU.click(); if (type === "story") { renderStory(); showScreen("story"); } else showScreen("title"); };
+    showScreen("charselect");
+  }
+
+  /* ---------------- 乱斗 ---------------- */
+  function renderFree() {
+    const pgrid = $("#free-pgrid"), egrid = $("#free-egrid");
+    pgrid.innerHTML = ""; egrid.innerHTML = "";
+    freeSel = { player: null, enemies: [], diff: "normal" };
+    D.PLAYABLE.forEach(id => {
+      const ch = D.CHARACTERS[id];
+      const card = document.createElement("div");
+      card.className = "char-card";
+      card.innerHTML = face(ch) + '<div><div class="nm">' + ch.name + '</div><div class="hao">' + ch.hao + "</div></div>";
+      card.onclick = () => {
+        AU.select();
+        $$("#free-pgrid .char-card").forEach(c => c.classList.remove("sel"));
+        card.classList.add("sel");
+        freeSel.player = id;
+      };
+      pgrid.appendChild(card);
+    });
+    const pool = [...D.PLAYABLE, "hanxiao", "weibing", "shibo", "weirong", "qinfa", "chongguo", "mob"];
+    pool.forEach(id => {
+      const ch = D.CHARACTERS[id];
+      const card = document.createElement("div");
+      card.className = "char-card";
+      card.innerHTML = face(ch) + '<div><div class="nm">' + ch.name + '</div><div class="hao">' + (ch.boss ? "BOSS · " : "") + ch.hao + "</div></div>";
+      card.onclick = () => {
+        AU.select();
+        if (freeSel.enemies.includes(id)) {
+          freeSel.enemies = freeSel.enemies.filter(x => x !== id);
+          card.classList.remove("sel");
+        } else {
+          if (freeSel.enemies.length >= 3) { toast("至多三名敌人"); return; }
+          freeSel.enemies.push(id);
+          card.classList.add("sel");
+        }
+      };
+      egrid.appendChild(card);
+    });
+    $$("#free-diff button").forEach(b => {
+      b.onclick = () => {
+        $$("#free-diff button").forEach(x => x.classList.remove("on"));
+        b.classList.add("on");
+        freeSel.diff = b.dataset.v;
+        AU.click();
+      };
+    });
+    $("#free-go").onclick = () => {
+      if (!freeSel.player) { toast("先点选汝之角色"); return; }
+      if (!freeSel.enemies.length) { toast("至少点选一名敌人"); return; }
+      AU.click();
+      startBattle({ mode: "free", playerChar: freeSel.player, enemies: freeSel.enemies.slice(), diff: freeSel.diff, aiAggr: SAVE.settings.aiAggr });
+      showScreen("battle");
+    };
+  }
+
+  /* ---------------- 图鉴/成就/设置 ---------------- */
+  function renderCodex() {
+    const grid = $("#codex-grid");
+    grid.innerHTML = "";
+    Object.values(D.CHARACTERS).filter(c => c.id !== "tree").forEach(ch => {
+      const card = document.createElement("div");
+      card.className = "char-card";
+      card.innerHTML = face(ch) + '<div><div class="nm">' + ch.name + '</div><div class="hao">' + (ch.boss ? "BOSS · " : "") + ch.hao + " · " + ch.juan + '</div><div class="jn">' + (ch.playable ? "可选" : "史中人") + "</div></div>";
+      card.onclick = () => { AU.click(); showCharDetail(ch); };
+      grid.appendChild(card);
+    });
+  }
+
+  function showCharDetail(ch) {
+    const sk = ch.skills ? ch.skills : [ch.skill];
+    const skHtml = sk.map(s => '<p><span class="tag red">技</span><b>「' + s.name + "」</b>" + s.desc + "</p>").join("");
+    modal(
+      '<div class="row">' + face(ch) + "<div><h3>" + ch.name + "</h3>" +
+      '<div class="sub">' + (ch.boss ? "BOSS · " : "") + ch.hao + " · " + ch.juan + " · 血" + ch.hp + "</div></div></div>" +
+      '<div class="quote">' + ch.quote + "</div>" +
+      '<p>' + ch.bio + "</p>" +
+      '<p><span class="tag">被动</span><b>「' + ch.passive.name + "」</b>" + ch.passive.desc + "</p>" + skHtml +
+      '<div class="btnrow"><button class="btn" id="m-close">掩卷</button></div>'
+    );
+    $("#m-close").onclick = closeModal;
+  }
+
+  function renderAch() {
+    const list = $("#ach-list");
+    list.innerHTML = "";
+    D.ACHIEVEMENTS.forEach(a => {
+      const got = SAVE.hasAch(a.id);
+      const card = document.createElement("div");
+      card.className = "ach-card" + (got ? " got" : "");
+      card.innerHTML = '<div class="an">' + a.name + "</div><div class=\"ad\">" + a.desc + "</div>";
+      list.appendChild(card);
+    });
+    $("#ach-count").textContent = SAVE.data.ach ? Object.keys(SAVE.data.ach).length : 0;
+  }
+
+  const AI_AGGR_DESC = {
+    passive: "消极：多在近身时才动手，技能用得少，残血便退避。适合只想看剧情。",
+    measured: "守成：会主动逼近并出手，但残血时会退避，血祭谨慎。",
+    active: "主动：正常进攻，优先集火残血者，常用技能与血祭。（默认）",
+    frenzy: "狂攻：不计代价，频繁血祭，死战不退。"
+  };
+  function renderSettings() {
+    const rps = SAVE.settings.rpsMode || "ask";
+    $$("#set-rps button").forEach(b => b.classList.toggle("on", b.dataset.v === rps));
+    const fx = SAVE.settings.fx || "full";
+    $$("#set-fx button").forEach(b => b.classList.toggle("on", b.dataset.v === fx));
+    const ai = SAVE.settings.aiAggr || "active";
+    $$("#set-aiaggr button").forEach(b => b.classList.toggle("on", b.dataset.v === ai));
+    if ($("#set-aiaggr-desc")) $("#set-aiaggr-desc").textContent = AI_AGGR_DESC[ai] || "";
+    $("#set-sfx").classList.toggle("on", SAVE.settings.sfx);
+    $("#set-music").classList.toggle("on", SAVE.settings.music);
+    $$("#set-speed button").forEach(b => b.classList.toggle("on", +b.dataset.v === SAVE.settings.speed));
+  }
+
+  /* ---------------- 战斗 ---------------- */
+  function startBattle(cfg) {
+    mode = null; floaters = []; banner = null;
+    battle = new E.Battle(cfg);
+    window.SJI.battle = battle;
+    $("#battle-title").textContent = cfg.mode === "story" ? (cfg.stage.juan + " · " + cfg.stage.title) : (cfg.mode === "survival" ? "破败城墙 · 生存" : "乱斗 · " + D.CHARACTERS[cfg.playerChar].hao);
+    $("#battle-log").innerHTML = "";
+    buildBG();
+    startRaf();
+    updateAll();
+    const boot = async () => {
+      if (cfg.introScene) await showDialogue(cfg.introScene);
+      battle.run().catch(err => { console.error(err); toast("战场出了差池：" + err.message); });
+    };
+    boot();
+  }
+
+  function onLog(s) {
+    const el = $("#battle-log");
+    if (!el) return;
+    const div = document.createElement("div");
+    if (s.indexOf("——") === 0) div.className = "sys";
+    else if (s.indexOf("倒下") >= 0 || s.indexOf("血祭") >= 0) div.className = "em";
+    div.textContent = s;
+    el.appendChild(div);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  /* HUD 刷新 */
+  function updateAll() {
+    if (!battle) return;
+    const p = battle.player;
+    // 玩家卡
+    const pc = $("#pc-face");
+    pc.style.background = p.ch.color;
+    pc.textContent = p.ch.glyph;
+    $("#pc-name").innerHTML = "<b>" + p.ch.name + "</b>（" + p.ch.hao + "）";
+    const hpPct = Math.max(0, p.hp / p.maxhp * 100);
+    const inner = $("#pc-hp-in");
+    inner.style.width = hpPct + "%";
+    inner.classList.toggle("low", p.hp <= p.maxhp * 0.3);
+    if ($("#pc-hp-ghost")) $("#pc-hp-ghost").style.width = hpPct + "%";
+    $("#player-card").classList.toggle("critical", p.alive && p.hp <= p.maxhp * 0.3);
+    $("#pc-hp-tx").textContent = "血 " + Math.max(0, p.hp) + " / " + p.maxhp;
+    // 行动点
+    const pips = $("#ap-pips");
+    pips.innerHTML = "";
+    for (let i = 0; i < Math.max(p.apNow, 0); i++) {
+      const d = document.createElement("div"); d.className = "ap-pip on"; pips.appendChild(d);
+    }
+    // 状态
+    const chips = $("#pc-st");
+    chips.innerHTML = "";
+    const addChip = (txt, color) => { const s = document.createElement("span"); s.className = "st-chip"; s.style.background = color; s.textContent = txt; chips.appendChild(s); };
+    if (p.hasKnife) addChip("刀", "#7a5c30");
+    if (p.hasHorse) addChip("马", "#5c3070");
+    if (p.st.bloodlust > 0) addChip("血祭×" + p.st.bloodlust, "#a63a2b");
+    if (p.st.poison > 0) addChip("毒" + p.st.poison, "#6a4a8c");
+    if (p.st.skip > 0) addChip("晕", "#8a7a3a");
+    if (p.st.seal > 0) addChip("被封", "#555");
+    if (p.st.silence > 0) addChip("默", "#555");
+    if (p.st.shield > 0) addChip("盾" + p.st.shield, "#3a6a8a");
+    if (p.st.grudge > 0) addChip("尝胆+" + p.st.grudge, "#2e8b74");
+    if (p.st.empower > 0) addChip("势+" + p.st.empower, "#9a7b2d");
+    if (p.offField > 0) addChip("返家途中", "#8a6a2a");
+    // 技能按钮
+    const skBtn = $("#b-skill");
+    const sk = battle.skillOf(p, 0);
+    const cd = battle.skillCd(p, 0);
+    const skOk = cd <= 0 && p.apNow >= (sk.ap || 1) && p.st.silence <= 0;
+    skBtn.innerHTML = sk.name + (cd > 0 ? "（歇" + cd + "）" : (sk.ap ? "·" + sk.ap + "动" : ""));
+    skBtn.disabled = !skOk || phaseLocked();
+    // 其它按钮
+    $("#b-knife").disabled = p.hasKnife || (!(!phaseLocked() && p.apNow > 0) && p.charId !== "lifan");
+    $("#b-knife").textContent = p.hasKnife ? "已持刀" : "购刀" + (p.charId === "lifan" ? "·免动" : "·1动");
+    $("#b-horse").disabled = p.hasHorse || phaseLocked() || p.apNow <= 0;
+    $("#b-horse").textContent = p.hasHorse ? "已购马" : "购马·1动";
+    $("#b-attack").disabled = phaseLocked() || !p.hasKnife || p.apNow <= 0 || p.st.seal > 0 || !battle.opponentsOf(p).some(f => E.adj(p, f));
+    $("#b-horseatk").disabled = phaseLocked() || !p.hasHorse || p.apNow <= 0 || !E.isWall(p.r, p.c) || !battle.opponentsOf(p).some(f => E.isWall(f.r, f.c) && E.manh(p, f) <= 3);
+    $("#b-blood").disabled = phaseLocked() || p.apNow <= 0 || p.hp < 2;
+    const undoN = (p._undo && p._undo.length) || 0;
+    $("#b-undo").disabled = phaseLocked() || undoN === 0;
+    $("#b-undo").textContent = undoN ? "撤销移动(" + undoN + ")" : "撤销移动";
+    $("#b-wait").disabled = phaseLocked();
+    // 敌人列表
+    const elist = $("#enemy-list");
+    elist.innerHTML = "";
+    battle.units.filter(u => u.side === "enemy").forEach(u => {
+      const row = document.createElement("div");
+      row.className = "enemy-row" + (u.alive ? "" : " dead");
+      const apDots = (u.alive && u.offField <= 0) ? Array.from({ length: Math.max(0, Math.min(6, u.apNow)) }, () => '<span class="ap-mini"></span>').join("") : "";
+      row.innerHTML = face(u.ch) + '<div style="min-width:64px">' + u.ch.hao + (u.offField > 0 ? "（家）" : "") + '</div>'
+        + '<div style="min-width:34px">' + apDots + '</div>'
+        + '<div class="ehp"><i style="width:' + (u.alive ? Math.max(0, u.hp / u.maxhp * 100) : 0) + '%"></i></div><div style="min-width:38px;text-align:right">' + (u.alive ? u.hp + "/" + u.maxhp : "亡") + "</div>";
+      elist.appendChild(row);
+    });
+    // 顶部信息
+    $("#round-no").textContent = "第 " + battle.round + " 回合" + (battle.mode === "survival" ? " · 第" + battle.survivalWaveNo + "波" : "");
+    if ($("#ai-label")) {
+      const nm = { passive: "消极", measured: "守成", active: "主动", frenzy: "狂攻" };
+      $("#ai-label").textContent = "AI " + (nm[battle.aiAggr] || "主动");
+    }
+  }
+
+  function phaseLocked() { return !battle || battle.over || battle._playerPhaseActive !== true; }
+
+  /* 玩家阶段（引擎调用） */
+  async function playerPhase(b) {
+    battle = b;
+    b._playerPhaseActive = true;
+    await showBanner("汝之回合", 700);
+    if (checkAutoEnd()) { b._playerPhaseActive = false; return; }
+    updateAll();
+    await new Promise(resolve => { b._phaseResolve = resolve; });
+    b._playerPhaseActive = false;
+    mode = null;
+    updateAll();
+  }
+
+  function checkAutoEnd() {
+    if (!battle) return true;  // 战场已离场（模块引用被清空）时视为结束
+    const p = battle.player;
+    return battle.over || p.apNow <= 0 || !p.alive || p.offField > 0;
+  }
+
+  function afterPlayerAction() {
+    updateAll();
+    if (checkAutoEnd()) endPlayerPhase();
+  }
+  function endPlayerPhase() {
+    mode = null;
+    if (battle && battle._phaseResolve) { const r = battle._phaseResolve; battle._phaseResolve = null; r(); }
+  }
+
+  /* 行动按钮 */
+  function arm(m) { mode = (mode === m) ? null : m; updateAll(); }
+  function bindActions() {
+    $("#b-knife").onclick = async () => { AU.click(); await battle.doBuyKnife(battle.player); afterPlayerAction(); };
+    $("#b-horse").onclick = async () => { AU.click(); await battle.doBuyHorse(battle.player); afterPlayerAction(); };
+    $("#b-attack").onclick = () => { AU.click(); arm("knife"); };
+    $("#b-horseatk").onclick = () => { AU.click(); arm("horse"); };
+    $("#b-skill").onclick = () => {
+      AU.click();
+      const p = battle.player, sk = battle.skillOf(p, 0);
+      if (sk.kind === "unit") arm("skill");
+      else { battle.doSkill(p, 0, null).then(afterPlayerAction); }
+    };
+    $("#b-blood").onclick = async () => { AU.click(); await battle.doSacrifice(battle.player); afterPlayerAction(); };
+    $("#b-undo").onclick = async () => {
+      AU.click();
+      if (battle.undoMove()) { mode = null; updateAll(); }
+    };
+    $("#b-wait").onclick = () => { AU.click(); endPlayerPhase(); };
+    $("#b-surrender").onclick = () => {
+      modal('<h3>认输？</h3><p>胜负乃兵家常事，重开重开。</p><div class="btnrow"><button class="btn" id="m-no">再战</button><button class="btn primary" id="m-yes">认输</button></div>');
+      $("#m-no").onclick = closeModal;
+      $("#m-yes").onclick = () => { closeModal; battle.finish("lose"); };
+    };
+    $("#b-exit").onclick = () => {
+      AU.click();
+      if (battle) { battle.over = true; endPlayerPhase(); }
+      stopRaf(); showScreen("title"); initTitle();
+    };
+    $("#b-speed").onclick = () => {
+      const s = SAVE.settings.speed === 3 ? 1 : SAVE.settings.speed + 1;
+      SAVE.setSetting("speed", s);
+      $("#b-speed").textContent = "速×" + s;
+      AU.click();
+    };
+    $("#b-mute").onclick = () => {
+      const v = !SAVE.settings.sfx;
+      SAVE.setSetting("sfx", v);
+      AU.setSfx(v);
+      $("#b-mute").textContent = v ? "音" : "默";
+      AU.click();
+    };
+    document.addEventListener("keydown", ev => {
+      if (ev.key === "Escape" && mode) { mode = null; updateAll(); }
+      if (ev.key === " " && battle && battle._playerPhaseActive) { ev.preventDefault(); endPlayerPhase(); }
+    });
+  }
+
+  /* ---------------- 猜拳 ---------------- */
+  const RPS = [{ k: "rock", g: "✊", n: "石头" }, { k: "scissors", g: "✌", n: "剪刀" }, { k: "paper", g: "✋", n: "布" }];
+  async function rpsRound(b) {
+    battle = b;
+    if (SAVE.settings.rpsMode === "auto") {
+      const k = Math.random();
+      const resK = k < 0.4 ? "胜" : (k < 0.75 ? "和" : "负");
+      const ap = resK === "胜" ? 4 : (resK === "和" ? 3 : 2);
+      b.pushLog("—— 自动猜拳：" + resK + "，得" + ap + "动。——");
+      if (window.SJI_DEBUG && window.SJI_DEBUG.skipScenes) return { res: resK, ap };
+      await showBanner("猜拳 " + resK + "　得" + ap + "动", 460);
+      return { res: resK, ap };
+    }
+    await showBanner("猜拳定行动", 650);
+    if (b.over) return { res: "和", ap: 2 };
+    return queueModal(() => new Promise(resolve => {
+      modal(
+        '<div class="rps-title">猜 拳</div>' +
+        '<div class="rps-sub">胜得四动 · 和得三动 · 负得二动</div>' +
+        '<div class="rps-btns">' + RPS.map((r, i) => '<button class="rps-btn" data-i="' + i + '"><span class="g">' + r.g + "</span>" + r.n + "</button>").join("") + "</div>" +
+        '<div class="rps-vs" id="rps-vs">　</div>' +
+        '<div class="rps-result" id="rps-res">　</div>'
+      );
+      const vs = $("#rps-vs"), res = $("#rps-res");
+      $$("#modal-box .rps-btn").forEach(btn => {
+        btn.onclick = async () => {
+          const mine = RPS[+btn.dataset.i];
+          const foe = RPS[Math.floor(Math.random() * 3)];
+          $$("#modal-box .rps-btn").forEach(x => x.disabled = true);
+          // 天命出拳小动画
+          for (let i = 0; i < 6; i++) {
+            vs.textContent = mine.g + "　对　" + RPS[i % 3].g;
+            AU.click();
+            await new Promise(r => setTimeout(r, 80));
+          }
+          vs.textContent = mine.g + "　对　" + foe.g;
+          let resK, ap;
+          if (mine.k === foe.k) { resK = "和"; ap = 3; AU.rpsDraw(); }
+          else if ((mine.k === "rock" && foe.k === "scissors") || (mine.k === "scissors" && foe.k === "paper") || (mine.k === "paper" && foe.k === "rock")) { resK = "胜"; ap = 4; AU.rpsWin(); }
+          else { resK = "负"; ap = 2; AU.rpsLose(); }
+          res.textContent = resK + "！天命予汝" + ap + "动";
+          res.style.color = resK === "胜" ? "#a63a2b" : (resK === "负" ? "#555" : "#9a7b2d");
+          setTimeout(() => { closeModal(); resolve({ res: resK, ap }); }, window.SJI_DEBUG && window.SJI_DEBUG.fast ? 30 : 850);
+        };
+      });
+      if (window.SJI_DEBUG && window.SJI_DEBUG.autoRps) {
+        setTimeout(() => { const b2 = $$("#modal-box .rps-btn")[Math.floor(Math.random() * 3)]; if (b2 && !b2.disabled) b2.click(); }, 30);
+      }
+    }));
+  }
+
+  /* ---------------- 增益三选一 ---------------- */
+  async function pickBoon(b) {
+    battle = b;
+    if (b.over) return null;
+    const taken = b.boonsTaken || [];
+    const commons = D.BOONS.filter(x => !x.rare && !taken.includes(x.id)).sort(() => Math.random() - 0.5);
+    const rares = D.BOONS.filter(x => x.rare && !taken.includes(x.id)).sort(() => Math.random() - 0.5);
+    const pool = commons.slice(0, 2).concat(rares.slice(0, 1)).sort(() => Math.random() - 0.5);
+    while (pool.length < 3 && commons.length > pool.length) pool.push(commons[pool.length]);
+    return queueModal(() => new Promise(resolve => {
+      modal(
+        '<h3>苔藓之间，拾得一策</h3>' +
+        '<div class="sub">破败城墙 · 三选其一</div>' +
+        '<div class="boon-btns">' + pool.map((bo, i) =>
+          '<button class="btn boon-b" data-i="' + i + '"><span class="bn">「' + bo.name + "」</span><span class=\"bd\">" + bo.desc + "</span></button>").join("") + "</div>"
+      );
+      $$("#modal-box .boon-b").forEach(btn => {
+        btn.onclick = () => { AU.select(); closeModal(); resolve(pool[+btn.dataset.i]); };
+      });
+    }));
+  }
+
+  /* ---------------- 剧情对话 ---------------- */
+  function showDialogue(lines) {
+    if (window.SJI_DEBUG && window.SJI_DEBUG.skipScenes) return Promise.resolve();
+    const runScene = () => new Promise(resolve => {
+      const mask = $("#modal-mask"), box = $("#modal-box");
+      let idx = 0, typing = null, done = false;
+      const SPK = (window.SJI_SCENES && window.SJI_SCENES.speakers) || {};
+      function finish() {
+        if (done) return;
+        done = true;
+        if (typing) clearInterval(typing);
+        document.removeEventListener("keydown", onKey);
+        mask.classList.remove("on");
+        mask.onclick = null;
+        box.onclick = null;
+        box.innerHTML = "";
+        resolve();
+      }
+      function showLine() {
+        const pair = lines[idx];
+        const sp = SPK[pair[0]] || D.CHARACTERS[pair[0]] || { name: pair[0], glyph: "?", color: "#666" };
+        box.innerHTML =
+          '<div class="dlg">' +
+          '<div class="dlg-head">' + face(sp) +
+          '<div><div class="dlg-name" style="color:' + sp.color + '">' + sp.name + "</div>" +
+          '<div class="dlg-role">' + (pair[0] === "史" ? "史官" : (sp.hao || "")) + "</div></div>" +
+          '<button class="btn small" id="dlg-skip">跳过</button></div>' +
+          '<div class="dlg-text" id="dlg-text"></div>' +
+          '<div class="dlg-next">▼</div></div>';
+        mask.classList.add("on");
+        const tx = $("#dlg-text");
+        let i = 0;
+        tx.textContent = "";
+        typing = setInterval(() => {
+          i++;
+          tx.textContent = pair[1].slice(0, i);
+          if (i >= pair[1].length) { clearInterval(typing); typing = null; }
+        }, 22);
+        $("#dlg-skip").onclick = (e) => { e.stopPropagation(); finish(); };
+        box.onclick = () => {
+          if (typing) { clearInterval(typing); typing = null; tx.textContent = pair[1]; return; }
+          idx++;
+          if (idx >= lines.length) finish(); else showLine();
+        };
+      }
+      function onKey(e) {
+        if (e.key === " " || e.key === "Enter") { e.preventDefault(); if (box.onclick) box.onclick(); }
+        if (e.key === "Escape") finish();
+      }
+      document.addEventListener("keydown", onKey);
+      showLine();
+    });
+    return queueModal(runScene);
+  }
+
+  /* ---------------- 横幅/特效 ---------------- */
+  function showBanner(text, ms) {
+    const el = $("#phase-banner");
+    el.textContent = text;
+    el.classList.add("on");
+    return new Promise(r => setTimeout(() => { el.classList.remove("on"); r(); }, (window.SJI_DEBUG && window.SJI_DEBUG.fast ? 60 : ms)));
+  }
+
+  function uPos(u) {
+    return { x: PAD + u.rx * TILE + TILE / 2, y: PAD + u.ry * TILE + TILE / 2 };
+  }
+  function fxFloat(u, text, color) {
+    floaters.push({ u, text, color, t: 1, dy: 0 });
+    if (text && text[0] === "+") {
+      const P = uPos(u);
+      spawnParticles(P.x, P.y, { n: 8, colors: ["#7fe08a", "#ffd98a"], speed: 55, life: 0.7, grav: -70, size: 2.5 });
+    }
+  }
+  function fxHit(u, dmg, opts) {
+    u.flash = 1;
+    fxFloat(u, "-" + dmg, opts && opts.poison ? "#b06ad0" : "#d63a2a");
+    const P = uPos(u);
+    if (opts && opts.poison) spawnParticles(P.x, P.y, { n: 6, color: "#b06ad0", speed: 60, life: 0.6, grav: -40, size: 2.5 });
+    else if (opts && opts.type === "horse") spawnParticles(P.x, P.y, { n: 10, color: "#c9b28a", speed: 150, life: 0.45, grav: 240 });
+    else spawnParticles(P.x, P.y, { n: Math.min(14, 4 + dmg * 2), colors: ["#d63a2a", "#a63a2b", "#f2ead8"], speed: 110, life: 0.45 });
+    if (dmg >= 3) addShake(6);
+  }
+  function fxStatus(u, text) { banner = { text, t: 1.4 }; }
+  function snap(u) { u.rx = u.c; u.ry = u.r; }
+
+  /* ---------------- 打击特效系统 ---------------- */
+  let particles = [], slashes = [], projectiles = [], rings = [], ghosts = [], vignettes = [];
+  let shakeT = 0, shakeMag = 0;
+  const PROJ_STYLE = {
+    wenbin: ["arrow", "#3a2a1a"], wonder: ["beam", "#d8a11f"], shaoming: ["paper", "#f5efe0"],
+    xinhui: ["wave", "#c04a6a"], shibo: ["beam", "#4f6d8c"], weirong: ["beam", "#6b4f8c"],
+    qinfa: ["line", "#3d4a5c"], xiangdong: ["beam", "#8a8ab8"], limo: ["wave", "#8f8f5c"],
+    dage: ["paper", "#e8d8c0"], lifan: ["wave", "#3f7d8c"], ziye: ["paper", "#8c6a2f"],
+    zichen: ["ring", "#7d4a6b"], luhao: ["paper", "#4a6d9c"], guyin: ["wave", "#555555"],
+    keai: ["paper", "#c76b98"], wanzhen: ["beam", "#6a8577"], tree: ["dab", "#4c6b3c"]
+  };
+
+  function spawnParticles(x, y, o) {
+    const n = o.n || 10;
+    for (let i = 0; i < n; i++) {
+      if (particles.length > 320) particles.shift();
+      const a = Math.random() * Math.PI * 2, sp = (o.speed || 90) * (0.4 + Math.random() * 0.8);
+      particles.push({
+        x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - (o.up || 0),
+        life: (o.life || 0.55) * (0.6 + Math.random() * 0.7), t: 0,
+        color: o.colors ? o.colors[Math.floor(Math.random() * o.colors.length)] : (o.color || "#a63a2b"),
+        size: (o.size || 3) * (0.5 + Math.random()), grav: o.grav !== undefined ? o.grav : 160
+      });
+    }
+  }
+  function addShake(mag) { shakeMag = Math.max(shakeMag, mag); shakeT = Math.max(shakeT, 1); }
+
+  function fxAttack(att, def, opts) {
+    if (!att || !def) return;
+    const A = uPos(att), B = uPos(def);
+    const cheb = Math.max(Math.abs(att.r - def.r), Math.abs(att.c - def.c));
+    const dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy) || 1;
+    if (opts.type === "horse") {
+      rings.push({ x: B.x, y: B.y, t: 1, color: "#8a6a3a", r: 16 });
+      spawnParticles(B.x, B.y, { n: 14, color: "#a89066", speed: 130, life: 0.5, grav: 220, size: 3.5 });
+      addShake(9);
+      att._lunge = { dx: dx / len, dy: dy / len, t: 1 };
+      return;
+    }
+    if (cheb <= 1) {
+      att._lunge = { dx: dx / len, dy: dy / len, t: 1 };
+      slashes.push({ x: B.x, y: B.y, a: Math.atan2(dy, dx), t: 1, color: opts.type === "skill" ? "#d8a11f" : "#f2ead8" });
+      spawnParticles(B.x, B.y, { n: 7, colors: ["#f2ead8", "#a63a2b"], speed: 120, life: 0.4, size: 2.5 });
+      return;
+    }
+    const st = PROJ_STYLE[att.charId] || ["dab", "#5a5248"];
+    projectiles.push({ x: A.x, y: A.y, tx: B.x, ty: B.y, t: 0, style: st[0], color: st[1] });
+  }
+
+  function fxDeath(u) {
+    const P = uPos(u);
+    ghosts.push({ x: P.x, y: P.y, glyph: u.ch.glyph, color: u.ch.color, t: 1.3 });
+    spawnParticles(P.x, P.y, { n: 22, colors: [u.ch.color, "#6a615a", "#2b2622"], speed: 150, life: 0.7, size: 3.5 });
+  }
+
+  function fxVignette(rgb) { vignettes.push({ rgb, t: 1 }); }
+
+  /* ---------------- 画布 ---------------- */
+  function buildBG() {
+    bgCanvas = document.createElement("canvas");
+    bgCanvas.width = CS; bgCanvas.height = CS;
+    const g = bgCanvas.getContext("2d");
+    // 宣纸底
+    g.fillStyle = "#efe4c8"; g.fillRect(0, 0, CS, CS);
+    for (let i = 0; i < 900; i++) {
+      g.fillStyle = "rgba(" + (120 + Math.random() * 60 | 0) + "," + (100 + Math.random() * 50 | 0) + "," + (60 + Math.random() * 40 | 0) + "," + (Math.random() * 0.05) + ")";
+      g.fillRect(Math.random() * CS, Math.random() * CS, Math.random() * 26 + 4, Math.random() * 3 + 1);
+    }
+    // 瓦片
+    for (let r = 0; r < E.SIZE; r++) for (let c = 0; c < E.SIZE; c++) {
+      const x = PAD + c * TILE, y = PAD + r * TILE;
+      if (E.isWall(r, c)) {
+        g.fillStyle = "#cabd9e"; g.fillRect(x, y, TILE, TILE);
+        // 砖缝
+        g.strokeStyle = "rgba(90,75,50,.35)"; g.lineWidth = 1.4;
+        for (let by = 0; by <= TILE; by += 24) {
+          g.beginPath(); g.moveTo(x, y + by); g.lineTo(x + TILE, y + by); g.stroke();
+        }
+        for (let row = 0; row < 4; row++) {
+          const offset = (row % 2) * 24;
+          for (let bx = offset; bx <= TILE; bx += 48) {
+            g.beginPath(); g.moveTo(x + bx, y + row * 24); g.lineTo(x + bx, y + row * 24 + 24); g.stroke();
+          }
+        }
+        // 内沿阴影
+        if (r === 1 || c === 1 || r === E.SIZE - 2 || c === E.SIZE - 2) {
+          g.fillStyle = "rgba(60,45,25,.14)"; g.fillRect(x, y, TILE, TILE);
+        }
+      } else {
+        g.fillStyle = "#eee2c2"; g.fillRect(x, y, TILE, TILE);
+        // 草痕
+        const seed = (r * 7 + c * 13) % 5;
+        g.strokeStyle = "rgba(120,130,70,.28)"; g.lineWidth = 1.2;
+        for (let i = 0; i < 3; i++) {
+          const gx = x + 16 + ((seed * 17 + i * 29) % (TILE - 30));
+          const gy = y + 20 + ((seed * 31 + i * 37) % (TILE - 40));
+          g.beginPath(); g.moveTo(gx, gy + 7); g.quadraticCurveTo(gx + 3, gy, gx + 7, gy - 4); g.stroke();
+        }
+      }
+      g.strokeStyle = "rgba(90,75,50,.14)";
+      g.strokeRect(x + .5, y + .5, TILE - 1, TILE - 1);
+    }
+    // 障碍格：课桌/讲台/柜子（关卡可配 blocked）
+    const blocked = (window.SJI.battle && window.SJI.battle.cfg && window.SJI.battle.cfg.stage
+      && window.SJI.battle.cfg.stage.blocked) || [];
+    for (const [br, bc] of blocked) {
+      const x = PAD + bc * TILE, y = PAD + br * TILE;
+      // 阴影
+      g.fillStyle = "rgba(60,40,20,.18)";
+      g.beginPath(); g.ellipse(x + TILE / 2, y + TILE - 16, 32, 9, 0, 0, 7); g.fill();
+      // 桌体
+      const bw = TILE - 22, bh = TILE - 30;
+      g.fillStyle = "#8a6a45";
+      g.fillRect(x + 11, y + 12, bw, bh);
+      // 桌面高光
+      g.fillStyle = "#b08a5c";
+      g.fillRect(x + 11, y + 12, bw, 9);
+      // 木纹
+      g.strokeStyle = "rgba(80,55,30,.35)"; g.lineWidth = 1;
+      for (let i = 1; i < 4; i++) {
+        g.beginPath(); g.moveTo(x + 13, y + 12 + i * (bh / 4)); g.lineTo(x + 9 + bw, y + 12 + i * (bh / 4)); g.stroke();
+      }
+      // 桌腿
+      g.fillStyle = "#6b5033";
+      g.fillRect(x + 14, y + 12 + bh, 6, 9);
+      g.fillRect(x + 9 + bw - 6, y + 12 + bh, 6, 9);
+      // 桌上之物（书/水壶）
+      g.fillStyle = "#c94f3a";
+      g.fillRect(x + TILE / 2 - 13, y + 22, 18, 11);
+      g.fillStyle = "#f2ead8";
+      g.fillRect(x + TILE / 2 - 13, y + 22, 18, 3);
+      g.fillStyle = "#5a7d9a";
+      g.beginPath(); g.arc(x + TILE / 2 + 11, y + 30, 6, 0, 7); g.fill();
+      g.strokeStyle = "rgba(0,0,0,.25)"; g.lineWidth = 1.5;
+      g.strokeRect(x + 11.5, y + 12.5, bw - 1, bh - 1);
+    }
+
+    // 角楼（四角）
+    for (const [rr, cc] of [[0, 0], [0, E.SIZE - 1], [E.SIZE - 1, 0], [E.SIZE - 1, E.SIZE - 1]]) {
+      const x = PAD + cc * TILE + TILE / 2, y = PAD + rr * TILE + TILE / 2;
+      g.fillStyle = "#6e6152"; g.fillRect(x - 15, y - 18, 30, 36);
+      g.fillStyle = "#453b30"; g.fillRect(x - 20, y - 24, 40, 9);
+      g.fillStyle = "#8a7d63"; g.fillRect(x - 15, y - 18, 30, 5);
+      g.fillStyle = "#a63a2b"; g.beginPath(); g.arc(x, y - 6, 4.5, 0, 7); g.fill();
+      g.strokeStyle = "rgba(242,234,216,.9)"; g.lineWidth = 1.2;
+      g.beginPath(); g.arc(x, y - 6, 6.5, 0, 7); g.stroke();
+    }
+    // 旗帜（四边中点）
+    for (const [rr, cc, ch] of [[0, 3, "實"], [E.SIZE - 1, 3, "驗"], [3, 0, "史"], [3, E.SIZE - 1, "記"]]) {
+      const x = PAD + cc * TILE + TILE / 2, y = PAD + rr * TILE + TILE / 2;
+      g.strokeStyle = "#5a4a3a"; g.lineWidth = 2.5;
+      g.beginPath(); g.moveTo(x - 22, y - 24); g.lineTo(x - 22, y + 24); g.stroke();
+      g.fillStyle = "#a63a2b";
+      g.beginPath();
+      g.moveTo(x - 22, y - 22); g.lineTo(x + 2, y - 18); g.lineTo(x - 22, y - 6);
+      g.closePath(); g.fill();
+      g.fillStyle = "#f2ead8";
+      g.font = "bold 11px KaiTi, serif"; g.textAlign = "center"; g.textBaseline = "middle";
+      g.fillText(ch, x - 12, y - 15);
+    }
+
+    // 外框
+    g.strokeStyle = "#8a7a58"; g.lineWidth = 3;
+    g.strokeRect(PAD - 1.5, PAD - 1.5, E.SIZE * TILE + 3, E.SIZE * TILE + 3);
+    // 中央篆字
+    g.save();
+    g.globalAlpha = 0.1;
+    g.font = "bold 120px KaiTi, STKaiti, serif";
+    g.fillStyle = "#5a4020"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillText("馬刀", PAD + 3.5 * TILE, PAD + 3.5 * TILE);
+    g.restore();
+  }
+
+  function fxLevel() { return SAVE.settings.fx || "full"; }
+
+  function startRaf() {
+    if (rafOn) return;
+    rafOn = true;
+    let last = performance.now();
+    const cv = $("#battle-canvas");
+    cv.width = CS; cv.height = CS;
+    const ctx = cv.getContext("2d");
+    function frame(now) {
+      if (!rafOn) return;
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      draw(ctx, dt);
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+  function stopRaf() { rafOn = false; }
+
+  function draw(ctx, dt) {
+    if (!bgCanvas) return;
+    ctx.clearRect(0, 0, CS, CS);
+    ctx.drawImage(bgCanvas, 0, 0);
+    if (!battle) return;
+    ctx.save();
+    if (shakeT > 0 && fxLevel() !== "off") {
+      shakeT -= dt * 2.4;
+      const m = shakeMag * Math.max(0, shakeT);
+      ctx.translate((Math.random() - .5) * m, (Math.random() - .5) * m);
+    }
+    const speedK = [1, 0.6, 0.3][SAVE.settings.speed - 1] || 1;
+
+    // 高亮
+    const p = battle.player;
+    if (battle._playerPhaseActive && p.alive && p.offField <= 0 && mode === null && !checkAutoEnd()) {
+      const reach = battle._reachable(p, battle.moveRange(p));
+      ctx.fillStyle = "rgba(80,140,70,.30)";
+      for (const key of reach.keys) {
+        const [r, c] = key.split(",").map(Number);
+        if (battle.unitAt(r, c) || (r === p.r && c === p.c)) continue;
+        dot(ctx, PAD + c * TILE + TILE / 2, PAD + r * TILE + TILE / 2, 10);
+      }
+    }
+    if (mode === "knife" || mode === "horse" || mode === "skill") {
+      const t = performance.now() / 300;
+      const targets = battle.opponentsOf(p).filter(f =>
+        mode === "knife" ? E.adj(p, f) :
+        mode === "horse" ? (E.isWall(p.r, p.c) && E.isWall(f.r, f.c) && E.manh(p, f) <= 3) :
+        chebSkillRange(p, f));
+      for (const f of targets) {
+        const pos = uPos(f);
+        ctx.strokeStyle = "rgba(200,50,40," + (0.55 + 0.4 * Math.sin(t)) + ")";
+        ctx.lineWidth = 3.5;
+        ctx.strokeRect(pos.x - 32, pos.y - 32, 64, 64);
+      }
+    }
+
+    // 单位（友军→敌人→玩家 画序）
+    const order = [...battle.units].sort((a, b) => (a.side === "player" ? 1 : 0) - (b.side === "player" ? 1 : 0));
+    for (const u of order) {
+      if (!u.alive || u.offField > 0) continue;
+      u.rx += (u.c - u.rx) * Math.min(1, dt * 8 / speedK);
+      u.ry += (u.r - u.ry) * Math.min(1, dt * 8 / speedK);
+      if (u.flash > 0) u.flash -= dt * 3;
+      let px = PAD + u.rx * TILE + TILE / 2, py = PAD + u.ry * TILE + TILE / 2;
+      if (u.flash > 0) {
+        px += Math.sin(u.flash * 40) * 5 * u.flash;
+      }
+      if (u._lunge) {
+        u._lunge.t -= dt * 5;
+        if (u._lunge.t <= 0) delete u._lunge;
+        else { const k = Math.sin(u._lunge.t * Math.PI) * 16; px += u._lunge.dx * k; py += u._lunge.dy * k; }
+      }
+      // 底座阴影
+      ctx.fillStyle = "rgba(60,40,20,.18)";
+      ctx.beginPath(); ctx.ellipse(px, py + 26, 26, 8, 0, 0, 7); ctx.fill();
+      // 本体
+      ctx.beginPath(); ctx.arc(px, py, 29, 0, 7);
+      ctx.fillStyle = u.flash > 0 && Math.sin(u.flash * 50) > 0 ? "#ffffff" : u.ch.color;
+      ctx.fill();
+      ctx.lineWidth = u.side === "player" ? 4.5 : 3;
+      ctx.strokeStyle = u.side === "player" ? "#d8a11f" : (u.side === "ally" ? "#3a7d46" : "#6e2318");
+      ctx.stroke();
+      if (u.st.bloodlust > 0) {
+        ctx.strokeStyle = "rgba(255,90,90," + (0.35 + 0.3 * Math.sin(performance.now() / 140)) + ")";
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(px, py, 33, 0, 7); ctx.stroke();
+      }
+      if (u.st.shield > 0) {
+        ctx.strokeStyle = "rgba(110,180,230,.8)";
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(px, py, 33, -2.4, -0.7); ctx.stroke();
+      }
+      // 字
+      ctx.font = "bold 30px KaiTi, STKaiti, serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillStyle = "#fff";
+      ctx.strokeStyle = "rgba(0,0,0,.4)"; ctx.lineWidth = 3;
+      ctx.strokeText(u.ch.glyph, px, py + 1);
+      ctx.fillText(u.ch.glyph, px, py + 1);
+      // 血条
+      const hw = 56, hpc = Math.max(0, u.hp / u.maxhp);
+      if (u.hpGhost === undefined) u.hpGhost = u.hp;
+      if (u.hp < u.hpGhost) u.hpGhost = Math.max(u.hp, u.hpGhost - dt * 7);
+      else u.hpGhost = u.hp;
+      const ghc = Math.max(0, u.hpGhost / u.maxhp);
+      ctx.fillStyle = "rgba(43,38,34,.75)";
+      ctx.fillRect(px - hw / 2 - 1, py + 34, hw + 2, 8);
+      ctx.fillStyle = "#e8ddc8";
+      ctx.fillRect(px - hw / 2, py + 35, hw * ghc, 6);
+      ctx.fillStyle = hpc > 0.3 ? "#6aa84f" : "#cc4125";
+      ctx.fillRect(px - hw / 2, py + 35, hw * hpc, 6);
+      // 刀马徽记
+      ctx.font = "13px serif";
+      let bx = px + 20;
+      if (u.hasKnife) { ctx.fillStyle = "#ffd98a"; ctx.fillText("刀", bx, py - 26); bx -= 15; }
+      if (u.hasHorse) { ctx.fillStyle = "#d8c8ff"; ctx.fillText("马", bx, py - 26); }
+      // 状态点
+      let sy = py - 40;
+      ctx.font = "12px serif";
+      if (u.st.poison > 0) { ctx.fillStyle = "#b06ad0"; ctx.fillText("毒" + u.st.poison, px, sy); sy -= 13; }
+      if (u.st.bloodlust > 0) { ctx.fillStyle = "#ff5a5a"; ctx.fillText("祭", px, sy); sy -= 13; }
+      if (u.st.skip > 0) { ctx.fillStyle = "#8a7a3a"; ctx.fillText("晕", px, sy); sy -= 13; }
+      if (u.st.seal > 0) { ctx.fillStyle = "#666"; ctx.fillText("封", px, sy); sy -= 13; }
+    }
+
+    // 返家者标记（不在场上但未阵亡）
+    for (const u of battle.units) {
+      if (!u.alive || u.offField <= 0) continue;
+      const pos = uPos(u);
+      ctx.globalAlpha = 0.5;
+      ctx.setLineDash([5, 4]);
+      ctx.strokeStyle = "#8a7a58"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, 22, 0, 7); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = "bold 15px KaiTi, serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillStyle = "#6a5a3a";
+      ctx.fillText("返家", pos.x, pos.y);
+      ctx.globalAlpha = 1;
+    }
+
+    // 悬停描边
+    const hu = hoverUnit();
+    if (hu && hu.alive) {
+      const pos = uPos(hu);
+      ctx.strokeStyle = "rgba(43,38,34,.6)"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, 34, 0, 7); ctx.stroke();
+    }
+
+    const FX = fxLevel();
+    // 打击特效层
+    if (FX === "off") { slashes.length = 0; projectiles.length = 0; rings.length = 0; ghosts.length = 0; particles.length = 0; }
+    else if (FX === "lite" && particles.length > 40) particles.length = 40;
+    for (let i = slashes.length - 1; i >= 0; i--) {
+      const sl = slashes[i];
+      sl.t -= dt * 3.2;
+      if (sl.t <= 0) { slashes.splice(i, 1); continue; }
+      ctx.save();
+      ctx.translate(sl.x, sl.y); ctx.rotate(sl.a + 0.6);
+      ctx.strokeStyle = "rgba(242,234,216," + sl.t.toFixed(2) + ")";
+      ctx.lineWidth = 4 * sl.t + 1;
+      ctx.beginPath(); ctx.arc(0, 0, 26, -0.9, 0.9); ctx.stroke();
+      ctx.strokeStyle = "rgba(166,58,43," + (sl.t * 0.8).toFixed(2) + ")";
+      ctx.lineWidth = 2 * sl.t + 0.5;
+      ctx.beginPath(); ctx.arc(0, 0, 31, -0.7, 0.7); ctx.stroke();
+      ctx.restore();
+    }
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+      const pr = projectiles[i];
+      pr.t += dt * 3.4;
+      if (pr.t >= 1) {
+        spawnParticles(pr.tx, pr.ty, { n: 9, colors: [pr.color, "#f2ead8"], speed: 100, life: 0.4 });
+        projectiles.splice(i, 1); continue;
+      }
+      const x = pr.x + (pr.tx - pr.x) * pr.t, y = pr.y + (pr.ty - pr.y) * pr.t - Math.sin(pr.t * Math.PI) * 14;
+      ctx.save();
+      if (pr.style === "beam") {
+        ctx.strokeStyle = pr.color; ctx.lineWidth = 3; ctx.globalAlpha = 0.85;
+        ctx.beginPath(); ctx.moveTo(pr.x, pr.y); ctx.lineTo(x, y); ctx.stroke();
+        ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(x, y, 4, 0, 7); ctx.fill();
+      } else if (pr.style === "arrow") {
+        const ang = Math.atan2(pr.ty - pr.y, pr.tx - pr.x);
+        ctx.translate(x, y); ctx.rotate(ang);
+        ctx.strokeStyle = pr.color; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(7, 0); ctx.stroke();
+        ctx.fillStyle = pr.color; ctx.beginPath(); ctx.moveTo(9, 0); ctx.lineTo(4, -3); ctx.lineTo(4, 3); ctx.fill();
+      } else if (pr.style === "paper") {
+        ctx.translate(x, y); ctx.rotate(Math.sin(pr.t * 9) * 0.5);
+        ctx.fillStyle = pr.color; ctx.fillRect(-6, -8, 12, 16);
+        ctx.strokeStyle = "rgba(90,70,40,.5)"; ctx.strokeRect(-6, -8, 12, 16);
+      } else if (pr.style === "wave") {
+        ctx.strokeStyle = pr.color; ctx.lineWidth = 3; ctx.globalAlpha = 0.8;
+        ctx.beginPath(); ctx.arc(x, y, 8, 0, 7); ctx.stroke();
+      } else if (pr.style === "ring") {
+        ctx.strokeStyle = pr.color; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(x, y, 10, 0, 7); ctx.stroke();
+      } else {
+        ctx.fillStyle = pr.color; ctx.beginPath(); ctx.arc(x, y, 5, 0, 7); ctx.fill();
+      }
+      ctx.restore(); ctx.globalAlpha = 1;
+    }
+    for (let i = rings.length - 1; i >= 0; i--) {
+      const r = rings[i];
+      r.t -= dt * 2.6; r.r += dt * 60;
+      if (r.t <= 0) { rings.splice(i, 1); continue; }
+      ctx.strokeStyle = r.color; ctx.globalAlpha = r.t * 0.8; ctx.lineWidth = 3 * r.t + 0.5;
+      ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, 7); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    for (let i = ghosts.length - 1; i >= 0; i--) {
+      const g = ghosts[i];
+      g.t -= dt; g.y -= dt * 12;
+      if (g.t <= 0) { ghosts.splice(i, 1); continue; }
+      ctx.globalAlpha = Math.min(1, g.t) * 0.55;
+      ctx.fillStyle = g.color;
+      ctx.beginPath(); ctx.arc(g.x, g.y, 27, 0, 7); ctx.fill();
+      ctx.font = "bold 28px KaiTi, STKaiti, serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(255,255,255,.8)";
+      ctx.fillText(g.glyph, g.x, g.y + 1);
+      ctx.globalAlpha = 1;
+    }
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const pa = particles[i];
+      pa.t += dt;
+      if (pa.t >= pa.life) { particles.splice(i, 1); continue; }
+      pa.vy += pa.grav * dt;
+      pa.x += pa.vx * dt; pa.y += pa.vy * dt;
+      ctx.globalAlpha = Math.max(0, 1 - pa.t / pa.life);
+      ctx.fillStyle = pa.color;
+      ctx.fillRect(pa.x - pa.size / 2, pa.y - pa.size / 2, pa.size, pa.size);
+      ctx.globalAlpha = 1;
+    }
+
+    // 飘字
+    for (let i = floaters.length - 1; i >= 0; i--) {
+      const f = floaters[i];
+      f.t -= dt * 0.9; f.dy -= dt * 34;
+      if (f.t <= 0) { floaters.splice(i, 1); continue; }
+      const pos = f.u ? uPos(f.u) : { x: CS / 2, y: CS / 2 };
+      ctx.font = "bold 22px KaiTi, serif";
+      ctx.textAlign = "center";
+      ctx.globalAlpha = Math.min(1, f.t * 1.6);
+      ctx.fillStyle = f.color;
+      ctx.strokeStyle = "rgba(255,255,255,.8)"; ctx.lineWidth = 3;
+      ctx.strokeText(f.text, pos.x, pos.y - 44 + f.dy);
+      ctx.fillText(f.text, pos.x, pos.y - 44 + f.dy);
+      ctx.globalAlpha = 1;
+    }
+    // 技能横幅
+    if (banner) {
+      banner.t -= dt;
+      if (banner.t <= 0) banner = null;
+      else {
+        ctx.font = "bold 44px KaiTi, serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.globalAlpha = Math.min(1, banner.t);
+        ctx.fillStyle = "rgba(166,58,43,.92)";
+        ctx.strokeStyle = "rgba(255,244,220,.9)"; ctx.lineWidth = 6;
+        ctx.strokeText(banner.text, CS / 2, CS / 2 - 90);
+        ctx.fillText(banner.text, CS / 2, CS / 2 - 90);
+        ctx.globalAlpha = 1;
+      }
+    }
+    ctx.restore();
+
+    for (let i = vignettes.length - 1; i >= 0; i--) {
+      const v = vignettes[i];
+      if (fxLevel() === "off") { vignettes.length = 0; break; }
+      v.t -= dt * 1.6;
+      if (v.t <= 0) { vignettes.splice(i, 1); continue; }
+      const g = ctx.createRadialGradient(CS / 2, CS / 2, CS * 0.28, CS / 2, CS / 2, CS * 0.72);
+      g.addColorStop(0, "rgba(" + v.rgb + ",0)");
+      g.addColorStop(1, "rgba(" + v.rgb + "," + (v.t * 0.4).toFixed(3) + ")");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, CS, CS);
+    }
+  }
+
+  function chebSkillRange(p, f) {
+    const sk = battle.skillOf(p, 0);
+    if (!sk) return false;
+    const rng = sk.range || 1;
+    return Math.max(Math.abs(p.r - f.r), Math.abs(p.c - f.c)) <= rng;
+  }
+
+  function dot(ctx, x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); }
+
+  function tileFromEvent(ev) {
+    const cv = $("#battle-canvas");
+    const rect = cv.getBoundingClientRect();
+    const x = (ev.clientX - rect.left) * (CS / rect.width);
+    const y = (ev.clientY - rect.top) * (CS / rect.height);
+    const c = Math.floor((x - PAD) / TILE), r = Math.floor((y - PAD) / TILE);
+    if (r < 0 || c < 0 || r >= E.SIZE || c >= E.SIZE) return null;
+    return { r, c };
+  }
+  function hoverUnit() {
+    if (!hoverTile || !battle) return null;
+    return battle.unitAt(hoverTile.r, hoverTile.c);
+  }
+
+  const IS_TOUCH = (typeof window !== "undefined") && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  function bindCanvas() {
+    const cv = $("#battle-canvas");
+    if (cv) cv.style.touchAction = "manipulation";     // 去掉双击缩放延迟
+    if (IS_TOUCH) return bindCanvasTouch(cv);
+    cv.addEventListener("mousemove", ev => {
+      hoverTile = tileFromEvent(ev);
+      const u = hoverUnit();
+      const tip = $("#tooltip");
+      if (u) {
+        tip.style.display = "block";
+        tip.style.left = (ev.clientX + 14) + "px";
+        tip.style.top = (ev.clientY + 14) + "px";
+        tip.innerHTML = '<div class="tt-n">' + u.ch.name + "（" + u.ch.hao + "）</div>血 " + u.hp + "/" + u.maxhp
+          + "　行动 " + u.apNow + "　" + (u.hasKnife ? "持刀 " : "") + (u.hasHorse ? "有马 " : "")
+          + "<br>被动「" + u.ch.passive.name + "」<br><span style='color:#ddd'>" + u.ch.passive.desc + "</span>"
+          + "<br>技「" + u.ch.skill.name + "」<br><span style='color:#ddd'>" + u.ch.skill.desc + "</span>"
+          + "<br><span style='color:#9a8f7a'>点击可览其全传</span>";
+      } else tip.style.display = "none";
+    });
+    cv.addEventListener("mouseleave", () => { hoverTile = null; $("#tooltip").style.display = "none"; });
+    cv.addEventListener("click", async ev => {
+      if (!battle || battle.over || !battle._playerPhaseActive) return;
+      const tile = tileFromEvent(ev);
+      if (!tile) return;
+      const p = battle.player;
+      const target = battle.unitAt(tile.r, tile.c);
+      if (mode === "knife") {
+        if (target && p.hasKnife && E.adj(p, target) && battle.opponentsOf(p).includes(target)) {
+          mode = null;
+          await battle.doKnife(p, target);
+          afterPlayerAction();
+          return;
+        }
+        mode = null; updateAll(); return;
+      }
+      if (mode === "horse") {
+        if (target && p.hasHorse && E.isWall(p.r, p.c) && E.isWall(target.r, target.c) && E.manh(p, target) <= 3 && battle.opponentsOf(p).includes(target)) {
+          mode = null;
+          await battle.doHorse(p, target);
+          afterPlayerAction();
+          return;
+        }
+        mode = null; updateAll(); return;
+      }
+      if (mode === "skill") {
+        if (target && battle.opponentsOf(p).includes(target) && chebSkillRange(p, target)) {
+          mode = null;
+          await battle.doSkill(p, 0, target);
+          afterPlayerAction();
+          return;
+        }
+        mode = null; updateAll(); return;
+      }
+      // 点中敌军：显示其图鉴（非瞄准态时）
+      if (target && target.side === "enemy" && battle.mode !== undefined) {
+        showCharDetail(target.ch);
+        return;
+      }
+      // 默认移动
+      if (target) return;
+      const reach = battle._reachable(p, battle.moveRange(p));
+      const key = tile.r + "," + tile.c;
+      if (reach.keys.includes(key) && !battle.unitAt(tile.r, tile.c)) {
+        await battle.doMove(p, tile.r, tile.c);
+        afterPlayerAction();
+      }
+    });
+    cv.addEventListener("contextmenu", ev => { ev.preventDefault(); mode = null; updateAll(); });
+  }
+
+  /* 触屏：点按代替悬停（点敌看图鉴、点空格移动、点敌在瞄准态则攻击） */
+  function bindCanvasTouch(cv) {
+    cv.addEventListener("pointerup", async ev => {
+      if (!battle || battle.over || !battle._playerPhaseActive) return;
+      const tile = tileFromEvent(ev);
+      if (!tile) return;
+      const p = battle.player;
+      const target = battle.unitAt(tile.r, tile.c);
+      if (mode === "knife" && target && E.adj(p, target) && battle.opponentsOf(p).includes(target)) {
+        mode = null; await battle.doKnife(p, target); afterPlayerAction(); return;
+      }
+      if (mode === "horse" && target && p.hasHorse && E.isWall(p.r, p.c) && E.isWall(target.r, target.c)
+          && E.manh(p, target) <= 3 && battle.opponentsOf(p).includes(target)) {
+        mode = null; await battle.doHorse(p, target); afterPlayerAction(); return;
+      }
+      if (mode === "skill" && target && battle.opponentsOf(p).includes(target) && chebSkillRange(p, target)) {
+        mode = null; await battle.doSkill(p, 0, target); afterPlayerAction(); return;
+      }
+      if (mode) { mode = null; updateAll(); return; }
+      if (target) { if (target.side === "enemy") showCharDetail(target.ch); return; }
+      const reach = battle._reachable(p, battle.moveRange(p));
+      if (reach.keys.includes(tile.r + "," + tile.c) && !battle.unitAt(tile.r, tile.c)) {
+        await battle.doMove(p, tile.r, tile.c);
+        afterPlayerAction();
+      }
+    });
+  }
+
+  /* ---------------- 结算 ---------------- */
+  function onBattleEnd(b) {
+    battle = b;
+    endPlayerPhase();
+    updateAll();
+    const win = b.result === "win";
+    if (win) AU.victory(); else AU.defeat();
+    setTimeout(async () => {
+      stopRaf();
+      const scn = (window.SJI_SCENES && b.cfg.stage) ? window.SJI_SCENES.stages[b.cfg.stage.id] : null;
+      try {
+        if (win && scn && scn.victory) await showDialogue(scn.victory);
+        if (win && b.cfg.stage && b.cfg.stage.id === "s15" && window.SJI_SCENES) await showDialogue(window.SJI_SCENES.epilogue);
+        if (!win && scn && scn.defeat) await showDialogue(scn.defeat);
+      } catch (e) { console.error(e); }
+      showResult(b);
+    }, window.SJI_DEBUG && window.SJI_DEBUG.fast ? 150 : 1300);
+  }
+
+  function showResult(b) {
+    const win = b.result === "win";
+    const st = b.cfg.stage;
+    let extra = "";
+    if (b.mode === "story" && win) {
+      SAVE.clearStage(st.id);
+      unlockStageAch(st.id);
+      if (SAVE.allCleared()) SAVE.unlockAch("a_all");
+      const idx = D.STAGES.findIndex(s => s.id === st.id);
+      const next = D.STAGES[idx + 1];
+      if (next) extra = '<button class="btn primary" id="r-next">进军「' + next.juan + " · " + next.title + "」</button>";
+    }
+    if (b.mode === "free" && win) SAVE.unlockAch("a_free");
+    if (b.mode === "survival") {
+      const reached = b.survivalWaveNo || 1;
+      const isNew = SAVE.setBestSurvival(Math.max(0, reached - 1));
+      if (reached >= 10) SAVE.unlockAch("a_surv10");
+      if (reached >= 20) SAVE.unlockAch("a_surv20");
+      extra = '<p class="stat-inline">此行抵达第 ' + reached + " 波" + (isNew ? " · 新纪录！" : " · 最远第 " + SAVE.data.bestSurvival + " 波") + "</p>";
+    }
+    SAVE.beginAchLog();
+    if (win) {
+      SAVE.unlockAch("a_first");
+      SAVE.bump("wins");
+      if (b.stats.usedBlood) SAVE.unlockAch("a_blood");
+      if (!b.stats.everLeftWall) SAVE.unlockAch("a_wall");
+      if (b.stats.minHp !== undefined && b.stats.minHp <= 1) SAVE.unlockAch("a_1hp");
+      if (!b.stats.usedSkill) SAVE.unlockAch("a_noskill");
+      if (!b.stats.boughtHorse) SAVE.unlockAch("a_nohorse");
+      if (b.stats.startEnemies >= 3) SAVE.unlockAch("a_1v3");
+      if (b.stats.rushHit) SAVE.unlockAch("a_rush");
+      if (b.round <= 5) SAVE.unlockAch("a_fast");
+      if (b.cfg.playerChar === "lifan") SAVE.unlockAch("a_laugh");
+      SAVE.bumpCharWin(b.cfg.playerChar);
+      if (SAVE.allCharsWon()) SAVE.unlockAch("a_allchar");
+      if (b.diff === "hard") {
+        SAVE.unlockAch("a_ngplus");
+        if (st && st.id === "s14") SAVE.unlockAch("a_ngplus14");
+      }
+    } else {
+      SAVE.bump("losses");
+      SAVE.unlockAch("a_reopen");
+    }
+    if (SAVE.data.totals.moves >= 50) SAVE.unlockAch("a_walk");
+    if (SAVE.data.totals.heals >= 10) SAVE.unlockAch("a_heal");
+
+    $("#result-body").innerHTML =
+      '<div class="result-seal seal' + (win ? "" : " lose") + '">' + (win ? "胜" : "败") + "</div>" +
+      '<div class="result-title">' + (win ? "活者为王" : (b.result === "timeout" ? "高考终了" : "出师未捷")) + "</div>" +
+      '<div class="result-stats">回合：' + b.round + "　·　击破：" + b.stats.kills + "　·　用技：" + (b.stats.usedSkill ? "有" : "无") + "　·　血祭：" + (b.stats.usedBlood ? "有" : "无") + "</div>" +
+      (b.mode === "story" ? '<div class="result-quote panel">' + (win ? st.outro : st.intro) + "</div>" +
+      ((win && window.SJI_SCENES && window.SJI_SCENES.stages[st.id] && window.SJI_SCENES.stages[st.id].victory) ? "" : '<div class="result-yueks">' + st.yueks + "</div>") : "") +
+      extra +
+      '<div class="btnrow" style="justify-content:center;margin-top:18px">' +
+      '<button class="btn" id="r-retry">重整旗鼓</button>' +
+      '<button class="btn" id="r-menu">回到史册</button>' + extra2Btn(win, b) + "</div>" +
+      achSummaryHtml();
+
+    function extra2Btn(w, bb) {
+      return "";
+    }
+    $("#r-retry").onclick = () => {
+      AU.click();
+      const cfg = JSON.parse(JSON.stringify(b.cfg));
+      startBattle(cfg);
+      showScreen("battle");
+    };
+    $("#r-menu").onclick = () => { AU.click(); initTitle(); showScreen("title"); };
+    const nx = $("#r-next");
+    if (nx) nx.onclick = () => {
+      AU.click();
+      const idx = D.STAGES.findIndex(x => x.id === st.id);
+      openStageIntro(D.STAGES[idx + 1]);
+    };
+    spawnPetals($("#result-petals"), win ? 20 : 10, win ? ["#d8a11f", "#c9b28a", "#a63a2b"] : ["#8a8a92", "#6a6a72"]);
+    showScreen("result");
+  }
+
+  function achSummaryHtml() {
+    const list = SAVE.takeAchLog();
+    if (!list.length) return "";
+    return '<div class="panel" style="max-width:620px;margin:16px auto 0;text-align:left">'
+      + '<b>本场新解锁</b>'
+      + list.map(id => {
+          const a = D.ACHIEVEMENTS.find(x => x.id === id);
+          return a ? '<div class="stat-inline" style="margin-top:4px">✦ 「' + a.name + '」——' + a.desc + "</div>" : "";
+        }).join("")
+      + "</div>";
+  }
+
+  function unlockStageAch(id) {
+    const map = { s0: "a_tutorial", s1: "a_s1", s2: "a_s2", s5: "a_s5", s14: "a_s14" };
+    if (map[id]) SAVE.unlockAch(map[id]);
+  }
+
+  /* ---------------- 设置应用 ---------------- */
+  function applySettings() {
+    AU.setSfx(SAVE.settings.sfx);
+    AU.setMusic(SAVE.settings.music);
+    $("#b-mute").textContent = SAVE.settings.sfx ? "音" : "默";
+    $("#b-speed").textContent = "速×" + SAVE.settings.speed;
+  }
+  function bindSettings() {
+    $("#set-sfx").onclick = () => { SAVE.setSetting("sfx", !SAVE.settings.sfx); renderSettings(); applySettings(); AU.click(); };
+    $("#set-music").onclick = () => { SAVE.setSetting("music", !SAVE.settings.music); renderSettings(); applySettings(); AU.click(); };
+    $$("#set-speed button").forEach(b => {
+      b.onclick = () => { SAVE.setSetting("speed", +b.dataset.v); renderSettings(); applySettings(); AU.click(); };
+    });
+    $$("#set-aiaggr button").forEach(b => {
+      b.onclick = () => {
+        SAVE.setSetting("aiAggr", b.dataset.v);
+        renderSettings();
+        AU.click();
+        toast("AI 进攻性：" + b.textContent);
+      };
+    });
+    $$("#set-rps button").forEach(b => {
+      b.onclick = () => { SAVE.setSetting("rpsMode", b.dataset.v); renderSettings(); AU.click(); toast(b.dataset.v === "auto" ? "已改为自动猜拳" : "已改为逐回合询问"); };
+    });
+    $$("#set-fx button").forEach(b => {
+      b.onclick = () => { SAVE.setSetting("fx", b.dataset.v); renderSettings(); AU.click(); };
+    });
+    $("#set-export").onclick = () => {
+      const json = SAVE.exportJSON();
+      modal('<h3>导出存档</h3><div class="sub">复制下面全部文字，妥善保存</div>'
+        + '<textarea id="save-box" style="width:100%;height:150px;font-family:Consolas,monospace;font-size:12px">' + json + "</textarea>"
+        + '<div class="btnrow"><button class="btn" id="m-close2">掩卷</button></div>');
+      $("#m-close2").onclick = closeModal;
+      const box = $("#save-box"); if (box) box.select();
+    };
+    $("#set-import").onclick = () => {
+      modal('<h3>导入存档</h3><div class="sub">粘贴此前导出的存档文字</div>'
+        + '<textarea id="imp-box" style="width:100%;height:150px;font-family:Consolas,monospace;font-size:12px" placeholder="粘贴存档 JSON…"></textarea>'
+        + '<div class="btnrow"><button class="btn" id="m-no2">且慢</button><button class="btn primary" id="m-yes2">导入</button></div>');
+      $("#m-no2").onclick = closeModal;
+      $("#m-yes2").onclick = () => {
+        const txt = ($("#imp-box") || {}).value || "";
+        const r = SAVE.importJSON(txt);
+        closeModal();
+        if (r.ok) { toast("导入成功，正在重载…"); setTimeout(() => location.reload(), 600); }
+        else toast("导入失败：" + r.err);
+      };
+    };
+    $("#set-reset").onclick = () => {
+      modal('<h3>焚稿？</h3><p>将清空史册进度、成就与纪录。此举不可逆。</p><div class="btnrow"><button class="btn" id="m-no">且慢</button><button class="btn primary" id="m-yes">焚之</button></div>');
+      $("#m-no").onclick = closeModal;
+      $("#m-yes").onclick = () => { SAVE.reset(); renderSettings(); toast("已焚稿重来的。"); closeModal(); };
+    };
+  }
+
+  /* ---------------- 启动 ---------------- */
+  function boot() {
+    const back = (id, fn) => { $(id).onclick = () => { AU.click(); fn(); }; };
+    back("#story-back", () => { initTitle(); showScreen("title"); });
+    back("#free-back", () => { initTitle(); showScreen("title"); });
+    back("#codex-back", () => showScreen("title"));
+    back("#ach-back", () => showScreen("title"));
+    back("#set-back", () => showScreen("title"));
+    bindActions();
+    bindCanvas();
+    bindSettings();
+    applySettings();
+    initTitle();
+    showScreen("title");
+    // 首次交互解锁音频与音乐
+    const once = () => { AU.unlock(); if (SAVE.settings.music) AU.startMusic(); document.removeEventListener("pointerdown", once); };
+    document.addEventListener("pointerdown", once);
+    // 背景音乐开关也控制启停
+    $("#set-music").addEventListener("click", () => { if (SAVE.settings.music) AU.startMusic(); else AU.stopMusic(); });
+  }
+
+  return {
+    boot, toast, showScreen, onLog, onState: updateAll,
+    rpsRound, playerPhase, pickBoon, onBattleEnd,
+    fxFloat, fxHit, fxStatus, snap, fxAttack, fxDeath, fxVignette,
+    banner: showBanner,
+    get battle() { return battle; },
+    set battleRef(b) { battle = b; }
+  };
+})();
+
+</script>
+<script>
+/* ============================================================
+ * 实验史记 · 马刀风云 —— 启动与调试钩子
+ * ============================================================ */
+window.SJI = {
+  get settings() { return window.SJI_SAVE.settings; },
+  battle: null
+};
+
+window.SJI_DEBUG = {
+  fast: false,          // 快进动画
+  skipScenes: false,    // 跳过全部剧情对话
+  autoRps: false,       // 自动猜拳
+  get battle() { return window.SJI.battle; },
+  killEnemies() {       // 秒杀当前敌人（由引擎回合末自然结算）
+    const b = window.SJI.battle;
+    if (!b || b.over) return "no battle";
+    b.living("enemy").slice().forEach(u => b.rawHurt(u, u.hp, "天降正义"));
+    return "ok";
+  },
+  healPlayer(n) {
+    const b = window.SJI.battle;
+    if (b) { b.player.hp = Math.min(b.player.maxhp, b.player.hp + (n || 99)); b.pushLog("（神迹）「" + b.player.ch.hao + "」回复了血。"); return "ok"; }
+    return "no battle";
+  },
+  giveAll() {           // 刀马全给
+    const b = window.SJI.battle;
+    if (!b) return "no battle";
+    b.player.hasKnife = true; b.player.hasHorse = true;
+    return "ok";
+  }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.SJI_UI.boot();
+});
+
+</script>
+</body>
+</html>

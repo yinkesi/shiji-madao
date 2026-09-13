@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实验史记 · 马刀风云</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23a63a2b'/><text x='50' y='68' font-size='56' text-anchor='middle' fill='%23f7ecd7' font-family='KaiTi'>刀</text></svg>">
+</head>
+<body>
+<div id="app">
+
+  <!-- 标题 -->
+  <div class="screen on" id="screen-title">
+    <div class="petals" id="title-petals"></div>
+    <div class="title-main">實驗史記</div>
+    <div class="title-sub">馬 刀 風 雲</div>
+    <div class="brush-bar"></div>
+    <div class="title-seal seal">音克思<br>著</div>
+    <div class="title-quote">「规则至简，而引人入胜。」——卷八 · 马刀书</div>
+    <div class="title-menu">
+      <button class="btn big" id="btn-resume" style="display:none">继续上局</button>
+      <button class="btn big primary" id="btn-story">剧情模式 · 十五卷</button>
+      <button class="btn big" id="btn-ngplus" style="display:none">二周目 · 困难</button>
+      <button class="btn big" id="btn-free">乱斗 · 自选敌我</button>
+      <button class="btn big" id="btn-survival">破败城墙 · 生存</button>
+      <button class="btn" id="btn-codex">图鉴 · 史中人</button>
+      <button class="btn" id="btn-ach">成就 · 史评</button>
+      <button class="btn" id="btn-settings">设置</button>
+    </div>
+    <div class="title-footer" id="best-line"></div>
+    <div class="title-footer">据音克思《实验史记》改编 · 马刀玩法见卷八 · 猜拳得行动点，买刀买马，同城马踢，血祭翻倍，活者为王</div>
+  </div>
+
+  <!-- 剧情 -->
+  <div class="screen" id="screen-story">
+    <div class="topbar"><h2>史册 · 十五卷</h2><div class="crumb" id="story-progress"></div></div>
+    <div class="stage-list" id="stage-list"></div>
+    <div class="sel-bar"><button class="btn" id="story-back">返回</button></div>
+  </div>
+
+  <!-- 乱斗 -->
+  <div class="screen" id="screen-free">
+    <div class="topbar"><h2>乱斗</h2><div class="crumb">自选敌我，至多三敌</div></div>
+    <div class="panel"><b>汝之角色</b><div class="char-grid" id="free-pgrid" style="margin-top:8px"></div></div>
+    <div class="panel" style="margin-top:12px"><b>敌军（点选，至多三）</b><div class="char-grid" id="free-egrid" style="margin-top:8px"></div></div>
+    <div class="panel" style="margin-top:12px"><b>难度</b>
+      <div class="seg" id="free-diff" style="margin-top:8px">
+        <button data-v="easy">简单</button><button data-v="normal" class="on">普通</button><button data-v="hard">困难</button><button data-v="extreme">极难</button>
+      </div>
+      <div class="stat-inline" style="margin-top:6px">极难：敌方五动、伤害 ×1.35、血量 ×1.25，</div>
+      <div class="stat-inline">强制死战不退，且击破敌人不再回血（乱斗）。</div>
+    </div>
+    <div class="sel-bar"><button class="btn" id="free-back">返回</button><button class="btn primary" id="free-go">开战</button></div>
+  </div>
+
+  <!-- 选人 -->
+  <div class="screen" id="screen-charselect">
+    <div class="topbar"><h2>点将</h2><div class="crumb">十七人皆可执刀</div></div>
+    <div class="panel"><div class="char-grid" id="charselect-grid"></div></div>
+    <div class="panel" id="cs-diff-panel" style="margin-top:12px"><b>敌方强度</b>
+      <div class="seg" id="cs-diff" style="margin-top:8px">
+        <button data-v="easy">简单</button><button data-v="normal" class="on">普通</button><button data-v="hard">困难</button><button data-v="extreme">极难</button>
+      </div>
+      <div class="stat-inline" style="margin-top:6px">普通：敌方三动（三人以上两动）。困难：四动（三人以上三动）。</div>
+      <div class="stat-inline">极难：敌方五动（三人以上三动）、伤害 ×1.35、血量 ×1.25，强制死战不退，击破不回血。</div>
+    </div>
+    <div class="panel" id="cs-info" style="margin-top:12px;min-height:52px"></div>
+    <div class="sel-bar"><button class="btn" id="cs-back">返回</button><button class="btn primary" id="cs-go">出征</button></div>
+  </div>
+
+  <!-- 战斗 -->
+  <div class="screen" id="screen-battle">
+    <div class="topbar">
+      <h2 id="battle-title">战场</h2>
+      <div class="crumb" id="round-no">第 1 回合</div>
+      <div>
+        <button class="btn small" id="b-speed">速×1</button>
+        <button class="btn small" id="b-mute">音</button>
+        <span class="stat-inline" id="ai-label" style="margin-right:6px"></span>
+        <button class="btn small" id="b-surrender">认输</button>
+        <button class="btn small" id="b-exit">离场</button>
+      </div>
+    </div>
+    <div id="battle-wrap">
+      <div id="battle-left">
+        <div id="canvas-outer">
+          <canvas id="battle-canvas"></canvas>
+          <div class="phase-banner" id="phase-banner"></div>
+        </div>
+        <div class="panel" id="player-card">
+          <span class="tokenface" id="pc-face">·</span>
+          <div style="flex:1">
+            <div id="pc-name"></div>
+            <div class="hpbar-outer"><div class="hpbar-ghost" id="pc-hp-ghost"></div><div class="hpbar-inner" id="pc-hp-in"></div><div class="hpbar-text" id="pc-hp-tx"></div></div>
+            <div class="ap-pips" id="ap-pips" title="行动点"></div>
+            <div class="st-chips" id="pc-st"></div>
+          </div>
+        </div>
+        <div class="actbar">
+          <button class="btn" id="b-knife">购刀·1动</button>
+          <button class="btn" id="b-horse">购马·1动</button>
+          <button class="btn" id="b-attack">刀击·1动</button>
+          <button class="btn" id="b-horseatk">马踢·1动</button>
+          <button class="btn" id="b-skill">技能</button>
+          <button class="btn" id="b-undo">撤销移动</button>
+          <button class="btn" id="b-blood">血祭</button>
+          <button class="btn" id="b-wait">待机（空格）</button>
+        </div>
+      </div>
+      <div id="battle-right">
+        <div class="panel enemy-list" id="enemy-panel"><b>敌军</b><div id="enemy-list" style="margin-top:6px"></div></div>
+        <div class="panel" style="flex:1;display:flex;flex-direction:column"><b>战报</b><div id="battle-log" style="margin-top:6px"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 结算 -->
+  <div class="screen" id="screen-result"><div class="petals" id="result-petals"></div><div id="result-body"></div></div>
+
+  <!-- 图鉴 -->
+  <div class="screen" id="screen-codex">
+    <div class="topbar"><h2>图鉴 · 史中人</h2><div class="crumb">凡三十二人</div></div>
+    <div class="panel"><div class="char-grid" id="codex-grid"></div></div>
+    <div class="sel-bar"><button class="btn" id="codex-back">返回</button></div>
+  </div>
+
+  <!-- 成就 -->
+  <div class="screen" id="screen-ach">
+    <div class="topbar"><h2>成就 · 史评</h2><div class="crumb" id="ach-count"></div></div>
+    <div class="ach-list" id="ach-list"></div>
+    <div class="sel-bar"><button class="btn" id="ach-back">返回</button></div>
+  </div>
+
+  <!-- 设置 -->
+  <div class="screen" id="screen-settings">
+    <div class="topbar"><h2>设置</h2></div>
+    <div class="panel">
+      <div class="set-row"><div class="lab">音效</div><button id="set-sfx">开/关</button></div>
+      <div class="set-row"><div class="lab">琴音（背景乐）</div><button id="set-music">开/关</button></div>
+      <div class="set-row"><div class="lab">战斗速度</div><div class="seg" id="set-speed"><button data-v="1">从容</button><button data-v="2">迅捷</button><button data-v="3">风驰</button></div></div>
+      <div class="set-row" style="display:block">
+        <div class="lab" style="margin-bottom:8px">猜拳</div>
+        <div class="seg" id="set-rps">
+          <button data-v="ask">逐回合询问</button><button data-v="auto">自动猜拳</button>
+        </div>
+        <div class="stat-inline" style="margin-top:8px">自动：不再等你出拳，直接以随机结果定行动点（动画也更快）。</div>
+      </div>
+      <div class="set-row" style="display:block">
+        <div class="lab" style="margin-bottom:8px">动效</div>
+        <div class="seg" id="set-fx">
+          <button data-v="full">全效</button><button data-v="lite">精简</button><button data-v="off">关闭</button>
+        </div>
+        <div class="stat-inline" style="margin-top:8px">精简/关闭可去掉粒子、震屏与花瓣，低配设备或对闪光敏感时更舒适。</div>
+      </div>
+      <div class="set-row" style="display:block">
+        <div class="lab" style="margin-bottom:8px">存档（换设备或清缓存前请先导出）</div>
+        <div class="seg" style="border:none;padding:0">
+          <button class="btn small" id="set-export">导出存档</button>
+          <button class="btn small" id="set-import">导入存档</button>
+        </div>
+      </div>
+      <div class="set-row" style="display:block">
+        <div class="lab" style="margin-bottom:8px">AI 进攻性</div>
+        <div class="seg" id="set-aiaggr">
+          <button data-v="passive">消极</button><button data-v="measured">守成</button><button data-v="active">主动</button><button data-v="frenzy">狂攻</button>
+        </div>
+        <div class="stat-inline" id="set-aiaggr-desc" style="margin-top:8px"></div>
+      </div>
+      <div class="set-row"><div class="lab">焚稿（清空存档）</div><button class="btn small" id="set-reset">焚之</button></div>
+    </div>
+    <div class="sel-bar"><button class="btn" id="set-back">返回</button></div>
+  </div>
+
+</div>
+
+<div class="modal-mask" id="modal-mask"><div class="modal" id="modal-box"></div></div>
+<div id="toast-wrap"></div>
+<div id="tooltip"></div>
+
+<script src="js/data.js"></script>
+<script src="js/scenes.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/save.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

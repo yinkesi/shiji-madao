@@ -1,0 +1,14 @@
+# 测试过程产物（截图、渲染页、日志）
+testshots/
+report_pages/
+*.log
+
+# 由源文件生成的中间产物（PDF 可按需重建）
+*.pdf
+
+# 运行时/编辑器
+node_modules/
+__pycache__/
+.vscode/
+.DS_Store
+Thumbs.db

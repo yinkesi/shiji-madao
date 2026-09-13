@@ -1,0 +1,5 @@
+# 统一以 LF 存入仓库，避免 Windows 下 CRLF/LF 反复变动
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.docx binary
