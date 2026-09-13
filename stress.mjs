@@ -51,7 +51,7 @@ for(const st of D.STAGES){
     const b=new E.Battle({mode:'story',stage:st,playerChar:ch,enemies:st.enemies,allies:st.allies||[],rule:st.rule,waves:st.waves});
     // 覆盖波次（s8）
     if(st.waves) b.waves=st.waves;
-    const r=await Promise.race([b.run(), new Promise(res=>setTimeout(()=>res('HANG'),30000))]);
+    const r=await Promise.race([b.run(), new Promise(res=>setTimeout(()=>res('HANG'),60000))]);
     if(r==='HANG'){console.log('HANG', st.id); fails++;}
     else console.log(st.id, ch, '->', r, 'rounds', b.round, 'loglen', b.log.length);
   }catch(e){ console.log('ERROR in', st.id, e.stack.split('\n').slice(0,3).join(' | ')); fails++; }

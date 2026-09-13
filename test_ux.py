@@ -63,6 +63,34 @@ with sync_playwright() as p:
     assert pg.evaluate("window.SJI_SAVE.clearedCount()") >= 1, "导入后进度未恢复"
     log("[2] 存档导出/导入/焚稿 — OK（导入后进度恢复）")
 
+    # ---- 极难：点将页可选、且确实生效 ----
+    pg.evaluate("window.SJI_SAVE.setSetting('rpsMode','ask')")
+    pg.evaluate("window.SJI_DEBUG.skipScenes = true")
+    pg.evaluate("window.SJI_UI.showScreen('title')")
+    pg.click("#btn-story"); pg.wait_for_selector("#screen-story.on")
+    pg.evaluate("document.querySelector('.stage-card:not(.locked)').click()")
+    pump(20, stop="() => !!document.querySelector('#modal-mask.on')", kill=False, end_turn=False)
+    pg.evaluate("document.querySelector('#m-go').click()")
+    pg.wait_for_selector("#screen-charselect.on")
+    btns = pg.evaluate("[...document.querySelectorAll('#cs-diff button')].map(b=>b.dataset.v)")
+    assert btns == ["easy", "normal", "hard", "extreme"], f"难度档位不全: {btns}"
+    pg.click("#cs-diff button[data-v='extreme']")
+    pg.evaluate("document.querySelector('#charselect-grid .char-card').click()")
+    pg.evaluate("document.querySelector('#cs-go').click()")
+    pg.wait_for_selector("#screen-battle.on")
+    pg.wait_for_function("() => window.SJI.battle && window.SJI.battle.round >= 1", timeout=25000)
+    got = pg.evaluate("window.SJI.battle.diff")
+    ap = pg.evaluate("window.SJI.battle.enemyBaseAP()")
+    scale = pg.evaluate("window.SJI.battle.enemyDmgScale()")
+    label = pg.text_content("#ai-label")
+    assert got == "extreme", f"极难未生效: {got}"
+    assert ap == 5, f"极难敌方行动点应为5: {ap}"
+    assert "极难" in label and "狂攻" in label, f"顶栏未显示极难: {label}"
+    log(f"[2.5] 极难模式：可选并生效（敌方{ap}动、伤害×{scale:.2f}、顶栏「{label.strip()}」）— OK")
+    pg.evaluate("window.SJI.battle.over = true")
+    pg.wait_for_timeout(200)
+    pg.evaluate("window.SJI_SAVE.setSetting('rpsMode','auto')")
+
     # ---- 自动猜拳：开战后不应出现猜拳弹窗 ----
     pg.evaluate("window.SJI_DEBUG.skipScenes = true")
     pg.evaluate("window.SJI_SAVE.setSetting('rpsMode','auto'); window.SJI_SAVE.setSetting('fx','full')")

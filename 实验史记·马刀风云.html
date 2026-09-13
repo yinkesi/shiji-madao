@@ -356,8 +356,10 @@ body {
     <div class="panel" style="margin-top:12px"><b>敌军（点选，至多三）</b><div class="char-grid" id="free-egrid" style="margin-top:8px"></div></div>
     <div class="panel" style="margin-top:12px"><b>难度</b>
       <div class="seg" id="free-diff" style="margin-top:8px">
-        <button data-v="easy">简单</button><button data-v="normal" class="on">普通</button><button data-v="hard">困难</button>
+        <button data-v="easy">简单</button><button data-v="normal" class="on">普通</button><button data-v="hard">困难</button><button data-v="extreme">极难</button>
       </div>
+      <div class="stat-inline" style="margin-top:6px">极难：敌方五动、伤害 ×1.35、血量 ×1.25，</div>
+      <div class="stat-inline">强制死战不退，且击破敌人不再回血（乱斗）。</div>
     </div>
     <div class="sel-bar"><button class="btn" id="free-back">返回</button><button class="btn primary" id="free-go">开战</button></div>
   </div>
@@ -368,9 +370,10 @@ body {
     <div class="panel"><div class="char-grid" id="charselect-grid"></div></div>
     <div class="panel" id="cs-diff-panel" style="margin-top:12px"><b>敌方强度</b>
       <div class="seg" id="cs-diff" style="margin-top:8px">
-        <button data-v="easy">简单</button><button data-v="normal" class="on">普通</button><button data-v="hard">困难</button>
+        <button data-v="easy">简单</button><button data-v="normal" class="on">普通</button><button data-v="hard">困难</button><button data-v="extreme">极难</button>
       </div>
-      <div class="stat-inline" style="margin-top:6px">普通：敌方每回合三动（三人以上两动）。困难：四动（三人以上三动）。</div>
+      <div class="stat-inline" style="margin-top:6px">普通：敌方三动（三人以上两动）。困难：四动（三人以上三动）。</div>
+      <div class="stat-inline">极难：敌方五动（三人以上三动）、伤害 ×1.35、血量 ×1.25，强制死战不退，击破不回血。</div>
     </div>
     <div class="panel" id="cs-info" style="margin-top:12px;min-height:52px"></div>
     <div class="sel-bar"><button class="btn" id="cs-back">返回</button><button class="btn primary" id="cs-go">出征</button></div>
@@ -728,7 +731,7 @@ window.SJI_DATA = (function () {
       skills: [
         { name: "评职称", kind: "raoe", range: 99, ap: 2, cd: 3,
           desc: "所有敌人本回合不能施技。（不为班主任者不得评职称——一出，天下皆惊）" },
-        { name: "种树", kind: "summon", ap: 1, cd: 2,
+        { name: "种树", kind: "summon", ap: 1, cd: 3,
           desc: "召唤一名'树'随从。（多种树木，树木皆死，时人谓之种树校长）" }
       ],
       quote: "为师者，吾之属地也，有师敢不从吾乎？",
@@ -997,7 +1000,9 @@ window.SJI_DATA = (function () {
     { id: "a_laugh", name: "Say You", desc: "用李帆获胜一场。（Q=CU）" },
     { id: "a_ngplus", name: "二周目", desc: "在困难强度下取得一场胜利。（重开重开，再来一遍）" },
     { id: "a_ngplus14", name: "铁人", desc: "在困难强度下通关卷十四·王崇国本纪。（与为兵并肩，再战校长）" },
-    { id: "a_allchar", name: "十七人皆执刀", desc: "以全部十七位可操作角色各取胜一场。（史册之中，人人有传）" }
+    { id: "a_allchar", name: "十七人皆执刀", desc: "以全部十七位可操作角色各取胜一场。（史册之中，人人有传）" },
+    { id: "a_extreme", name: "以卵击石", desc: "在极难强度下取胜一场。（明知不可为而为之）" },
+    { id: "a_extreme_final", name: "尽城墙", desc: "在极难强度下通关卷十四·王崇国本纪。（苔藓覆其上，其高极大以至于不能尽，吾终将尽之）" }
   ];
 
   /* ---------------- 生存模式增益 ---------------- */
@@ -1675,13 +1680,14 @@ window.SJI_ENGINE = (function () {
 
       // 乱斗难度血量修正
       if (this.mode === "free") {
-        const mult = this.diff === "easy" ? 0.8 : (this.diff === "hard" ? 1.2 : 1);
+        const mult = this.diff === "easy" ? 0.8 : (this.diff === "extreme" ? 1.35 : (this.diff === "hard" ? 1.2 : 1));
         enemies.forEach(u => { if (!u.ch.boss) { u.maxhp = Math.max(4, Math.round(u.maxhp * mult)); u.hp = u.maxhp; } });
       } else {
         // 剧情/生存：敌方血池随人数递减，避免一对多时输出不敷
         const stg = (this.cfg && this.cfg.stage) ? this.cfg.stage : null;
-        const k = (stg && stg.hpScale !== undefined) ? stg.hpScale
+        let k = (stg && stg.hpScale !== undefined) ? stg.hpScale
           : (enemies.length >= 4 ? 0.62 : (enemies.length === 3 ? 0.7 : (enemies.length === 2 ? 0.85 : 1)));
+        if (this.diff === "extreme") k *= 1.25;   // 极难：敌方更耐打
         if (k !== 1) enemies.forEach(u => { u.maxhp = Math.max(4, Math.round(u.maxhp * k)); u.hp = u.maxhp; });
         this._hpScale = k;
       }
@@ -1826,7 +1832,11 @@ window.SJI_ENGINE = (function () {
         window.SJI_AUDIO.die();
         if (def.side === "enemy") {
           this.stats.kills++;
-          if (att && att.side === "player") this.heal(this.player, 2 + (att.boons.killHeal || 0), "大胜而归，");
+          if (att && att.side === "player") {
+            const baseHeal = (this.diff === "extreme") ? 0 : 2;   // 极难：击破不再回血
+            const heal = baseHeal + (att.boons.killHeal || 0);
+            if (heal > 0) this.heal(this.player, heal, "大胜而归，");
+          }
           this._checkTriggers("enemyDown", def.charId);
         }
         if (window.SJI_UI && window.SJI_UI.fxDeath) window.SJI_UI.fxDeath(def);
@@ -2287,7 +2297,11 @@ window.SJI_ENGINE = (function () {
       window.SJI_UI.onState();
       await sleep(240);
       let guard = 0;
-      const prof = (u.side === "ally") ? { skill: 0.9, sac: 0.4, retreat: 0.1, keep: 0, focus: "weakest", horse: 1 } : this.aiProfile();
+      const prof = (u.side === "ally")
+        ? { skill: 0.9, sac: 0.4, retreat: 0.1, keep: 0, focus: "weakest", horse: 1 }
+        : (this.diff === "extreme"
+            ? { skill: 1.0, sac: 0.75, retreat: 0, keep: 0, focus: "weakest", horse: 1 }   // 极难：敌方死战不退
+            : this.aiProfile());
       while (u.apNow > 0 && u.alive && !this.over && guard++ < 10) {
         const foes = this.opponentsOf(u);
         if (!foes.length) break;
@@ -2445,6 +2459,7 @@ window.SJI_ENGINE = (function () {
       const big = this.living("enemy").length >= 3;
       if (this.mode === "survival") return big ? 2 : 3;
       if (this.diff === "easy") return big ? 1 : 2;
+      if (this.diff === "extreme") return big ? 3 : 5;
       if (this.diff === "hard") return big ? 2 : 4;
       return big ? 2 : 3;
     }
@@ -2488,7 +2503,8 @@ window.SJI_ENGINE = (function () {
       const n = this.living("enemy").length;
       let base = n >= 4 ? 0.65 : (n === 3 ? 0.75 : (n === 2 ? 0.88 : 0.9));
       if (this.mode === "survival") base *= 0.9;
-      if (this.diff === "hard") base *= 1.15;
+      if (this.diff === "extreme") base *= 1.35;
+      else if (this.diff === "hard") base *= 1.15;
       else if (this.diff === "easy") base *= 0.7;
       return base;
     }
@@ -2857,7 +2873,7 @@ window.SJI_UI = (function () {
     const ng = $("#btn-ngplus");
     if (ng) {
       ng.style.display = SAVE.allCleared() ? "block" : "none";
-      ng.onclick = () => { AU.unlock(); AU.click(); SAVE.setSetting("ngPlus", true); renderStory(); showScreen("story"); toast("二周目：敌方强度默认困难"); };
+      ng.onclick = () => { AU.unlock(); AU.click(); SAVE.setSetting("ngPlus", true); renderStory(); showScreen("story"); toast("二周目：敌方强度默认极难"); };
     }
     spawnPetals($("#title-petals"), 14, ["#c98a8a", "#b86868", "#d8b28a"]);
     $("#btn-story").onclick = () => { AU.unlock(); AU.click(); renderStory(); showScreen("story"); };
@@ -2939,7 +2955,7 @@ window.SJI_UI = (function () {
     const grid = $("#charselect-grid");
     grid.innerHTML = "";
     let sel = null;
-    let diff = SAVE.settings.lastDiff || (SAVE.settings.ngPlus ? "hard" : "normal");
+    let diff = SAVE.settings.lastDiff || (SAVE.settings.ngPlus ? "extreme" : "normal");
     // 难度选择（剧情/生存可选，乱斗自有难度）
     $("#cs-diff-panel").style.display = "block";
     $$("#cs-diff button").forEach(b => {
@@ -3194,7 +3210,10 @@ window.SJI_UI = (function () {
     $("#round-no").textContent = "第 " + battle.round + " 回合" + (battle.mode === "survival" ? " · 第" + battle.survivalWaveNo + "波" : "");
     if ($("#ai-label")) {
       const nm = { passive: "消极", measured: "守成", active: "主动", frenzy: "狂攻" };
-      $("#ai-label").textContent = "AI " + (nm[battle.aiAggr] || "主动");
+      const dn = { easy: "简单", normal: "普通", hard: "困难", extreme: "极难" };
+      const diffTxt = dn[battle.diff] || "普通";
+      const aiTxt = (battle.diff === "extreme") ? "狂攻(强制)" : (nm[battle.aiAggr] || "主动");
+      $("#ai-label").textContent = diffTxt + " · AI " + aiTxt;
     }
   }
 
@@ -4066,6 +4085,10 @@ window.SJI_UI = (function () {
       if (b.diff === "hard") {
         SAVE.unlockAch("a_ngplus");
         if (st && st.id === "s14") SAVE.unlockAch("a_ngplus14");
+      }
+      if (b.diff === "extreme") {
+        SAVE.unlockAch("a_extreme");
+        if (st && st.id === "s14") SAVE.unlockAch("a_extreme_final");
       }
     } else {
       SAVE.bump("losses");

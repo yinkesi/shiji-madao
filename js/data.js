@@ -240,7 +240,7 @@ window.SJI_DATA = (function () {
       skills: [
         { name: "评职称", kind: "raoe", range: 99, ap: 2, cd: 3,
           desc: "所有敌人本回合不能施技。（不为班主任者不得评职称——一出，天下皆惊）" },
-        { name: "种树", kind: "summon", ap: 1, cd: 2,
+        { name: "种树", kind: "summon", ap: 1, cd: 3,
           desc: "召唤一名'树'随从。（多种树木，树木皆死，时人谓之种树校长）" }
       ],
       quote: "为师者，吾之属地也，有师敢不从吾乎？",
