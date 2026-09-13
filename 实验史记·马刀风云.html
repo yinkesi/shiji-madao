@@ -1946,7 +1946,6 @@ window.SJI_ENGINE = (function () {
       apNow: 0, roundDealt: 0, dampUsed: false,
       boons: { knife: 0, horse: 0, move: 0, dodge: 0, regen: 0, apBonus: 0, cdReduce: 0, blood2: false,
                bloodFree: false, cleave: 0, horseRange: 0, killHeal: 0, shield: 0, firstStrike: 0 },
-      minHpSeen: null,
       aggr: ch.aggr || 0.6
     };
   }
@@ -2009,16 +2008,15 @@ window.SJI_ENGINE = (function () {
 
       // 乱斗难度血量修正
       if (this.mode === "free") {
-        const mult = this.diff === "easy" ? 0.8 : (this.diff === "extreme" ? 1.35 : (this.diff === "hard" ? 1.2 : 1));
+        const mult = CFG.FREE_HP_MULT[this.diff] || 1;
         enemies.forEach(u => { if (!u.ch.boss) { u.maxhp = Math.max(4, Math.round(u.maxhp * mult)); u.hp = u.maxhp; } });
       } else {
         // 剧情/生存：敌方血池随人数递减，避免一对多时输出不敷
         const stg = (this.cfg && this.cfg.stage) ? this.cfg.stage : null;
         let k = (stg && stg.hpScale !== undefined) ? stg.hpScale
-          : (enemies.length >= 4 ? 0.62 : (enemies.length === 3 ? 0.7 : (enemies.length === 2 ? 0.85 : 1)));
-        if (this.diff === "extreme") k *= 1.25;   // 极难：敌方更耐打
+          : CFG.HP_BY_COUNT[Math.min(4, enemies.length)];
+        if (this.diff === "extreme") k *= CFG.DIFFICULTY.extreme.hpExtra;   // 极难：敌方更耐打
         if (k !== 1) enemies.forEach(u => { u.maxhp = Math.max(4, Math.round(u.maxhp * k)); u.hp = u.maxhp; });
-        this._hpScale = k;
       }
 
       this.units = [p, ...allies, ...enemies];
@@ -2359,7 +2357,7 @@ window.SJI_ENGINE = (function () {
     }
 
     async doSacrifice(u) {
-      if (u.apNow <= 0 || (!u.boons.bloodFree && u.hp < 2)) return false;
+      if (u.apNow <= 0 || (!u.boons.bloodFree && u.hp < CFG.RULES.SAC_MIN_HP)) return false;
       u.apNow--;
       this.lockUndo();
       const loss = u.boons.bloodFree ? 0 : Math.floor(u.hp / 2);
@@ -2640,9 +2638,8 @@ window.SJI_ENGINE = (function () {
       await sleep(240);
       let guard = 0;
       const prof = (u.side === "ally")
-        ? { skill: 0.9, sac: 0.4, retreat: 0.1, keep: 0, focus: "weakest", horse: 1 }
-        : (this.diff === "extreme"
-            ? { skill: 1.0, sac: 0.75, retreat: 0, keep: 0, focus: "weakest", horse: 1 }   // 极难：敌方死战不退
+        ? CFG.AI_ALLY
+        : (this.diff === "extreme" ? CFG.AI_AGGR.frenzy
             : this.aiProfile());
       while (u.apNow > 0 && u.alive && !this.over && guard++ < 10) {
         const foes = this.opponentsOf(u);
@@ -2734,7 +2731,7 @@ window.SJI_ENGINE = (function () {
           hasKnife: u.hasKnife, hasHorse: u.hasHorse,
           st: u.st, cds: u.cds, usedSave: u.usedSave, boons: u.boons,
           homeR: u.homeR, homeC: u.homeC, apNow: u.apNow,
-          _undo: u._undo, minHpSeen: u.minHpSeen
+          _undo: u._undo
         })),
         log: this.log.slice(-40)
       };
@@ -2783,9 +2780,10 @@ window.SJI_ENGINE = (function () {
       if (u.side === "player") {
         const n = this.living("enemy").length;
         if (n > 1) {
-          const bonus = Math.min(3, n - 1);
+          const O = CFG.RULES.OUTNUMBER;
+          const bonus = Math.min(O.apCap, (n - 1) * O.apPer);
           ap += bonus;
-          const hpBonus = Math.min(2, n - 1);
+          const hpBonus = Math.min(O.hpCap, (n - 1) * O.hpPer);
           if (!u._outnumberedHp) {
             u._outnumberedHp = hpBonus;
             u.maxhp += hpBonus; u.hp += hpBonus;
@@ -2802,23 +2800,15 @@ window.SJI_ENGINE = (function () {
     }
 
     enemyBaseAP() {
+      const d = CFG.DIFFICULTY[this.diff] || CFG.DIFFICULTY.normal;
       const big = this.living("enemy").length >= 3;
-      if (this.mode === "survival") return big ? 2 : 3;
-      if (this.diff === "easy") return big ? 1 : 2;
-      if (this.diff === "extreme") return big ? 3 : 5;
-      if (this.diff === "hard") return big ? 2 : 4;
-      return big ? 2 : 3;
+      if (this.mode === "survival") return d.apSolo;
+      return big ? d.apBig : d.apSolo;
     }
 
     /* AI 进攻性档位：影响技能使用、血祭、目标选择与是否撤退 */
     aiProfile() {
-      const T = {
-        passive:  { skill: 0.35, sac: 0.04, retreat: 0.7, keep: 0.55, focus: "nearest", horse: 0.3 },
-        measured: { skill: 0.65, sac: 0.20, retreat: 0.35, keep: 0.25, focus: "nearest", horse: 0.7 },
-        active:   { skill: 0.90, sac: 0.40, retreat: 0.10, keep: 0, focus: "weakest", horse: 1 },
-        frenzy:   { skill: 1.00, sac: 0.75, retreat: 0, keep: 0, focus: "weakest", horse: 1 }
-      };
-      return T[this.aiAggr] || T.active;
+      return CFG.AI_AGGR[this.aiAggr] || CFG.AI_AGGR.active;
     }
 
     _pickTarget(u, foes, focus) {
@@ -2881,11 +2871,9 @@ window.SJI_ENGINE = (function () {
     /* 敌方伤害缩放：以少打多为常态，人多则单体伤害递减，避免围殴瞬杀 */
     enemyDmgScale() {
       const n = this.living("enemy").length;
-      let base = n >= 4 ? 0.65 : (n === 3 ? 0.75 : (n === 2 ? 0.88 : 0.9));
-      if (this.mode === "survival") base *= 0.9;
-      if (this.diff === "extreme") base *= 1.35;
-      else if (this.diff === "hard") base *= 1.15;
-      else if (this.diff === "easy") base *= 0.7;
+      let base = CFG.DMG_BY_COUNT[Math.min(4, n)];
+      if (this.mode === "survival") base *= CFG.SURVIVAL_HP_EXTRA;
+      base *= (CFG.DIFFICULTY[this.diff] || CFG.DIFFICULTY.normal).dmgMul;
       return base;
     }
 
@@ -3109,7 +3097,7 @@ window.SJI_ENGINE = (function () {
         const ids = this.waves[this.waveIndex] || [];
         const stg2 = (this.cfg && this.cfg.stage) ? this.cfg.stage : null;
         const k = (stg2 && stg2.hpScale !== undefined) ? stg2.hpScale
-          : (ids.length >= 4 ? 0.62 : (ids.length === 3 ? 0.7 : (ids.length === 2 ? 0.85 : 1)));
+          : CFG.HP_BY_COUNT[Math.min(4, ids.length)];
         ids.forEach((id, i) => {
           const m = makeUnit(id, "enemy", 300 + this.waveIndex * 10 + i);
           if (k !== 1) { m.maxhp = Math.max(4, Math.round(m.maxhp * k)); m.hp = m.maxhp; }
