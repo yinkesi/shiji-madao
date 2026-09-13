@@ -977,6 +977,7 @@ window.SJI_DATA = (function () {
       intro: "含笑者，孙含笑也，予称之为'上'。上查寝，见汝未当床；上诘之，汝狡辨曰：吾在通济。上怒曰：尔在何处？实验高中耳！——今上亲至马刀场，'遣返回家'之罚，汝且试之。",
       tip: "上受一切伤害-1，且会遣返回家（移出战场一回合）。此乃持久战，血祭抢攻未必明智。",
       enemies: ["hanxiao"], allies: [], rule: null,
+      blocked: [[3, 2], [3, 4]], terrain: "cabinet",
       outro: "上诫学生曰：余日一中返家上网，而吾等于宿舍焉，落后甚多，尔当勉自而学也！",
       yueks: "音克思曰：贤哉含笑！敢复读，有勇耳；去支教，有见耳。勇见兼备，序他班而朝同列，无敌于实验。号曰文，可谓谊哉！"
     },
@@ -985,6 +986,7 @@ window.SJI_DATA = (function () {
       intro: "绍铭仪表堂堂，歆慧貌美晔丽。初，鲁豪感绍铭曰：急击勿失。于是绍歆自此游。二人比邻，则情比金坚，伤害+1——欲破其阵，先分其人。歆慧一声'滚'，能退汝两格。汝之友军，正是媒人鲁豪。",
       tip: "二人相邻时各伤害+1，勿让其聚首。鲁豪会为你顶刀，但别指望他输出。",
       enemies: ["shaoming", "xinhui"], allies: ["luhao"], rule: { id: "dyad", desc: "敌人相邻时伤害+1（情比金坚）" }, unlocks: ["shaoming", "xinhui"],
+      blocked: [[2, 3], [4, 3]], terrain: "pillar",
       outro: "铭沉默良久，长叹曰：怎能不悔也！慧既黑铭，曰：吾觉未有之爽也。",
       yueks: "音克思曰：吾闻之大展曰：恋爱多出于地理近。绍歆岂不类乎？欲以己之一厢情愿而恋爱，卒亡其慧，尚不觉寐而不自省，过矣。"
     },
@@ -993,6 +995,7 @@ window.SJI_DATA = (function () {
       intro: "秋季运动会。绍铭存歆慧手链于袖，观其入场。今日之绍铭，不怒自威——他刚在级部榜上名列前茅。",
       tip: "此时的绍铭已被加强：血11、纸条3伤。勿令其半血以下，被动『不怒自威』会加伤。",
       enemies: ["shaoming"], allies: [], rule: null, hpScale: 1.15,
+      blocked: [[1, 2], [1, 4], [5, 2], [5, 4]], terrain: "cabinet",
       outro: "运动会既散，绍铭窃置手链于歆慧口袋。歆慧归家乃视之，以QQ问曰：手链？二人遂和好如初。",
       yueks: "音克思曰：一链定情，一纸绝交。少年之心，秋天的运动会。"
     },
@@ -1002,7 +1005,7 @@ window.SJI_DATA = (function () {
       intro: "张世波者，大师也，仙风道骨，鹤发童颜，每回合吸东来之紫气自愈；杨为荣者，物理老师也，黑棒不盈尺而威力无双，刀击+1。二师授课于马刀场。汝非孤军——汶斌在侧：下课铃响，故走往饭，此自然之理也！",
       tip: "大师会回血，集火先斩之。为荣黑棒刀刀入肉（刀击+1），勿与之纠缠。",
       enemies: ["shibo", "weirong"], allies: ["wenbin"], rule: null, unlocks: ["wenbin"],
-      blocked: [[2, 2], [2, 4], [4, 2], [4, 4]],   // 六班教室的课桌
+      blocked: [[2, 2], [2, 4], [4, 2], [4, 4]], terrain: "desk",   // 六班教室的课桌
       outro: "为荣见绍铭班倒一，以戒尺笃之，而阴谓课代表曰：绍铭今班倒一，此恋爱乎？",
       yueks: "音克思曰：凡六班之老师，无不爱岗敬业，知识渊博，此六班强盛之基也。"
     },
@@ -1011,7 +1014,7 @@ window.SJI_DATA = (function () {
       intro: "晚自习，为荣执黑棒巡行于课桌之间。教室里桌椅纵横，正是伏击之地。钦法于门外观望。",
       tip: "课桌不可通行，可借以卡位。为荣的黑棒刀击+1，勿与其贴身。",
       enemies: ["weirong", "mob"], allies: [], rule: null,
-      blocked: [[2, 2], [2, 4], [4, 2], [4, 4]],
+      blocked: [[2, 2], [2, 4], [4, 2], [4, 4]], terrain: "desk",
       outro: "子琛谓之破伤风棒：苟有得痔疮者离击，或已死。为荣闻之，不怒，反以此为荣。",
       yueks: "音克思曰：为荣之物理，广大而精微，妙趣横生，生皆拥之。"
     },
@@ -1021,6 +1024,7 @@ window.SJI_DATA = (function () {
       intro: "TGO者，tiganorganization也，数学题感无双。今逐一领教：先会教主汶斌——秒解题，弹簧纸箭射程数米；再战马刀之神wonder——血祭翻倍两次，勿使其近身血祭。每有新题，wonder辄曰：GBC，算不算？",
       tip: "两阵连战，阵间回复四血。汶斌之箭与wonder之神算皆远及三格，近身则其刀亦利。wonder血祭后两击双倍，见祭速退！",
       enemies: ["wonder", "wenbin"], waves: [["wenbin"], ["wonder"]], allies: [], rule: null, unlocks: ["wonder"],
+      blocked: [[2, 2], [2, 4], [4, 2], [4, 4]], terrain: "desk",
       outro: "Wonder每算错，即拍大腿而叫曰：别叫别叫。汶斌有诗赞之曰：打完响指拍大腿，大喊一声别叫了。",
       yueks: "音克思曰：TGO为六班数学之冠，奇思妙想皆出其中，马刀兴焉。至高三，虽分离，亦多究题，此TGO之基也。"
     },
@@ -1029,6 +1033,7 @@ window.SJI_DATA = (function () {
       intro: "九省联考，压轴第18题。wonder以牛顿定理破之，时人先贬后服。今日，他要当着你的面，再解一次——你就是那道题。",
       tip: "wonder独自一人，血量与攻击皆已强化。其血祭两次翻倍，见祭速退。GBC，算不算？",
       enemies: ["wonder"], allies: [], rule: null, hpScale: 1.35,
+      blocked: [[3, 1], [3, 5]], terrain: "table",
       outro: "答案既出，果wonder之法，六班叹服。wonder拍大腿而叫曰：别叫别叫！",
       yueks: "音克思曰：wonder之思维甚慢，然思绪精妙，毅力超凡，能思十四节课而不辍。"
     },
@@ -1038,6 +1043,7 @@ window.SJI_DATA = (function () {
       intro: "少年展者，祝大展也，有龙凤之姿，探楼发屋，一步两格；可怡心善展，比邻则大展伤害+1且每回合得疗。高中之恋爱者多不就，惟大展成——今汝为不成人之美者。",
       tip: "可怡会为大展疗伤加持，先斩可怡，或以击退拆散二人。大展步幅极大，勿以为距离安全。",
       enemies: ["dazhan", "keai"], allies: [], rule: { id: "lovers", desc: "可怡与大展相邻时，展伤害+1且每回合回血" }, hpScale: 0.7, unlocks: ["dazhan"],
+      blocked: [[3, 1], [3, 5]], terrain: "table",
       outro: "既高考，展与可怡牵之手而行于校园，岂不美哉？",
       yueks: "音克思曰：高中之恋爱者多不就，惟大展成。究其本，乃展之收敛而谨慎也。此之谓：恋爱者必慎也。"
     },
@@ -1046,7 +1052,7 @@ window.SJI_DATA = (function () {
       intro: "陈修逸，不知其何许人也，头甚圜，绝类卤蛋。所持陀螺名曰三溴化氮，鲜有败绩；体味绝类鸩毒，中者中毒。免疫击退——官知止而神欲行。三次为捉，四次换家，至今不易其志。",
       tip: "三溴化氮周身AOE+中毒，勿贴身连击。免疫击退，马踢只能伤之不能踢之。其血不厚，稳扎稳打。",
       enemies: ["touge"], allies: [], rule: null, unlocks: ["touge"],
-      blocked: [[3, 3]],   // 讲台（头哥正是在此处被为兵逮住）
+      blocked: [[3, 3]], terrain: "platform",   // 讲台（头哥正是在此处被为兵逮住）
       outro: "为兵视马刀角色，念曰：豌豆射手，何为豌豆射手？众哄堂大笑。至头哥返校，见其小臂多有伤痕，盖其父母为之。",
       yueks: "音克思曰：余尝闻鲁豪之摆烂，神人之体味，大哥之特立独行。盖修逸者，可谓兼之矣。"
     },
@@ -1072,6 +1078,7 @@ window.SJI_DATA = (function () {
       intro: "郭凯宇者，呱宇也，为二楼最帅之男，嗜水如命，疾如电，三成闪避？非也，二成也；隋奕然者，小蛙也，魔方技艺炉火纯青，每回合首次受伤-1，拍肚皮自得其乐。二人同场，帅与清秀并存。",
       tip: "呱宇闪避不低，用必中技能与马踢取之；小蛙首伤-1，连击方可破防。",
       enemies: ["guayu", "yiran"], allies: [], rule: null, unlocks: ["guayu", "yiran"],
+      blocked: [[2, 3], [4, 3]], terrain: "pillar",
       outro: "宇尝四战汶斌，三败而一胜。奕然于班走，捡一发卡，幻想其为梦晨所有。",
       yueks: "音克思曰：呱宇、奕然者，世多其贤。吾考之行事，网罗其闻，知其有奇事也。"
     },
@@ -1080,6 +1087,7 @@ window.SJI_DATA = (function () {
       intro: "乒乓球期末考试。呱宇与搭档正反手不辨，师长以为其陪考。今日呱宇持拍而立——汝就是那个 unlucky 的搭档。",
       tip: "呱宇疾如电（二成闪避），球拍如刀。补考三度，方能过二十板。",
       enemies: ["guayu", "mob", "mob"], allies: [], rule: null,
+      blocked: [[2, 2], [2, 4], [4, 2], [4, 4]], terrain: "table",
       outro: "及至补考，牛逼同学相助，最后一度成二十板，补考乃过。展二人谢牛逼同学而去。",
       yueks: "音克思曰：尔向用反手，吾以为尔陪考也。——师长亦大惊。"
     },
@@ -1089,7 +1097,7 @@ window.SJI_DATA = (function () {
       intro: "王子琛者，故六班之班长也，号曰武，号令两班，政由琛出。其'体育课起义'波及全场，夺话筒而令汝不得行动。第三回合，其心腹二人将入场：凡有责任，在吾一人！",
       tip: "第三回合有二路人入场，勿被围殴。班长之威使近身者伤害-1，以技能与马踢远程取之。",
       enemies: ["zichen"], allies: [], rule: { id: "uprising", desc: "第三回合敌人援军二人入场（起义）" },
-      blocked: [[1, 1], [1, 5], [5, 1], [5, 5]],   // 操场四角的器械
+      blocked: [[1, 1], [1, 5], [5, 1], [5, 5]], terrain: "cabinet",   // 操场四角的器械
       outro: "琛既上书，言于含笑曰：吾师，今事已毕，起义大成。含笑瞪目。琛忙释：非汝之所想也。",
       yueks: "音克思曰：子琛起于六班，续位于七班。号令两班，政由琛出，威震天下。位终，且近古以来未之有也。"
     },
@@ -1098,7 +1106,7 @@ window.SJI_DATA = (function () {
       intro: "道德帮者，刘鲁豪、颜小川、顾一也。以顾一有德，鲁豪有道，而小川兼通德艺。三人比邻，DDB同德，伤害+1。皇太子每场不死一次，川受伤越痛反击越狠。汝非孤军——毓润强跟之饭，'三带一'是也。",
       tip: "汝有友军毓润（虽其求战心不坚）。三人相邻伤害+1，先破其阵型。顾一有皇太子庇佑，留后手。",
       enemies: ["luhao", "xiaochuan", "guyin"], allies: ["yurun"], rule: { id: "dyad", desc: "敌人相邻时伤害+1（DDB同德）" }, unlocks: ["yurun", "guyin"],
-      blocked: [[3, 2], [3, 4]],   // 食堂长桌（只因说：吾摆烂矣）
+      blocked: [[3, 2], [3, 4]], terrain: "table",   // 食堂长桌（只因说：吾摆烂矣）
       outro: "川曰：呜呼，高中之人，非有超世之才，未可节外生枝。诚哉川之言也。",
       yueks: "音克思曰：以川之才俊，虽内向，何女不容？才貌如川且若此，况庸碌之人乎？"
     },
@@ -1107,6 +1115,7 @@ window.SJI_DATA = (function () {
       intro: "李帆者，山东青岛人，时人号之曰'李疯'。购刀免费，Say You Say Me使汝笑场不能自持。神教会残部二人随其入场——刘毅立神教时，帆为左护法，凡十四人，以骂神为己任。",
       tip: "帆购刀免费，前期即有刀伤。笑场之歌范围二格，能散则散。先清杂兵，再诛李疯。",
       enemies: ["lifan", "mob", "mob"], allies: [], rule: null, unlocks: ["lifan"],
+      blocked: [[2, 3], [4, 3]], terrain: "desk",
       outro: "帆任英语课代表之职，誓为同学争权。苹苹怒斥众曰：汝等皆叛徒也！帆窃喜，以苹苹未知其课代表乃叛军之首也。",
       yueks: "音克思曰：予观《李帆传》《头哥传》，越于韩柳之文采。终得一言以评之曰：疯奇。"
     },
@@ -1115,7 +1124,7 @@ window.SJI_DATA = (function () {
       intro: "禁闭室，数学组对面的杂物间。李帆因早读私语被为兵停课，置于此处半日——同押的还有钦法巡行至此的你。帆笑：Q=CU。",
       tip: "禁闭室狭小（中央柜子不可通行）。李帆购刀免费，笑场之歌仍在。",
       enemies: ["lifan", "qinfa"], allies: [], rule: null,
-      blocked: [[3, 3]],
+      blocked: [[3, 3]], terrain: "cabinet",
       outro: "帆于禁闭室考英语，勇夺19.9分。苹苹果得C等，帆窃喜。",
       yueks: "音克思曰：帆于禁闭而考19.9，其疯奇如此。"
     },
@@ -1125,6 +1134,7 @@ window.SJI_DATA = (function () {
       intro: "李默者，不知其何班也，走路侧翼加速，状如羚羊，一步两格；吴相东者，实验之奇人也，每逢考试必潜携手机——三成闪避，每场一次致命不死。一场游戏一场梦，此战亦然。",
       tip: "二人皆难捉摸：羚羊步大，相东善逃。封锁其走位（利用城墙与马踢），以范围技逼其现形。",
       enemies: ["limo", "xiangdong"], allies: [], rule: null, unlocks: ["limo", "xiangdong"],
+      blocked: [[2, 2], [2, 4], [4, 2], [4, 4]], terrain: "pillar",
       outro: "至实验，乘师不备，相东又走。师下令全守卫闭门，卒获之。当时，已十二点矣。",
       yueks: "音克思曰：实验果多神人也。"
     },
@@ -1142,7 +1152,7 @@ window.SJI_DATA = (function () {
       intro: "王崇国，即墨实验之校长也，貌丑德薄，苛于师而怠于职。钦法为其爪牙，当场抓获，缴械沉默。崇国'弃车保帅'，濒死复起；'评职称'禁汝施技；'种树'召唤随从——树木虽皆死，今日且种之。为兵为其所贬，今来助阵：终焉之战。",
       tip: "先斩钦法，绝其抓获。崇国血厚且有免死，血祭爆发务必一次到位。其召唤之树，一踢即散。",
       enemies: ["qinfa", "chongguo"], allies: ["weibing"], rule: null, hpScale: 0.78,
-      blocked: [[2, 3], [4, 3]],   // 校长室的办公桌与文件柜
+      blocked: [[2, 3], [4, 3]], terrain: "cabinet",   // 校长室的办公桌与文件柜
       outro: "后崇国走，复入二中，多种树木。树木皆死，时人谓之'种树校长'。为兵亦复其职，未几，再接新班。",
       yueks: "音克思曰：荣国轻师而重生，犹植木于沙，欲其茂而不得其土。嗟乎，苟能推此心以待师，何至于天下共怨也？"
     },
@@ -1151,6 +1161,7 @@ window.SJI_DATA = (function () {
       intro: "二中二十三班有四人焉：谭晟翔、鲁齐岳、李子烨、岳连奇。四人初以学业相近而相善，后以一言相疑，以一人相争，离合反覆，终至交恶。爱者反为仇，仇者复为友——场上四人，各有二成之机误伤'友军'。乱世用重典，唯一人可终结此局。",
       tip: "敌人内讧（二成机率打错人），但四人围攻仍极险。利用党争，逐个诱杀，勿陷中央。",
       enemies: ["shengxiang", "qiyue", "ziye", "lianqi"], allies: [], rule: { id: "chaos", desc: "敌人二成机率误伤最近的任何人（党争）" }, unlocks: ["shengxiang", "qiyue", "ziye", "lianqi"],
+      blocked: [[2, 2], [2, 4], [4, 2], [4, 4]], terrain: "desk",
       outro: "向所谓终身之好者，亦不过一时之心。然当其时也，喜怒皆真，故记之。",
       yueks: "音克思曰：流言可以离友，猜疑可以成仇，而人心之变，虽史家亦不能尽知也。靡不有初，鲜克有终，观于四人，信哉！"
     },
@@ -1159,6 +1170,7 @@ window.SJI_DATA = (function () {
       intro: "高考后，烧烤摊。齐岳与连奇并肩而坐——三白之后，勉许之；既高考而分，然兄弟仍是兄弟。炭火明灭，如人心难测。",
       tip: "二人相邻仍有『情比金坚』（刀击与马踢伤害+1）。先分后破，老规矩。",
       enemies: ["qiyue", "lianqi"], allies: [], rule: { id: "dyad", desc: "敌人相邻时刀击与马踢伤害+1（兄弟并肩）" },
+      blocked: [[3, 2], [3, 4]], terrain: "table",
       outro: "（这结尾我不知道选哪个好了，早晨写了第二个，晚上写了第一个，烧烤中）",
       yueks: "音克思曰：向所谓终身之好者，亦不过一时之心。然当其时也，喜怒皆真。"
     }
@@ -3975,6 +3987,8 @@ window.SJI_UI = (function () {
   function fxVignette(rgb) { vignettes.push({ rgb, t: 1 }); }
 
   /* ---------------- 画布 ---------------- */
+  function ttype2color(a, b) { return Math.random() < 0.5 ? a : b; }
+
   function buildBG() {
     bgCanvas = document.createElement("canvas");
     bgCanvas.width = CS; bgCanvas.height = CS;
@@ -4019,39 +4033,74 @@ window.SJI_UI = (function () {
       g.strokeStyle = "rgba(90,75,50,.14)";
       g.strokeRect(x + .5, y + .5, TILE - 1, TILE - 1);
     }
-    // 障碍格：课桌/讲台/柜子（关卡可配 blocked）
+    // 障碍格：按关卡地形类型绘制（课桌/讲台/立柱/球台/柜子）
     const blocked = (window.SJI.battle && window.SJI.battle.cfg && window.SJI.battle.cfg.stage
       && window.SJI.battle.cfg.stage.blocked) || [];
+    const ttype = (window.SJI.battle.cfg.stage && window.SJI.battle.cfg.stage.terrain) || "desk";
     for (const [br, bc] of blocked) {
       const x = PAD + bc * TILE, y = PAD + br * TILE;
-      // 阴影
       g.fillStyle = "rgba(60,40,20,.18)";
-      g.beginPath(); g.ellipse(x + TILE / 2, y + TILE - 16, 32, 9, 0, 0, 7); g.fill();
-      // 桌体
-      const bw = TILE - 22, bh = TILE - 30;
-      g.fillStyle = "#8a6a45";
-      g.fillRect(x + 11, y + 12, bw, bh);
-      // 桌面高光
-      g.fillStyle = "#b08a5c";
-      g.fillRect(x + 11, y + 12, bw, 9);
-      // 木纹
-      g.strokeStyle = "rgba(80,55,30,.35)"; g.lineWidth = 1;
-      for (let i = 1; i < 4; i++) {
-        g.beginPath(); g.moveTo(x + 13, y + 12 + i * (bh / 4)); g.lineTo(x + 9 + bw, y + 12 + i * (bh / 4)); g.stroke();
+      g.beginPath(); g.ellipse(x + TILE / 2, y + TILE - 14, 30, 8, 0, 0, 7); g.fill();
+      if (ttype === "pillar") {
+        // 石柱：圆柱 + 柱头 + 高光
+        g.fillStyle = "#8f8478";
+        g.fillRect(x + TILE / 2 - 15, y + 12, 30, TILE - 26);
+        g.fillStyle = "#a99d8e";
+        g.fillRect(x + TILE / 2 - 15, y + 12, 10, TILE - 26);
+        g.fillStyle = "#6e6152";
+        g.fillRect(x + TILE / 2 - 19, y + 8, 38, 8);
+        g.fillRect(x + TILE / 2 - 19, y + TILE - 20, 38, 8);
+      } else if (ttype === "table") {
+        // 长桌/球台：矮台面 + 白线
+        g.fillStyle = ttype2color(x, y, "#3f6e5e", "#4a7a68");
+        g.fillRect(x + 8, y + 16, TILE - 16, TILE - 34);
+        g.strokeStyle = "rgba(255,255,255,.7)"; g.lineWidth = 1.5;
+        g.strokeRect(x + 10, y + 18, TILE - 20, TILE - 38);
+        g.beginPath(); g.moveTo(x + 8, y + TILE / 2 - 2); g.lineTo(x + TILE - 8, y + TILE / 2 - 2); g.stroke();
+        g.fillStyle = "#5a4a3a";
+        g.fillRect(x + 12, y + TILE - 20, 5, 14); g.fillRect(x + TILE - 17, y + TILE - 20, 5, 14);
+      } else if (ttype === "cabinet") {
+        // 柜子：高柜 + 格架
+        g.fillStyle = "#5c4a38";
+        g.fillRect(x + 10, y + 8, TILE - 20, TILE - 16);
+        g.fillStyle = "#6e5a44";
+        g.fillRect(x + 13, y + 11, TILE - 26, TILE - 22);
+        g.strokeStyle = "rgba(35,25,15,.6)"; g.lineWidth = 1.5;
+        g.beginPath(); g.moveTo(x + 13, y + TILE / 2); g.lineTo(x + TILE - 13, y + TILE / 2); g.stroke();
+        g.fillStyle = "#c9a227";
+        g.fillRect(x + TILE / 2 - 2, y + TILE / 2 - 8, 4, 3);
+        g.fillRect(x + TILE / 2 - 2, y + TILE / 2 + 5, 4, 3);
+      } else if (ttype === "platform") {
+        // 讲台：台阶 + 台面
+        g.fillStyle = "#9a8f7c";
+        g.fillRect(x + 6, y + TILE - 30, TILE - 12, 20);
+        g.fillStyle = "#877c68";
+        g.fillRect(x + 10, y + 16, TILE - 20, TILE - 46);
+        g.fillStyle = "#a63a2b";
+        g.fillRect(x + TILE / 2 - 10, y + 20, 20, 6);
+      } else {
+        // desk 课桌（默认）
+        const bw = TILE - 22, bh = TILE - 30;
+        g.fillStyle = "#8a6a45";
+        g.fillRect(x + 11, y + 12, bw, bh);
+        g.fillStyle = "#b08a5c";
+        g.fillRect(x + 11, y + 12, bw, 9);
+        g.strokeStyle = "rgba(80,55,30,.35)"; g.lineWidth = 1;
+        for (let i = 1; i < 4; i++) {
+          g.beginPath(); g.moveTo(x + 13, y + 12 + i * (bh / 4)); g.lineTo(x + 9 + bw, y + 12 + i * (bh / 4)); g.stroke();
+        }
+        g.fillStyle = "#6b5033";
+        g.fillRect(x + 14, y + 12 + bh, 6, 9);
+        g.fillRect(x + 9 + bw - 6, y + 12 + bh, 6, 9);
+        g.fillStyle = "#c94f3a";
+        g.fillRect(x + TILE / 2 - 13, y + 22, 18, 11);
+        g.fillStyle = "#f2ead8";
+        g.fillRect(x + TILE / 2 - 13, y + 22, 18, 3);
+        g.fillStyle = "#5a7d9a";
+        g.beginPath(); g.arc(x + TILE / 2 + 11, y + 30, 6, 0, 7); g.fill();
+        g.strokeStyle = "rgba(0,0,0,.25)"; g.lineWidth = 1.5;
+        g.strokeRect(x + 11.5, y + 12.5, bw - 1, bh - 1);
       }
-      // 桌腿
-      g.fillStyle = "#6b5033";
-      g.fillRect(x + 14, y + 12 + bh, 6, 9);
-      g.fillRect(x + 9 + bw - 6, y + 12 + bh, 6, 9);
-      // 桌上之物（书/水壶）
-      g.fillStyle = "#c94f3a";
-      g.fillRect(x + TILE / 2 - 13, y + 22, 18, 11);
-      g.fillStyle = "#f2ead8";
-      g.fillRect(x + TILE / 2 - 13, y + 22, 18, 3);
-      g.fillStyle = "#5a7d9a";
-      g.beginPath(); g.arc(x + TILE / 2 + 11, y + 30, 6, 0, 7); g.fill();
-      g.strokeStyle = "rgba(0,0,0,.25)"; g.lineWidth = 1.5;
-      g.strokeRect(x + 11.5, y + 12.5, bw - 1, bh - 1);
     }
 
     // 角楼（四角）

@@ -816,6 +816,8 @@ window.SJI_UI = (function () {
   function fxVignette(rgb) { vignettes.push({ rgb, t: 1 }); }
 
   /* ---------------- 画布 ---------------- */
+  function ttype2color(a, b) { return Math.random() < 0.5 ? a : b; }
+
   function buildBG() {
     bgCanvas = document.createElement("canvas");
     bgCanvas.width = CS; bgCanvas.height = CS;
@@ -860,39 +862,74 @@ window.SJI_UI = (function () {
       g.strokeStyle = "rgba(90,75,50,.14)";
       g.strokeRect(x + .5, y + .5, TILE - 1, TILE - 1);
     }
-    // 障碍格：课桌/讲台/柜子（关卡可配 blocked）
+    // 障碍格：按关卡地形类型绘制（课桌/讲台/立柱/球台/柜子）
     const blocked = (window.SJI.battle && window.SJI.battle.cfg && window.SJI.battle.cfg.stage
       && window.SJI.battle.cfg.stage.blocked) || [];
+    const ttype = (window.SJI.battle.cfg.stage && window.SJI.battle.cfg.stage.terrain) || "desk";
     for (const [br, bc] of blocked) {
       const x = PAD + bc * TILE, y = PAD + br * TILE;
-      // 阴影
       g.fillStyle = "rgba(60,40,20,.18)";
-      g.beginPath(); g.ellipse(x + TILE / 2, y + TILE - 16, 32, 9, 0, 0, 7); g.fill();
-      // 桌体
-      const bw = TILE - 22, bh = TILE - 30;
-      g.fillStyle = "#8a6a45";
-      g.fillRect(x + 11, y + 12, bw, bh);
-      // 桌面高光
-      g.fillStyle = "#b08a5c";
-      g.fillRect(x + 11, y + 12, bw, 9);
-      // 木纹
-      g.strokeStyle = "rgba(80,55,30,.35)"; g.lineWidth = 1;
-      for (let i = 1; i < 4; i++) {
-        g.beginPath(); g.moveTo(x + 13, y + 12 + i * (bh / 4)); g.lineTo(x + 9 + bw, y + 12 + i * (bh / 4)); g.stroke();
+      g.beginPath(); g.ellipse(x + TILE / 2, y + TILE - 14, 30, 8, 0, 0, 7); g.fill();
+      if (ttype === "pillar") {
+        // 石柱：圆柱 + 柱头 + 高光
+        g.fillStyle = "#8f8478";
+        g.fillRect(x + TILE / 2 - 15, y + 12, 30, TILE - 26);
+        g.fillStyle = "#a99d8e";
+        g.fillRect(x + TILE / 2 - 15, y + 12, 10, TILE - 26);
+        g.fillStyle = "#6e6152";
+        g.fillRect(x + TILE / 2 - 19, y + 8, 38, 8);
+        g.fillRect(x + TILE / 2 - 19, y + TILE - 20, 38, 8);
+      } else if (ttype === "table") {
+        // 长桌/球台：矮台面 + 白线
+        g.fillStyle = ttype2color(x, y, "#3f6e5e", "#4a7a68");
+        g.fillRect(x + 8, y + 16, TILE - 16, TILE - 34);
+        g.strokeStyle = "rgba(255,255,255,.7)"; g.lineWidth = 1.5;
+        g.strokeRect(x + 10, y + 18, TILE - 20, TILE - 38);
+        g.beginPath(); g.moveTo(x + 8, y + TILE / 2 - 2); g.lineTo(x + TILE - 8, y + TILE / 2 - 2); g.stroke();
+        g.fillStyle = "#5a4a3a";
+        g.fillRect(x + 12, y + TILE - 20, 5, 14); g.fillRect(x + TILE - 17, y + TILE - 20, 5, 14);
+      } else if (ttype === "cabinet") {
+        // 柜子：高柜 + 格架
+        g.fillStyle = "#5c4a38";
+        g.fillRect(x + 10, y + 8, TILE - 20, TILE - 16);
+        g.fillStyle = "#6e5a44";
+        g.fillRect(x + 13, y + 11, TILE - 26, TILE - 22);
+        g.strokeStyle = "rgba(35,25,15,.6)"; g.lineWidth = 1.5;
+        g.beginPath(); g.moveTo(x + 13, y + TILE / 2); g.lineTo(x + TILE - 13, y + TILE / 2); g.stroke();
+        g.fillStyle = "#c9a227";
+        g.fillRect(x + TILE / 2 - 2, y + TILE / 2 - 8, 4, 3);
+        g.fillRect(x + TILE / 2 - 2, y + TILE / 2 + 5, 4, 3);
+      } else if (ttype === "platform") {
+        // 讲台：台阶 + 台面
+        g.fillStyle = "#9a8f7c";
+        g.fillRect(x + 6, y + TILE - 30, TILE - 12, 20);
+        g.fillStyle = "#877c68";
+        g.fillRect(x + 10, y + 16, TILE - 20, TILE - 46);
+        g.fillStyle = "#a63a2b";
+        g.fillRect(x + TILE / 2 - 10, y + 20, 20, 6);
+      } else {
+        // desk 课桌（默认）
+        const bw = TILE - 22, bh = TILE - 30;
+        g.fillStyle = "#8a6a45";
+        g.fillRect(x + 11, y + 12, bw, bh);
+        g.fillStyle = "#b08a5c";
+        g.fillRect(x + 11, y + 12, bw, 9);
+        g.strokeStyle = "rgba(80,55,30,.35)"; g.lineWidth = 1;
+        for (let i = 1; i < 4; i++) {
+          g.beginPath(); g.moveTo(x + 13, y + 12 + i * (bh / 4)); g.lineTo(x + 9 + bw, y + 12 + i * (bh / 4)); g.stroke();
+        }
+        g.fillStyle = "#6b5033";
+        g.fillRect(x + 14, y + 12 + bh, 6, 9);
+        g.fillRect(x + 9 + bw - 6, y + 12 + bh, 6, 9);
+        g.fillStyle = "#c94f3a";
+        g.fillRect(x + TILE / 2 - 13, y + 22, 18, 11);
+        g.fillStyle = "#f2ead8";
+        g.fillRect(x + TILE / 2 - 13, y + 22, 18, 3);
+        g.fillStyle = "#5a7d9a";
+        g.beginPath(); g.arc(x + TILE / 2 + 11, y + 30, 6, 0, 7); g.fill();
+        g.strokeStyle = "rgba(0,0,0,.25)"; g.lineWidth = 1.5;
+        g.strokeRect(x + 11.5, y + 12.5, bw - 1, bh - 1);
       }
-      // 桌腿
-      g.fillStyle = "#6b5033";
-      g.fillRect(x + 14, y + 12 + bh, 6, 9);
-      g.fillRect(x + 9 + bw - 6, y + 12 + bh, 6, 9);
-      // 桌上之物（书/水壶）
-      g.fillStyle = "#c94f3a";
-      g.fillRect(x + TILE / 2 - 13, y + 22, 18, 11);
-      g.fillStyle = "#f2ead8";
-      g.fillRect(x + TILE / 2 - 13, y + 22, 18, 3);
-      g.fillStyle = "#5a7d9a";
-      g.beginPath(); g.arc(x + TILE / 2 + 11, y + 30, 6, 0, 7); g.fill();
-      g.strokeStyle = "rgba(0,0,0,.25)"; g.lineWidth = 1.5;
-      g.strokeRect(x + 11.5, y + 12.5, bw - 1, bh - 1);
     }
 
     // 角楼（四角）
