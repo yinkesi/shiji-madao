@@ -100,6 +100,8 @@ with sync_playwright() as p:
     page.click("#m-go")
     page.wait_for_selector("#screen-charselect.on")
     cards = page.query_selector_all("#charselect-grid .char-card")
+    page.evaluate("window.SJI_SAVE.unlockChars(['wonder'])")   # 确定性：解锁 wonder
+    cards = page.query_selector_all("#charselect-grid .char-card")
     cards[5].click()  # wonder
     page.click("#cs-go")
     page.wait_for_selector("#screen-battle.on")
