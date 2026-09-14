@@ -1,18 +1,6 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-global.window = {};
-window.SJI_SAVE = { bump: () => {}, data: { totals: {} }, settings: {} };
-window.SJI_UI = { onLog: () => {}, onState: () => {}, snap: () => {}, fxFloat: () => {}, fxHit: () => {}, fxStatus: () => {},
-  rpsRound: async () => ({ res: 'win', ap: 4 }), playerPhase: async () => {}, pickBoon: async () => null, onBattleEnd: () => {}, banner: async () => {} };
-window.SJI_AUDIO = new Proxy({}, { get: () => () => {} });
-window.SJI = { settings: { speed: 3 } };
-require('./js/config.js');
-require('./js/data.js');
-const D = window.SJI_DATA;
-require('./js/engine.js');
-const E = window.SJI_ENGINE;
-let fails = 0;
-const check = (n, c, x) => { console.log(`  ${c ? 'PASS' : 'FAIL'}  ${n}${x !== undefined ? '  (' + x + ')' : ''}`); if (!c) fails++; };
+import { loadEngine, checker } from '../helpers/engine_env.mjs';
+const { E, D } = loadEngine();
+const { check, done } = checker('体检修复');
 
 console.log('=== 修复1：可怡应把治疗给自己人 ===');
 {
@@ -54,5 +42,4 @@ console.log('\n=== 修复2：全程最低血记录（成就可达性） ===');
   check('全程最低血仍记为1 → 成就可达', b.stats.minHp === 1, b.stats.minHp);
   check('成就判定条件成立（minHp<=1）', b.stats.minHp !== undefined && b.stats.minHp <= 1);
 }
-console.log(fails === 0 ? '\n=== 体检修复 ALL PASS ===' : `\n!! ${fails} 项失败`);
-process.exit(fails ? 1 : 0);
+done();

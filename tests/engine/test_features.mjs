@@ -1,23 +1,7 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-global.window = {};
-let bumps = [];
-window.SJI_SAVE = {
-  bump: (k, n) => bumps.push([k, n]), data: { totals: {}, charWins: {} }, settings: {},
-  saveBattle: () => {}, clearBattle: () => {}, loadBattle: () => null
-};
-window.SJI_UI = { onLog: () => {}, onState: () => {}, snap: () => {}, fxFloat: () => {}, fxHit: () => {}, fxStatus: () => {},
-  rpsRound: async () => ({ res: 'win', ap: 4 }), playerPhase: async () => {}, pickBoon: async () => null, onBattleEnd: () => {}, banner: async () => {} };
-window.SJI_AUDIO = new Proxy({}, { get: () => () => {} });
-window.SJI = { settings: { speed: 3 } };
-require('./js/config.js');
-require('./js/data.js');
-const D = window.SJI_DATA;
-require('./js/engine.js');
-const E = window.SJI_ENGINE;
+import { loadEngine, checker } from '../helpers/engine_env.mjs';
+const { E, D } = loadEngine();
+const { check, done } = checker('新功能专项');
 
-let fails = 0;
-const check = (n, c, x) => { console.log(`  ${c ? 'PASS' : 'FAIL'}  ${n}${x !== undefined ? '  (' + x + ')' : ''}`); if (!c) fails++; };
 const mk = (cfg) => new E.Battle(Object.assign({ mode: 'free', playerChar: 'touge', enemies: ['mob'], diff: 'normal' }, cfg));
 
 console.log('=== ① 地形：障碍格不可通行、不可站立、可被寻路绕开 ===');
@@ -149,5 +133,4 @@ console.log('\n=== ⑤ 种树上限：场上至多三株（防止战斗被无限
   const trees = b.units.filter(u => u.charId === 'tree' && u.alive).length;
   check('树木数量不超过 3', trees <= 3, trees);
 }
-console.log(fails === 0 ? '\n=== 新功能专项 ALL PASS ===' : `\n!! ${fails} 项失败`);
-process.exit(fails ? 1 : 0);
+done();

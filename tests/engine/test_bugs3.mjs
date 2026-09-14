@@ -1,19 +1,7 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-global.window = {};
-window.SJI_SAVE = { bump: () => {}, data: { totals: {} }, settings: {} };
-window.SJI_UI = { onLog: () => {}, onState: () => {}, snap: () => {}, fxFloat: () => {}, fxHit: () => {}, fxStatus: () => {},
-  rpsRound: async () => ({ res: 'win', ap: 4 }), playerPhase: async () => {}, pickBoon: async () => null, onBattleEnd: () => {}, banner: async () => {} };
-window.SJI_AUDIO = new Proxy({}, { get: () => () => {} });
-window.SJI = { settings: { speed: 3 } };
-require('./js/config.js');
-require('./js/data.js');
-const D = window.SJI_DATA;
-require('./js/engine.js');
-const E = window.SJI_ENGINE;
+import { loadEngine, checker } from '../helpers/engine_env.mjs';
+const { E, D } = loadEngine();
+const { check, done } = checker('全部探针');
 
-let fails = 0;
-const check = (n, c, x) => { console.log(`  ${c ? 'PASS' : 'FAIL'}  ${n}${x !== undefined ? '  (' + x + ')' : ''}`); if (!c) fails++; };
 
 /* ---- Bug 探针 8：遣返+毒 交互（毒发是否影响 offField 单位） ---- */
 {
@@ -90,5 +78,4 @@ const check = (n, c, x) => { console.log(`  ${c ? 'PASS' : 'FAIL'}  ${n}${x !== 
   check('含笑技能可选中玩家', ret === true, ret);
 }
 
-console.log(fails === 0 ? '\n=== 全部探针通过 ===' : `\n!! ${fails} 项失败`);
-process.exit(fails ? 1 : 0);
+done();

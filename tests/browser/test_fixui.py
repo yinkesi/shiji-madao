@@ -1,22 +1,12 @@
 # -*- coding: utf-8 -*-
 """验证：遣返回家归位 + AI 主动性 + 难度选择器（真实浏览器）"""
 import sys, time
-sys.stdout.reconfigure(encoding='utf-8')
 from playwright.sync_api import sync_playwright
-
-URL = "file:///D:/code/shiji-madao/index.html"
-errors = []
-
-def log(m): print(m, flush=True)
+from pw_common import URL_SRC, errors, log, open_page, finish
 
 with sync_playwright() as p:
     browser = p.chromium.launch(channel="msedge", headless=True)
-    page = browser.new_page(viewport={"width": 1280, "height": 900})
-    page.on("pageerror", lambda e: errors.append(str(e)[:200]))
-    page.on("console", lambda m: errors.append("console:" + m.text[:200]) if m.type == "error" else None)
-    page.goto(URL); page.wait_for_load_state("networkidle")
-    page.evaluate("window.SJI_DEBUG.fast = true")
-    page.evaluate("window.SJI_SAVE.setSetting('speed', 3)")
+    page = open_page(browser, URL_SRC, fast=True)
     page.evaluate("window.SJI_DEBUG.skipScenes = true")
 
     # ---- 1) 难度选择器存在且能切换 ----
@@ -93,7 +83,4 @@ with sync_playwright() as p:
 
     browser.close()
 
-if errors:
-    print("!! 错误:", errors[:5])
-    sys.exit(1)
-print("=== 修复验证 ALL PASS ===")
+finish("修复验证")

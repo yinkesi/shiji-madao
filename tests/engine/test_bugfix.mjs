@@ -1,23 +1,7 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-global.window = {};
-let bumps = [];
-window.SJI_SAVE = { bump: (k, n) => bumps.push([k, n]), data: { totals: {} }, settings: {} };
-window.SJI_UI = { onLog: () => {}, onState: () => {}, snap: () => {}, fxFloat: () => {}, fxHit: () => {}, fxStatus: () => {},
-  rpsRound: async () => ({ res: 'win', ap: 4 }), playerPhase: async () => {}, pickBoon: async () => null, onBattleEnd: () => {}, banner: async () => {} };
-window.SJI_AUDIO = new Proxy({}, { get: () => () => {} });
-window.SJI = { settings: { speed: 3 } };
-require('./js/config.js');
-require('./js/data.js');
-const D = window.SJI_DATA;
-require('./js/engine.js');
-const E = window.SJI_ENGINE;
+import { loadEngine, checker } from '../helpers/engine_env.mjs';
+const { E, D, bumps } = loadEngine();
+const { check, done } = checker('修复与改动验证');
 
-let fails = 0;
-function check(name, cond, extra) {
-  console.log(`  ${cond ? 'PASS' : 'FAIL'}  ${name}${extra !== undefined ? '  (' + extra + ')' : ''}`);
-  if (!cond) fails++;
-}
 
 /* ---------- Bug1：汶斌被动「秒之」应有三成机率双倍 ---------- */
 {
@@ -60,7 +44,7 @@ function check(name, cond, extra) {
 
 /* ---------- Bug3：治疗应计入存档累计（成就"搬水者"） ---------- */
 {
-  bumps = [];
+  bumps.length = 0;
   const b = new E.Battle({ mode: 'free', playerChar: 'touge', enemies: ['mob'], diff: 'normal' });
   const p = b.player;
   p.hp = 4;
@@ -68,7 +52,7 @@ function check(name, cond, extra) {
   const heals = bumps.filter(x => x[0] === 'heals').reduce((a, x) => a + x[1], 0);
   console.log(`\n[修复3] 玩家回复3血后，存档累计 heals += ${heals}`);
   check('治疗计入存档累计', heals === 3, heals);
-  bumps = [];
+  bumps.length = 0;
   const foe = b.units.find(u => u.side === 'enemy');
   foe.hp = 2;
   b.heal(foe, 5, "敌疗，");
@@ -109,5 +93,4 @@ function check(name, cond, extra) {
   check('呱宇技能描述与实现一致', /行动点/.test(C.guayu.skill.desc));
 }
 
-console.log(fails === 0 ? '\n=== 修复与改动验证 ALL PASS ===' : `\n!! ${fails} 项失败`);
-process.exit(fails ? 1 : 0);
+done();

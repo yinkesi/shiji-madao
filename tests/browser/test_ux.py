@@ -1,22 +1,12 @@
 # -*- coding: utf-8 -*-
 """浏览器验证：本轮体验改进（撤销 / 点敌看图鉴 / 敌方行动点 / 自动猜拳 / 动效 / 存读档 / 续战）"""
 import sys, time, json
-sys.stdout.reconfigure(encoding='utf-8')
 from playwright.sync_api import sync_playwright
-
-URL = "file:///D:/code/shiji-madao/index.html"
-errors = []
-
-def log(m): print(m, flush=True)
+from pw_common import URL_SRC, SHOT, errors, log, open_page, finish
 
 with sync_playwright() as p:
     b = p.chromium.launch(channel="msedge", headless=True)
-    pg = b.new_page(viewport={"width": 1280, "height": 900})
-    pg.on("pageerror", lambda e: errors.append(str(e)[:200]))
-    pg.on("console", lambda m: errors.append("console:" + m.text[:160]) if m.type == "error" else None)
-    pg.goto(URL); pg.wait_for_load_state("networkidle")
-    pg.evaluate("window.SJI_DEBUG.fast = true")
-    pg.evaluate("window.SJI_SAVE.setSetting('speed', 3)")
+    pg = open_page(b, URL_SRC, fast=True)
 
     def pump(seconds, stop=None, kill=False, end_turn=False):
         end = time.time() + seconds
@@ -165,7 +155,7 @@ with sync_playwright() as p:
         # assert not d["needs"], f"{vw}x{vh} 战斗界面仍需滚动"
         log(f"[6.5] 一屏化 {vw}x{vh}：无需滚动，画布高 {d['canvasH']}px — OK")
     pg.set_viewport_size({"width": 1280, "height": 900})
-    pg.screenshot(path="D:/code/shiji-madao/testshots/17-noscroll-battle.png")
+    pg.screenshot(path=SHOT + "/17-noscroll-battle.png")
 
     # ---- 点敌军看图鉴 ----
     # 先确保处于玩家阶段且无弹层（否则点击会被遮罩拦下）
@@ -249,9 +239,7 @@ with sync_playwright() as p:
     body = pg.text_content("#result-body")
     has_ach_block = "本场新解锁" in body
     log(f"[10] 结算页成就清单：{'有' if has_ach_block else '无（本场无新成就时属正常）'}")
-    pg.screenshot(path="D:/code/shiji-madao/testshots/16-result-ach.png")
+    pg.screenshot(path=SHOT + "/16-result-ach.png")
     b.close()
 
-if errors:
-    print("!! 错误:", errors[:5]); sys.exit(1)
-print("=== 体验改进验证 ALL PASS ===")
+finish("体验改进验证")

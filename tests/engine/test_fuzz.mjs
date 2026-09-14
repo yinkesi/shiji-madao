@@ -1,43 +1,9 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-global.window = {};
-window.SJI_SAVE = { bump: () => {}, data: { totals: {} }, settings: {} };
-window.SJI_UI = { onLog: () => {}, onState: () => {}, snap: () => {}, fxFloat: () => {}, fxHit: () => {}, fxStatus: () => {},
-  rpsRound: async () => ({ res: 'win', ap: 4 }), playerPhase: async () => {}, pickBoon: async () => null, onBattleEnd: () => {}, banner: async () => {} };
-window.SJI_AUDIO = new Proxy({}, { get: () => () => {} });
-window.SJI = { settings: { speed: 3 } };
-require('./js/config.js');
-require('./js/data.js');
-const D = window.SJI_DATA;
-require('./js/engine.js');
-const E = window.SJI_ENGINE;
+import { loadEngine } from '../helpers/engine_env.mjs';
+import { bots } from '../helpers/bot.mjs';
+const { E, D, ui } = loadEngine();
+const { chaosBot } = bots(E);
+ui.playerPhase = chaosBot;
 
-/* 随机化机器人：乱走乱打乱用技，尽量制造极端状态 */
-async function chaosBot(b) {
-  const p = b.player;
-  let guard = 0;
-  while (p.apNow > 0 && guard++ < 16 && !b.over && p.alive && p.offField <= 0) {
-    const foes = b.opponentsOf(p);
-    if (!foes.length) break;
-    const t = foes[Math.floor(Math.random() * foes.length)];
-    const roll = Math.random();
-    if (roll < 0.3 && b.skillCd(p, 0) <= 0) { const k = b.aiPickSkill(p); if (k) { await b.doSkill(p, k.idx, k.target); continue; } }
-    if (roll < 0.4 && !p.hasKnife) { await b.doBuyKnife(p); continue; }
-    if (roll < 0.5 && !p.hasHorse) { await b.doBuyHorse(p); continue; }
-    if (roll < 0.55 && p.hp >= 3) { await b.doSacrifice(p); continue; }
-    const adj = foes.filter(f => E.adj(p, f));
-    if (roll < 0.75 && p.hasKnife && p.st.seal <= 0 && adj.length) { await b.doKnife(p, adj[0]); continue; }
-    if (roll < 0.8 && p.hasHorse && E.isWall(p.r, p.c)) {
-      const foe2 = foes.find(f => E.isWall(f.r, f.c) && E.manh(p, f) <= 3 + (p.boons.horseRange || 0));
-      if (foe2) { await b.doHorse(p, foe2); continue; }
-    }
-    const reach = b._reachable(p, b.moveRange(p));
-    const keys = reach.keys.filter(k => { const [r, c] = k.split(',').map(Number); return !b.unitAt(r, c) && !(r === p.r && c === p.c); });
-    if (keys.length) { const [r, c] = keys[Math.floor(Math.random() * keys.length)].split(',').map(Number); await b.doMove(p, r, c); continue; }
-    break;
-  }
-}
-window.SJI_UI.playerPhase = chaosBot;
 
 const chars = D.PLAYABLE;
 const diffs = ['easy', 'normal', 'hard', 'extreme'];
@@ -80,7 +46,7 @@ for (let i = 0; i < N; i++) {
   }
   const rounds = [];
   let turn = 0;
-  window.SJI_UI.playerPhase = async (bb) => {
+  ui.playerPhase = async (bb) => {
     const alive = bb.living(bb.player.side);
     const u = alive[Math.floor(Math.random() * alive.length)];
     if (u) { bb.player = u; }   // 乱点任何己方单位

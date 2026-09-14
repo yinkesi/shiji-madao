@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
 """验证：AI 进攻性设置项（持久化/显示/实际生效）"""
 import sys, time
-sys.stdout.reconfigure(encoding='utf-8')
 from playwright.sync_api import sync_playwright
+from pw_common import URL_SRC, errors, open_page, finish
 
-URL = "file:///D:/code/shiji-madao/index.html"
-errors = []
 with sync_playwright() as p:
     b = p.chromium.launch(channel="msedge", headless=True)
-    pg = b.new_page(viewport={"width":1280,"height":900})
-    pg.on("pageerror", lambda e: errors.append(str(e)[:200]))
-    pg.on("console", lambda m: errors.append("console:"+m.text[:200]) if m.type=="error" else None)
-    pg.goto(URL); pg.wait_for_load_state("networkidle")
-    pg.evaluate("window.SJI_DEBUG.fast = true; window.SJI_DEBUG.skipScenes = true")
-    pg.evaluate("window.SJI_SAVE.setSetting('speed', 3)")
+    pg = open_page(b, URL_SRC, fast=True, skip_scenes=True)
 
     # 1) 设置页有四档，可切换并写入
     pg.click("#btn-settings"); pg.wait_for_selector("#screen-settings.on")
@@ -69,6 +62,4 @@ with sync_playwright() as p:
     print(f"[4] 切档后新战斗生效：aiAggr={aggr2}，档位参数={prof}")
     b.close()
 
-if errors:
-    print("!! 错误:", errors[:4]); sys.exit(1)
-print("=== AI 进攻性设置验证 ALL PASS ===")
+finish("AI 进攻性设置验证")

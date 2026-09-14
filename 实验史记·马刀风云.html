@@ -3536,7 +3536,7 @@ window.SJI_UI = (function () {
     // 顶部信息
     $("#round-no").textContent = "第 " + battle.round + " 回合" + (battle.mode === "survival" ? " · 第" + battle.survivalWaveNo + "波" : "");
     if ($("#ai-label")) {
-      const nm = { passive: "消极", measured: "守成", active: "主动", frenzy: "狂攻" };
+      const nm = (window.SJI_CONFIG && window.SJI_CONFIG.AI_LABEL) || {};   // 单一来源：config.js
       const dn = { easy: "简单", normal: "普通", hard: "困难", extreme: "极难" };
       const diffTxt = dn[battle.diff] || "普通";
       const aiTxt = (battle.diff === "extreme") ? "狂攻(强制)" : (nm[battle.aiAggr] || "主动");

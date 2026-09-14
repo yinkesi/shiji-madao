@@ -1,15 +1,6 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-global.window = {};
-window.SJI_SAVE = { bump: () => {}, data: { totals: {} }, settings: {} };
-window.SJI_UI = { onLog: () => {}, onState: () => {}, snap: () => {}, fxFloat: () => {}, fxHit: () => {}, fxStatus: () => {},
-  rpsRound: async () => ({ res: 'win', ap: 3 }), playerPhase: async () => {}, pickBoon: async () => null, onBattleEnd: () => {}, banner: async () => {} };
-window.SJI_AUDIO = new Proxy({}, { get: () => () => {} });
-window.SJI = { settings: { speed: 3 } };
-require('./js/data.js');
-const D = window.SJI_DATA;
-require('./js/engine.js');
-const E = window.SJI_ENGINE;
+import { loadEngine, checker } from '../helpers/engine_env.mjs';
+const { E, D } = loadEngine({ ui: { rpsRound: async () => ({ res: 'win', ap: 3 }) } });
+const { check, done } = checker('鲁豪数值');
 
 const ch = D.CHARACTERS.luhao;
 console.log('鲁豪属性：血', ch.hp, '| 被动', ch.passive.name, '| 技能', ch.skill.name, '(' + ch.skill.desc.slice(0, 18) + '…)');
@@ -37,14 +28,12 @@ const n1 = b2.calcDamage(a2, d2t, 1, { type: 'knife' });
 const n3 = b2.calcDamage(a2, d2t, 3, { type: 'horse' });
 console.log(`  头哥  刀击1 -> ${n1} | 马踢3 -> ${n3}（基准，未翻倍）`);
 
-let fail = 0;
-function check(n, c) { console.log(`  ${c ? 'PASS' : 'FAIL'}  ${n}`); if (!c) fail = 1; }
 console.log('\n断言：');
 check('血量 20', ch.hp === 20);
 check('刀击翻倍 (1->2)', d1 === 2);
-check('马踢翻倍 (3->6)', d3 === 6);
-check('技能翻倍 (2->4)', d2 === 4);
+check('马踢不翻倍（被动仅限刀击）', d3 === 3);
+check('技能不翻倍（被动仅限刀击）', d2 === 2);
 check('技能唯一且为锦绣昼行', ch.skill && ch.skill.name === '锦绣昼行' && !ch.skills);
 check('基准角色未翻倍', n1 === 1 && n3 === 3);
 check('与血祭叠加（翻倍后再翻倍=4）', b.calcDamage(atk, def, 1, { type: 'knife' }) === 2);
-process.exit(fail);
+done();

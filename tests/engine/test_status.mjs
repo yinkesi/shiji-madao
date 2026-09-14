@@ -1,17 +1,6 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-global.window = {};
-window.SJI_SAVE = { bump: () => {}, data: { totals: {} }, settings: {} };
-window.SJI_UI = { onLog: () => {}, onState: () => {}, snap: () => {}, fxFloat: () => {}, fxHit: () => {}, fxStatus: () => {},
-  rpsRound: async () => ({ res: 'win', ap: 4 }), playerPhase: async (bb) => { bb.player.apNow = 0; },
-  pickBoon: async () => null, onBattleEnd: () => {}, banner: async () => {} };
-window.SJI_AUDIO = new Proxy({}, { get: () => () => {} });
-window.SJI = { settings: { speed: 3 } };
-require('./js/config.js');
-require('./js/data.js');
-const D = window.SJI_DATA;
-require('./js/engine.js');
-const E = window.SJI_ENGINE;
+import { loadEngine, checker } from '../helpers/engine_env.mjs';
+const { E, D } = loadEngine({ ui: { playerPhase: async (bb) => { bb.player.apNow = 0; } } });
+const { check, done } = checker('状态计时回归');
 
 /* 真跑引擎若干个回合（玩家阶段立刻交出行动），观察状态是否按回合解除 */
 async function runRounds(b, n) {
@@ -26,8 +15,6 @@ function mk(stageId, enemies) {
     enemies: enemies || st.enemies, allies: st.allies || [], rule: st.rule, diff: 'normal' });
 }
 
-let fails=0;
-const check=(n,c)=>{console.log(`  ${c?'PASS':'FAIL'}  ${n}`); if(!c) fails++;};
 console.log('=== ① 崇国「评职称」沉默：应在玩家自己的下个回合结束时解除 ===');
 {
   const b = mk('s14');
@@ -84,6 +71,4 @@ console.log('\n=== ⑤ 沉默对 AI（友军）同样按回合解除 ===');
   await b.aiAct(wb);
   check('友军沉默在其一个回合后解除', wb.st.silence === 0);
 }
-if (fails === 0) { console.log(''); console.log('=== 状态计时回归 ALL PASS ==='); }
-else { console.log(''); console.log('!! ' + fails + ' 项失败'); }
-process.exit(fails ? 1 : 0);
+done();

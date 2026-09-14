@@ -1,0 +1,12 @@
+{
+  "name": "shiji-madao",
+  "private": true,
+  "description": "《实验史记·马刀风云》回合制战棋 —— 构建/测试入口（实际逻辑在 build.py 与 run_tests.py）",
+  "scripts": {
+    "test": "python run_tests.py",
+    "test:stat": "python run_tests.py --stat",
+    "test:full": "python run_tests.py --full",
+    "test:slow": "python run_tests.py --full --slow",
+    "build": "python build.py"
+  }
+}

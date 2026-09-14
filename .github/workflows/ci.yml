@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  engine-tests:
+    name: 引擎快速层（Node）
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: run_tests.py 快速层
+        run: python run_tests.py
+
+  bundle-freshness:
+    name: 单文件包新鲜度
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 重建单文件包并校验与源码一致
+        run: |
+          python build.py
+          if ! git diff --exit-code -- '实验史记·马刀风云.html'; then
+            echo "::error::单文件包已过期：js/css 有改动但未重新运行 python build.py"
+            exit 1
+          fi

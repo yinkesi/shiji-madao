@@ -24,10 +24,16 @@ GitHub API：`python push_via_api.py`（把工作区中已跟踪的文件按 blo
 - **模块边界**：`data.js`（内容数据）与 `scenes.js`（剧本台词）不含逻辑；
   `engine.js` 不引用 DOM（可在 Node 中以 mock UI 独立测试）；
   `ui.js` 是引擎与 DOM 之间唯一的桥（引擎通过 `window.SJI_UI` 钩子回调界面）。
-- **一键测试**：`python run_tests.py`（引擎层 7 项，约 5 分钟）；`--full` 加浏览器层 8 项。
+- **一键测试**：`python run_tests.py`（快速层 9 项，约 1 分钟，CI 同款）；`--stat` 加统计层 3 项；
+  `--full` 加浏览器层 7 项；`--full --slow` 再加压测与十六关通关 2 项。
 - **后续重构方向**（有意保留的现状）：`ui.js` 仍为渲染+控制器合一（~1500 行），
   建议后续拆出 `render.js`（Canvas 绘制）与 `dialogue.js`（弹层队列）；特效系统已具备
   独立模块化条件（状态与绘制已内聚）。
+- **已知技术债**：①`doSkill`/`calcDamage` 的角色能力分支仍硬编码在 `engine.js`
+  （约 40 处 `charId ===` 判断），`data.js` 里部分能力字段引擎尚未读取（改了不生效），
+  应按角色逐个迁移并以 balance/duel 胜率基线验证；②引擎回调 `window.SJI_UI`/`SJI_AUDIO`
+  时 guard 风格不一，宜收敛为带 no-op 默认值的统一 hooks；③`_playerPhaseActive` 等
+  引擎私有字段被 ui.js 与浏览器测试直接读写，宜改为公共 API。
 
 ## 目录结构
 
@@ -40,27 +46,43 @@ GitHub API：`python push_via_api.py`（把工作区中已跟踪的文件按 blo
 | `js/audio.js` | WebAudio 程序合成音效与五声音阶拨弦背景乐（零外部资源） |
 | `js/save.js` | localStorage 存档（进度/成就/纪录/设置） |
 | `css/style.css` | 宣纸 · 墨 · 朱砂视觉主题 |
-| `实验史记·马刀风云.html` | 单文件打包版（构建产物） |
+| `实验史记·马刀风云.html` | 单文件打包版（构建产物，入库；CI 校验新鲜度） |
+| `tests/engine/` + `tests/helpers/` | Node 直跑的引擎层测试与机器人（共享 mock：`engine_env.mjs`、`bot.mjs`） |
+| `tests/browser/` | Playwright + Edge 的浏览器层回归（共享基座 `pw_common.py`） |
+| `build.py` / `run_tests.py` | 打包与一键测试入口（`npm run build` / `npm test`） |
 
 ## 开发与测试
 
 ```bash
 python build.py       # 打包单文件（确定性 LF 输出 + 自检）
-node stress.mjs       # 无头压力测试：16 关 + 全角色 + 生存（需 Node）
-node winrate4.mjs     # 关卡难度模拟（kiting bot 胜率）
-node test_balance.mjs # 角色强弱（中立基准，可传角色列表）
-node test_bugfix.mjs  # 断言级修复验证
-node test_review.mjs  # 体检修复断言（可怡目标 / 最低血记录）
-node test_aiaggr.mjs  # AI 四档行为差异
-python test_e2e.py    # Playwright 端到端（channel=msedge，file:// 加载）
-python test_bundle.py # 对打包单文件跑同一套 E2E
-python test_gauntlet.py  # 16 关连续通关 + 剧情演出
-python test_boon.py      # 生存增益弹窗抗覆盖（静置 7 秒）
-python test_wave_story.py # 剧情多波次依次登场
+npm test              # = python run_tests.py 快速层（9 项，约 1 分钟，CI 同款）
+npm run test:stat     # + 统计层：balance / duel / aiaggr 胜率与行为模拟
+npm run test:full     # + 浏览器层：Playwright + Edge 真实 UI 回归
+npm run test:slow     # + 重型层：stress 全量压测、十六关连续通关
+
+# 引擎层单跑（Node 直跑，无浏览器；mock 共享自 tests/helpers/）：
+node tests/engine/test_features.mjs   # 新功能专项
+node tests/engine/test_bugfix.mjs     # 断言级修复验证
+node tests/engine/test_review.mjs     # 体检修复断言（可怡目标 / 最低血记录）
+node tests/engine/test_fuzz.mjs 120   # 模糊测试（随机对局查崩溃，可传场数）
+node tests/engine/stress.mjs          # 无头压力测试：16 关 + 全角色 + 生存
+node tests/engine/winrate4.mjs        # 关卡难度模拟（kiting bot 胜率）
+node tests/engine/test_balance.mjs    # 角色强弱（中立基准，可传角色列表）
+node tests/engine/test_aiaggr.mjs     # AI 四档行为差异
+
+# 浏览器层单跑（Playwright，channel=msedge，file:// 加载；共享基座 pw_common.py）：
+python tests/browser/test_e2e.py         # 端到端：源码版 + 打包版各跑一遍
+python tests/browser/test_boon.py        # 生存增益弹窗抗覆盖（静置 7 秒）
+python tests/browser/test_wave_story.py  # 剧情多波次依次登场
+python tests/browser/test_gauntlet.py    # 16 关连续通关 + 剧情演出
+
 # 报告：md2docx.cjs 生成 docx，export_pdf.py 经 Word COM 导出 PDF
 NODE_PATH=$(npm root -g) node md2docx.cjs 技术报告.md 实验史记·马刀风云-技术报告.docx
 python export_pdf.py 实验史记·马刀风云-技术报告.docx 技术报告.pdf
 ```
+
+打包（index.html + css + js → 单文件）：`python build.py`。产物入库供"双击即玩"，
+CI 的 bundle-freshness 任务会在改了 js/css 却没重建时直接红。
 
 打包（index.html + css + js → 单文件）：
 
@@ -259,7 +281,7 @@ DOCX 由 `md2docx.cjs`（自写的 Markdown→DOCX 转换器，处理表格/代�
 | frenzy 狂攻 | 1.00 | 0.75 | 0 | 0 | 残血优先 | 1.0 |
 
 角色自身的 `aggr` 会在此基础上微调（`prof.skill + (aggr-0.6)*0.25`）；友军固定使用"主动"档。
-行为实测见 `test_aiaggr.mjs` / `test_retreat.mjs`。
+行为实测见 `tests/engine/test_aiaggr.mjs`。
 
 ## 剧情系统
 
