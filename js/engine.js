@@ -490,6 +490,7 @@ window.SJI_ENGINE = (function () {
       if (u.st.silence > 0) { this.pushLog("「" + u.ch.hao + "」被沉默，技不能出。"); return false; }
       const k = sk.kind;
       const dyad = !!this.rule && this.rule.id === "dyad";
+      const V = (k, d) => (sk[k] !== undefined ? sk[k] : d);
       u.apNow -= (sk.ap || 1);
       this.lockUndo();
       this._startCd(u, idx);
@@ -558,28 +559,28 @@ window.SJI_ENGINE = (function () {
             const spot = DIRS.map(([dr, dc]) => [target.r + dr, target.c + dc])
               .find(([r, c]) => this.passable(r, c));
             if (spot) { u.r = spot[0]; u.c = spot[1]; window.SJI_UI.snap(u); }
-            target.st.disarm = Math.max(target.st.disarm, 1);
+            target.st.disarm = Math.max(target.st.disarm, V("disarm", 1));
             this.pushLog("破门而入！「" + target.ch.hao + "」之刀被没收一回合。");
-            await this.dealDamage(u, target, 1, { type: "skill", pierce: true });
+            await this.dealDamage(u, target, V("dmg", 1), { type: "skill", pierce: true });
             break;
           }
           case "hanxiao":
             if (this._passiveImmuneStun(target)) { this.pushLog("不为所动！"); break; }
             if (target.offField > 0) { this.pushLog("「" + target.ch.hao + "」已在家中。"); break; }
             target.homeR = target.r; target.homeC = target.c;
-            target.offField = 1;
+            target.offField = V("offField", 1);
             this.pushLog("「" + target.ch.hao + "」被遣返回家，跳过下个回合后归位！");
             window.SJI_UI.fxFloat(target, "遣返回家！", "#ffb14e");
             break;
-          case "keai": this.heal(target, 2, "得一糖，"); break;
-          case "shengxiang": await this.dealDamage(u, target, 2, { type: "skill", dyad }); break;
-          case "qiyue": await this.dealDamage(u, target, 2, { type: "skill", dyad }); break;
-          case "lianqi": await this.dealDamage(u, target, 2, { type: "skill", dyad }); break;
+          case "keai": this.heal(target, V("heal", 2), "得一糖，"); break;
+          case "shengxiang": await this.dealDamage(u, target, V("dmg", 2), { type: "skill", dyad }); break;
+          case "qiyue": await this.dealDamage(u, target, V("dmg", 2), { type: "skill", dyad }); break;
+          case "lianqi": await this.dealDamage(u, target, V("dmg", 2), { type: "skill", dyad }); break;
           case "ziye":
-            await this.dealDamage(u, target, 1, { type: "skill", dyad });
-            if (target.alive) { target.st.apMod -= 1; this.pushLog("谗言入耳！「" + target.ch.hao + "」下回合行动-1。"); }
+            await this.dealDamage(u, target, V("dmg", 1), { type: "skill", dyad });
+            if (target.alive) { target.st.apMod -= V("apCut", 1); this.pushLog("谗言入耳！「" + target.ch.hao + "」下回合行动-1。"); }
             break;
-          case "tree": await this.dealDamage(u, target, 1, { type: "skill", dyad }); break;
+          case "tree": await this.dealDamage(u, target, V("dmg", 1), { type: "skill", dyad }); break;
           default: await this.dealDamage(u, target, 1, { type: "skill", dyad });
         }
         return true;
@@ -595,9 +596,10 @@ window.SJI_ENGINE = (function () {
         return true;
       }
       if (k === "adj") {
+        const adjDmg = V("dmg", 2), poisonR = V("poison", 2);
         for (const f of foes.filter(f => cheb(u, f) <= 1).slice()) {
-          await this.dealDamage(u, f, 2, { type: "skill", dyad });
-          if (f.alive && u.charId === "touge") { f.st.poison = Math.max(f.st.poison, 2); this.pushLog("「" + f.ch.hao + "」中溴毒！"); }
+          await this.dealDamage(u, f, adjDmg, { type: "skill", dyad });
+          if (f.alive && u.charId === "touge") { f.st.poison = Math.max(f.st.poison, poisonR); this.pushLog("「" + f.ch.hao + "」中溴毒！"); }
         }
         return true;
       }
