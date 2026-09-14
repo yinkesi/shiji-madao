@@ -2111,7 +2111,7 @@ window.SJI_ENGINE = (function () {
         if (def.charId === "hanxiao") dmg -= 1;
         if (def.charId === "zichen" && adj(att, def)) dmg -= 1;
         if (def.charId === "yiran" && !def.dampUsed) { dmg -= 1; def.dampUsed = true; }
-        if (def.st.shield > 0) { const ab = Math.min(def.st.shield, dmg); def.st.shield -= ab; dmg -= ab; }
+        // 护盾吸收已移至 dealDamage（在最小伤害钳制之后）
       }
       return Math.max(opts.min0 ? 0 : 1, dmg);
     }
@@ -2142,6 +2142,12 @@ window.SJI_ENGINE = (function () {
         }
       }
       let dmg = this.calcDamage(att, def, base, { ...opts, pierce });
+      // 护盾吸收（最小伤害钳制后，可完全格挡）
+      if (!opts.pierce && def.st.shield > 0) {
+        const ab = Math.min(def.st.shield, dmg);
+        def.st.shield -= ab;
+        dmg -= ab;
+      }
       def.hp -= dmg;
       this._trackMinHp(def);
       if (att.side === "player") { this.roundDealt += dmg; att.roundDealt = (att.roundDealt || 0) + dmg; }
