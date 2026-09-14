@@ -113,13 +113,6 @@ window.SJI_ENGINE = (function () {
 
       this.units = [p, ...allies, ...enemies];
 
-      // 双人同屏对战：二号位入场（对角）
-      if (this.mode === "versus") {
-        const p2 = makeUnit(this.cfg.p2Char, "p2", 0);
-        this._place(p2, this.passable(0, 3) ? [0, 3] : this._randomFree());
-        this.p2Unit = p2;
-        this.units.push(p2);
-      }
       this.player = p;
       if (p.boons.shield > 0) p.st.shield += p.boons.shield;
       this._trackMinHp(p);
@@ -161,9 +154,6 @@ window.SJI_ENGINE = (function () {
     }
     living(side) { return this.units.filter(u => u.alive && u.offField <= 0 && (!side || u.side === side)); }
     opponentsOf(u) {
-      if (this.mode === "versus") {
-        return this.units.filter(x => x.alive && x.offField <= 0 && x !== u && x.side !== u.side);
-      }
       const hostile = u.side === "enemy" ? ["player", "ally"] : ["enemy"];
       return this.units.filter(x => x.alive && x.offField <= 0 && hostile.includes(x.side));
     }
@@ -260,14 +250,12 @@ window.SJI_ENGINE = (function () {
         def.hp = 0; def.alive = false;
         this.pushLog("「" + def.ch.hao + "」倒下了！");
         window.SJI_AUDIO.die();
-        if (def.side === "enemy" || (this.mode === "versus" && def.side === "p2")) {
-          if (def.side === "enemy") this.stats.kills++;
-          const humanKiller = att && (att.side === "player" || (this.mode === "versus" && att.side === "p2"));
-          if (humanKiller && att !== def) {
-            const beneficiary = (att.side === "player") ? this.player : att;
-            const baseHeal = (this.diff === "extreme" && this.mode !== "versus") ? 0 : 2;
-            const heal = baseHeal + (att.boons.killHeal || 0);
-            if (heal > 0) this.heal(beneficiary, heal, "大胜而归，");
+        if (def.side === "enemy") {
+          this.stats.kills++;
+          if (att && att.side === "player") {
+            const dh = CFG.DIFFICULTY[this.diff] || CFG.DIFFICULTY.normal;
+            const heal = dh.killHeal + (att.boons.killHeal || 0);
+            if (heal > 0) this.heal(this.player, heal, "大胜而归，");
           }
           if (def.side === "enemy") this._checkTriggers("enemyDown", def.charId);
         }
@@ -889,10 +877,6 @@ window.SJI_ENGINE = (function () {
       return Math.max(0, Math.min(CFG.RULES.AP_CAP, ap));
     }
 
-    humanSides() {
-      return this.mode === "versus" ? ["player", "p2"] : ["player"];
-    }
-
     enemyBaseAP() {
       const d = CFG.DIFFICULTY[this.diff] || CFG.DIFFICULTY.normal;
       const big = this.living("enemy").length >= 3;
@@ -928,39 +912,7 @@ window.SJI_ENGINE = (function () {
       return best;
     }
 
-    /* 双人同屏：一个回合 = 双方各猜拳 → 依次行动 */
-    async runVersusRound() {
-      const ui = window.SJI_UI;
-      const humans = this.humanSides().map(side => this.units.find(u => u.side === side)).filter(Boolean);
-      if (this.round > CFG.RULES.MAX_ROUND) {
-        const r1 = this.humans[0] ? this.humans[0].hp / this.humans[0].maxhp : 0;
-        const r2 = this.humans[1] ? this.humans[1].hp / this.humans[1].maxhp : 0;
-        this.winner = r1 >= r2 ? "p1" : "p2";
-        this.finish("win");
-        return;
-      }
-      // 双方各猜一次拳
-      const a1 = await ui.rpsDuel(this, "p1");
-      const a2 = await ui.rpsDuel(this, "p2");
-      if (this.over) return;
-      for (const u of humans) {
-        u.apNow = this.calcAP(u, u.side === "p2" ? a2.ap : a1.ap);
-        if (u._undo) u._undo.length = 0;
-      }
-      // 双方轮流行动（各出一次拳，交替行动）
-      for (const u of humans) {
-        if (!u.alive || this.over) break;
-        this.player = u;          // HUD/撤销/状态跟随当前行动方
-        if (u.offField > 0) { u.offField--; this._returnHome(u); continue; }
-        if (this._tickStatusStart(u)) { ui.onState(); await sleep(400); continue; }
-        await ui.playerPhase(this, u);
-        this._tickStatusEnd(u);
-      }
-      for (const u of this.units) this._tickStatusEnd(u);
-      ui.onState();
-      await sleep(200);
-      await this._checkBattleEnd();
-    }
+
 
     /* 敌方伤害缩放：以少打多为常态，人多则单体伤害递减，避免围殴瞬杀 */
     enemyDmgScale() {
@@ -980,7 +932,6 @@ window.SJI_ENGINE = (function () {
         if (this.player._undo) this.player._undo.length = 0;
         for (const u of this.units) u._usedFirstStrike = false;
         await this._fireTriggers("roundStart");
-        if (this.mode === "versus") { await this.runVersusRound(); continue; }
         ui.onState();
         if (this.round > CFG.RULES.MAX_ROUND) { this.finish("timeout"); break; }
         // 起义援军
@@ -1138,14 +1089,6 @@ window.SJI_ENGINE = (function () {
 
     async _checkBattleEnd() {
       if (this.over) return;
-      if (this.mode === "versus") {
-        const a = this.living("player").length, b = this.living("p2").length;
-        if (a === 0 || b === 0) {
-          this.winner = a === 0 ? "p2" : "p1";
-          this.finish("win");
-        }
-        return;
-      }
       const foes = this.living("enemy");
       if (!this.player.alive) { this.finish("lose"); return; }
       if (foes.length === 0) {
