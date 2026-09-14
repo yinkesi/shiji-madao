@@ -33,10 +33,7 @@ body {
   overflow-x: hidden;
 }
 #app { max-width: 1180px; margin: 0 auto; padding: 10px 14px 40px; }
-#app:has(#screen-battle.on) {
-  height: 100vh; padding: 8px 14px 8px; display: flex; flex-direction: column;
-}
-#screen-battle.on { flex: 1 1 auto; min-height: 0; height: auto; }
+
 
 .screen { display: none; animation: fadeIn .35s ease; }
 .screen.on { display: block; }
@@ -182,8 +179,8 @@ body {
 #battle-wrap { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
 #battle-left { flex: 1 1 620px; min-width: 320px; }
 #battle-right { flex: 1 1 300px; min-width: 280px; display: flex; flex-direction: column; gap: 10px; }
-#canvas-outer { position: relative; flex: 1 1 auto; min-height: 0; display: flex; align-items: flex-start; justify-content: center; }
-#battle-canvas { height: auto; max-height: 100%; width: auto; max-width: 100%; display: block; border-radius: 10px; border: 1px solid #b9a984; box-shadow: 0 4px 18px rgba(80,60,30,.2); cursor: pointer; }
+#canvas-outer { position: relative; }
+#battle-canvas { width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid #b9a984; box-shadow: 0 4px 18px rgba(80,60,30,.2); cursor: pointer; }
 .phase-banner {
   position: absolute; top: 42%; left: 50%; transform: translate(-50%,-50%);
   font-size: 34px; letter-spacing: 10px; color: #fff; padding: 10px 34px;
@@ -230,14 +227,11 @@ body {
 .enemy-row.dead { opacity: .35; text-decoration: line-through; }
 
 /* ---------- 结算 ---------- */
-#screen-battle.on { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-#screen-battle .topbar { margin-bottom: 6px; flex: 0 0 auto; }
-#battle-wrap { flex: 1 1 auto; min-height: 0; display: flex; gap: 12px; align-items: stretch; }
-#battle-left { flex: 1 1 620px; min-width: 320px; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
-#battle-right { flex: 1 1 300px; min-width: 280px; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
-#battle-right .panel { min-height: 0; }
-#battle-right .panel:last-child { flex: 1 1 auto; display: flex; flex-direction: column; }
-#battle-log { flex: 1 1 auto; min-height: 0; }
+#screen-battle.on { display: block; }   /* 自然高度，允许滚动 */
+#battle-wrap { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+#battle-left { flex: 1 1 620px; min-width: 320px; }
+#battle-right { flex: 1 1 300px; min-width: 280px; display: flex; flex-direction: column; gap: 8px; }
+#battle-log { height: 308px; overflow-y: auto; font-size: 14px; line-height: 1.75; padding: 10px 14px; }
 #screen-result { text-align: center; padding-top: 4vh; position: relative; overflow: hidden; }
 #result-body { position: relative; z-index: 1; }
 .result-seal {
